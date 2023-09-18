@@ -1,0 +1,10 @@
+key;jmeno;prijmeni;vek;deti;rodice;kralici;prumer
+double;string;string;int;int;int;double;double
+6
+1;a;xxx;10;2;1;2.4;-0.5
+2;b;yyy;56;3;0;123.8;-1.2
+3;c;zzz;13;2;3;3.14;-2.2
+4;d;xxx;23;1;6;1.41;3.1
+5;a;xxx;76;3;10;8.833;5.2
+6;b;zzz;99;3;22;2.44443;9.9
+SELECT prijmeni, SUM(jmeno), MIN(key), MAX(key), MIN(vek), MAX(vek), SUM(deti), SUM(rodice), MIN(prumer), MAX(prumer) GROUP_BY prijmeni
