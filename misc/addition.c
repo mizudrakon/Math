@@ -38,36 +38,16 @@ int mark(char* num){
 int main(int argc, char** argv)
 {
     int q_num = argc-1;
-    char num[2][100];
-#ifdef STAT    
-    char num[2][100];
-    for (int i = 0; i < 2; i++)
+    //char num[2][100];
+    char** num;
+    if (q_num < 2)
     {
-        for (int j = 0; j < 100; j++)
-        {
-            num[i][j] = '0';
-            printf("%c",num[i][j]);   
-        }
-        putchar('\n');
+        num = (char**) malloc((2-q_num)*sizeof(char*));
     }
-#endif
-#ifdef DYN
-    //char** num = (char**)malloc(2*sizeof(char*));
-    for (char** p_num = num; p_num < num+2; p_num++)
-    {
-        //*p_num = (char*)malloc(100*sizeof(char));
-
-        for (char* n = *p_num; n <= *p_num+100; n++)
-        {
-            *n = '0';
-            printf("%c",*n);   
-        }
-        putchar('\n');
-    }
-#endif
     while (q_num < 2)
     {
         printf("please provide a number: ");
+        *(num+q_num) = (char*) malloc(100*sizeof(char));
         read(*(num+q_num));
         print_num(*(num+q_num));
         q_num++;
@@ -84,7 +64,7 @@ int main(int argc, char** argv)
         printf("one arg provided\n");
         a = *(argv+1);
         mark(a);
-        b = *num;
+        b = *(num+1);
     }
     else {
         printf("two or more args provided\n");
