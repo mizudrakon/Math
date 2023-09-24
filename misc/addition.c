@@ -4,21 +4,35 @@
 
 //reads a number as a field from input
 //we work with strings of 100 characters
-int read(char* num, FILE* f)
+char base(int b)
+{
+    if (b <= 9){
+        return b + '0';
+    }
+    if (b <= 26){
+        return b + 'a';
+    }
+    return '$';
+}
+
+int read(char* num, int base, FILE* f)
 {
     int c;
+    //we need to allow only numbers < base
     while ((c = getc(f)) < '0' || c > '9')//ignores white spaces in front
     {
-        if (c == 'q') return 1;
+        if (c == 'q') return 0;
     }
+    int len = 1;
     char* num_it = num;
     *num_it++ = c;
     while ((c = getc(f)) >= '0' && c <= '9')
     {
         *num_it++ = c;
+        len++;
     }
     if (num_it < num+100) *num_it = '$';//marks the end with $
-    return 0;
+    return len;
 }
 
 void print_num(char* num, FILE* f)//prints a number string to chosen output
@@ -40,6 +54,11 @@ int mark(char* num){
 
 int main(int argc, char** argv)
 {
+    for (int i = 90; i <= 97; i++)
+        printf("%c, ",i);
+        putchar('\n');
+
+#ifdef RUN
     int q_num = 0;
     //char num[2][100];
     char** num;
@@ -51,7 +70,7 @@ int main(int argc, char** argv)
     {
         printf("please provide a number: ");
         *(num+q_num) = (char*) malloc(100*sizeof(char));
-        read(*(num+q_num),stdin);
+        read(*(num+q_num),10,stdin);
         print_num(*(num+q_num),stdout);
         q_num++;
     }
@@ -86,5 +105,5 @@ int main(int argc, char** argv)
     }
     free((void*) num);
     //printf("freed num\n");
-    
+#endif
 }
