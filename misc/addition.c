@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 //#include "long_number.h"
-//#define DYN 
-//reads the number as a field - ok, this should probably be a seperate thing - read, operations...
+
+//reads a number as a field from input
+//we work with strings of 100 characters
 int read(char* num, FILE* f)
 {
     int c;
-    while ((c = getc(f)) < '0' || c > '9')
+    while ((c = getc(f)) < '0' || c > '9')//ignores white spaces in front
     {
         if (c == 'q') return 1;
     }
@@ -16,11 +17,11 @@ int read(char* num, FILE* f)
     {
         *num_it++ = c;
     }
-    if (num_it < num+100) *num_it = '$';
+    if (num_it < num+100) *num_it = '$';//marks the end with $
     return 0;
 }
 
-void print_num(char* num, FILE* f)
+void print_num(char* num, FILE* f)//prints a number string to chosen output
 {
     for (char* num_it = num; num_it < num+100 && *num_it != '$'; num_it++)
     {
@@ -80,13 +81,10 @@ int main(int argc, char** argv)
     print_num(b,stdout);
     
     for (char** n = num; n < num+q_num; n++){
-        free((void*) n);
-        //for (char* p_n = *n; p_n < *n+100; p_n++)
-        //    free((void*)p_n);
-        printf("freed a string\n");
-        //free((void*) n);
+        free((void*) *n);
+        //printf("freed a string\n");
     }
     free((void*) num);
-    printf("freed num\n");
+    //printf("freed num\n");
     
 }
