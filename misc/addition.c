@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define TEST
 //#include "long_number.h"
 
 //reads a number as a field from input
@@ -54,10 +55,12 @@ int mark(char* num){
 
 int main(int argc, char** argv)
 {
+
+#ifdef TEST
     for (int i = 90; i <= 97; i++)
         printf("%c, ",i);
         putchar('\n');
-
+#endif
 #ifdef RUN
     int q_num = 0;
     //char num[2][100];
