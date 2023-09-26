@@ -15,7 +15,6 @@ char base(int b)
     }
     return '$';
 }
-
 int read(char* num, int base, FILE* f)
 {
     int c;
@@ -35,7 +34,6 @@ int read(char* num, int base, FILE* f)
     if (num_it < num+100) *num_it = '$';//marks the end with $
     return len;
 }
-
 void print_num(char* num, FILE* f)//prints a number string to chosen output
 {
     for (char* num_it = num; num_it < num+100 && *num_it != '$'; num_it++)
@@ -45,7 +43,6 @@ void print_num(char* num, FILE* f)//prints a number string to chosen output
     putchar('\n');
 
 }
-
 int mark(char* num){
     char* num_it = num;
     while (*num_it >= '0' && *num_it <= '9') num_it++;
@@ -53,6 +50,7 @@ int mark(char* num){
     return 0;
 }
 #endif
+
 int main(int argc, char** argv)
 {
 
