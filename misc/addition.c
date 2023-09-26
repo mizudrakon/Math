@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define TEST
-//#include "long_number.h"
-
+#define RUN
+#include "str_number.h"
+#ifdef READN
 //reads a number as a field from input
 //we work with strings of 100 characters
 char base(int b)
@@ -52,7 +52,7 @@ int mark(char* num){
     *num_it = '$';
     return 0;
 }
-
+#endif
 int main(int argc, char** argv)
 {
 
