@@ -17,9 +17,13 @@ size_t read_num(char* num, char base, FILE* f);
 
 STR_INT* new_str_int(size_t base, size_t max_len, FILE* f){
     STR_INT* strnum = (STR_INT*) malloc(sizeof(STR_INT));
+    printf("created str_int pointer\n");
     strnum->value = (char*) malloc(max_len*sizeof(char));
+    printf("allocated char* space\n");
     strnum->base = base_conv(base);
+    printf("figured out the base %c\n", strnum->base);
     strnum->length = read_num(strnum->value, strnum->base, f);
+    printf("read the number\n");
 }
 
 STR_INT* convert(){}
@@ -31,13 +35,14 @@ char base_conv(size_t b)
     if (b <= 9){
         return b + '0' - 1; //the largest digit is one lower then the base 
     }
+    if (b == 10) return '9';
     if (b <= 36){
-        return b + 'a' - 1;
+        return b - 10 + 'a' - 1;
     }
     return '$';
 }
 
-bool base_check(char c, char b){
+int base_check(char c, char b){
     if (b >= 'a' && b <= 'z'){
         return (c >= '0' && c <= '9') || (c >= 'a' && c <= b);
     }
@@ -79,7 +84,7 @@ void print_num(char* num, FILE* f)//prints a number string to chosen output
     putchar('\n');
 }
 
-void print_str_int(STR_INT* num, FILE* f = stdout)
+void print_str_int(STR_INT* num, FILE* f)
 {
     print_num(num->value, f);
 }
