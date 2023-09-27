@@ -43,6 +43,11 @@ char base_conv(size_t b)
 }
 
 int base_check(char c, char b){
+    if (c >= 'A' && c <= 'Z')
+    {
+        c = 'a' + (c - 'A');
+    }
+
     if (b >= 'a' && b <= 'z'){
         return (c >= '0' && c <= '9') || (c >= 'a' && c <= b);
     }
@@ -53,10 +58,6 @@ size_t read_num(char* num, char base, FILE* f)
 {
     int c;
     //we need to allow only numbers < base
-    //to lower
-    if (c >= 'A' && c <= 'Z'){
-        c = 'a' + (c - 'A');
-    }
     //ignore white spaces or any possibly separating symbols in front
     c = getc(f);
     while (base_check(c, base) == 0)

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define TEST
+#define RUN
 #include "str_number.h"
 #ifdef READN
 //reads a number as a field from input
