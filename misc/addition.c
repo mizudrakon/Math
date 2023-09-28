@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #define RUN
 #include "str_number.h"
-#ifdef READN
+#ifdef DEFS
 //reads a number as a field from input
 //we work with strings of 100 characters
 char base(int b)
@@ -55,8 +55,8 @@ int main(int argc, char** argv)
 {
 
 #ifdef TEST
-    for (size_t i = 2; i <= 36; i++)
-        printf("%c, ",base_conv(i));
+    for (int i = 0; i <= 120; i++)
+        printf("%c = %d, ",i, base_check(i,'f'));
     putchar('\n');
 #endif
 #ifdef RUN

@@ -17,13 +17,13 @@ size_t read_num(char* num, char base, FILE* f);
 
 STR_INT* new_str_int(size_t base, size_t max_len, FILE* f){
     STR_INT* strnum = (STR_INT*) malloc(sizeof(STR_INT));
-    printf("created str_int pointer\n");
+    //printf("created str_int pointer\n");
     strnum->value = (char*) malloc(max_len*sizeof(char));
-    printf("allocated char* space\n");
+    //printf("allocated char* space\n");
     strnum->base = base_conv(base);
-    printf("figured out the base %c\n", strnum->base);
+    //printf("figured out the base %c\n", strnum->base);
     strnum->length = read_num(strnum->value, strnum->base, f);
-    printf("read the number\n");
+    //printf("read the number\n");
 }
 
 STR_INT* convert(){}
@@ -63,6 +63,7 @@ size_t read_num(char* num, char base, FILE* f)
     while (base_check(c, base) == 0)
     {
         if (c == '$') return 0;
+        //prinf("%c,",c);
         c = getc(f);
     }
     int len = 1;
@@ -71,15 +72,20 @@ size_t read_num(char* num, char base, FILE* f)
     {
         *num_it++ = c;
         len++;
+        //printf("%c,",len);
+        c = getc(f);
     }
-    if (num_it < num+100) *num_it = '$';//marks the end with $
+    if (num_it < num+100) *num_it = '\0';//marks the end with $
     return len;
 }
 
 void print_num(char* num, FILE* f)//prints a number string to chosen output
 {
+    printf("trying to write a number\n");
+    int j = 0;
     for (char* num_it = num; num_it < num+100 && *num_it != '\0'; num_it++)
     {
+        printf("%d,",j++);
         fprintf(f,"%c",*num_it);   
     }
     putchar('\n');
