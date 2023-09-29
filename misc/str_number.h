@@ -14,16 +14,14 @@ typedef struct
 
 char base_conv(size_t b);
 size_t read_num(char* num, char base, FILE* f);
+void print_num(char* num, FILE* f);
 
 STR_INT* new_str_int(size_t base, size_t max_len, FILE* f){
     STR_INT* strnum = (STR_INT*) malloc(sizeof(STR_INT));
-    //printf("created str_int pointer\n");
     strnum->value = (char*) malloc(max_len*sizeof(char));
-    //printf("allocated char* space\n");
     strnum->base = base_conv(base);
-    //printf("figured out the base %c\n", strnum->base);
     strnum->length = read_num(strnum->value, strnum->base, f);
-    //printf("read the number\n");
+    return strnum;
 }
 
 STR_INT* convert(){}
@@ -57,22 +55,20 @@ int base_check(char c, char b){
 size_t read_num(char* num, char base, FILE* f)
 {
     int c;
+    int len = 0;
     //we need to allow only numbers < base
     //ignore white spaces or any possibly separating symbols in front
     c = getc(f);
     while (base_check(c, base) == 0)
     {
         if (c == '$') return 0;
-        //prinf("%c,",c);
         c = getc(f);
     }
-    int len = 1;
     char* num_it = num; //iterator
     while (base_check(c,base))
     {
         *num_it++ = c;
         len++;
-        //printf("%c,",len);
         c = getc(f);
     }
     if (num_it < num+100) *num_it = '\0';//marks the end with $
@@ -81,11 +77,8 @@ size_t read_num(char* num, char base, FILE* f)
 
 void print_num(char* num, FILE* f)//prints a number string to chosen output
 {
-    printf("trying to write a number\n");
-    int j = 0;
     for (char* num_it = num; num_it < num+100 && *num_it != '\0'; num_it++)
     {
-        printf("%d,",j++);
         fprintf(f,"%c",*num_it);   
     }
     putchar('\n');
@@ -100,7 +93,7 @@ int mark(char* num, char base)
 {
     char* num_it = num;
     while (*num_it >= '0' && *num_it <= '9') num_it++;
-    *num_it = '$';
+    *num_it = '\0';
     return 0;
 }
 
