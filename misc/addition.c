@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     STR_INT** num_list;
     if (q_num + argc-1 < 2)
     {
-        printf("allocating %d\n",2-argc+1);
+        //printf("allocating %d\n",2-argc+1);
         num_list = (STR_INT**) malloc((2-argc+1)*sizeof(STR_INT*));
     }
     while (q_num + argc-1 < 2)
@@ -53,9 +53,9 @@ int main(int argc, char** argv)
     
     for (STR_INT** n = num_list; n < num_list+q_num; n++){
         free((void*) *n);
-        printf("freed a string\n");
+        //printf("freed a string\n");
     }
     free((void*) num_list);
-    printf("freed num\n");
+    //printf("freed num\n");
 #endif
 }
