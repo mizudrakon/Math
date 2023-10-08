@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 #endif
 #ifdef RUN
     int q_num = 0;
-    const int base = 10, size = 100;
+    const int base = 16, size = 100;
     //char num[2][100];
     STR_INT** num_list;
     //char** num;

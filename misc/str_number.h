@@ -12,18 +12,18 @@ typedef struct
     char* value;
 } STR_INT;
 
-char base_conv(size_t b);
-int base_check(char c, char b);
-size_t read_num(char* num, char base, FILE* f);
+char max_digit(size_t b);//given a base b, get the char representing the maximum single digit
+int is_digit(char c, char b);
+size_t read_num(char* num, char base, FILE* f);//read from input
 void print_num(char* num, FILE* f);
 void print_str_int(STR_INT* num, FILE* f);
-int mark(char* num, char base);
+int mark(char* num, char base);//mark the end of the number with \0
 
 STR_INT* new_str_int(size_t base, size_t max_len, FILE* f)
 {
     STR_INT* strnum = (STR_INT*) malloc(sizeof(STR_INT));
     strnum->value = (char*) malloc(max_len*sizeof(char));
-    strnum->base = base_conv(base);
+    strnum->base = max_digit(base);
     strnum->length = read_num(strnum->value, strnum->base, f);
     return strnum;
 }
@@ -32,7 +32,7 @@ STR_INT* convert(){}
 
 //we want a useful char from number
 //basically the symbol representing the largest allowed digit 1-9 a(10)-z(36)
-char base_conv(size_t b)
+char max_digit(size_t b)
 {
     if (b <= 9){
         return b + '0' - 1; //the largest digit is one lower then the base 
@@ -44,7 +44,7 @@ char base_conv(size_t b)
     return '$';
 }
 
-int base_check(char c, char b){
+int is_digit(char c, char b){
     if (c >= 'A' && c <= 'Z')
     {
         c = 'a' + (c - 'A');
@@ -63,13 +63,13 @@ size_t read_num(char* num, char base, FILE* f)
     //we need to allow only numbers < base
     //ignore white spaces or any possibly separating symbols in front
     c = getc(f);
-    while (base_check(c, base) == 0)
+    while (is_digit(c, base) == 0)
     {
         if (c == '$') return 0;
         c = getc(f);
     }
     char* num_it = num; //iterator
-    while (base_check(c,base))
+    while (is_digit(c,base))
     {
         *num_it++ = c;
         len++;
@@ -96,7 +96,8 @@ void print_str_int(STR_INT* num, FILE* f)
 int mark(char* num, char base)
 {
     char* num_it = num;
-    while (*num_it >= '0' && *num_it <= '9') num_it++;
+    while (is_digit(*num_it,base)) num_it++;
+    //while (*num_it >= '0' && *num_it <= '9') num_it++;
     *num_it = '\0';
     return 0;
 }
