@@ -13,10 +13,14 @@ typedef struct
 } STR_INT;
 
 char base_conv(size_t b);
+int base_check(char c, char b);
 size_t read_num(char* num, char base, FILE* f);
 void print_num(char* num, FILE* f);
+void print_str_int(STR_INT* num, FILE* f);
+int mark(char* num, char base);
 
-STR_INT* new_str_int(size_t base, size_t max_len, FILE* f){
+STR_INT* new_str_int(size_t base, size_t max_len, FILE* f)
+{
     STR_INT* strnum = (STR_INT*) malloc(sizeof(STR_INT));
     strnum->value = (char*) malloc(max_len*sizeof(char));
     strnum->base = base_conv(base);

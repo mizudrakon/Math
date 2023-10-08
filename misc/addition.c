@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #define RUN
 #include "str_number.h"
+#ifdef DEFS
+//test definitions
+#endif
 
 int main(int argc, char** argv)
 {
@@ -14,16 +17,21 @@ int main(int argc, char** argv)
 #ifdef RUN
     int q_num = 0;
     const int base = 10, size = 100;
+    //char num[2][100];
     STR_INT** num_list;
+    //char** num;
     if (q_num + argc-1 < 2)
     {
-        //printf("allocating %d\n",2-argc+1);
         num_list = (STR_INT**) malloc((2-argc+1)*sizeof(STR_INT*));
     }
     while (q_num + argc-1 < 2)
     {
         printf("please provide a number: ");
         *(num_list+q_num) = new_str_int(base,size,stdin);
+        //*(num_list+q_num) = (char*) malloc(100*sizeof(char));
+        //read(*(num+q_num),10,stdin);
+        printf("number read: ");
+        print_str_int(*(num_list+q_num),stdout);
         q_num++;
     }
 
