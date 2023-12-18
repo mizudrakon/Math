@@ -1,13 +1,12 @@
 #ifndef QUICK_H
 #define QUICK_H
 
-//#include <vector>
 #include <concepts>
 #include <format>
-#include <iostream>
 #include <queue>
 #include <memory>
 
+//convenient print function using format
 constexpr void print(const std::string_view text, auto&&... args){
     fputs(std::vformat(text,std::make_format_args(args...)).c_str(),stdout);
 }
@@ -37,14 +36,16 @@ namespace Quick
         It start;
         It end;
         Range(const Iterator auto& s, const Iterator auto& e):start(s),end(e){
-            print("range struct made\n");
+            //print("range struct made\n");
         }
         size_t size() {return end - start; }
-        ~Range(){print("destr\n");}
+        ~Range(){
+            //print("destr\n");
+        }
     };
 
     template <Iterator It>
-    It three_med(const It s, const It e){
+    It three_med(It s, It e){
         It m = (s + (e - s)/2);
         //Iterator f = s, l = e;
         if (*s > *m) std::swap(s,m);
@@ -70,7 +71,7 @@ namespace Quick
             R.pop();
             //check if we even need to bother
             if (j <= i){ 
-                break;
+                continue;
             }
             //using the median of three procedure to select the pivot
             auto p = *three_med(i, j);
