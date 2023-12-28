@@ -5,6 +5,7 @@
 #include <format>
 #include <queue>
 #include <memory>
+#include <vector>
 
 //convenient print function using format
 constexpr void print(const std::string_view text, auto&&... args){
@@ -108,6 +109,64 @@ namespace Quick
             print("{},",*i);
         }
         print("\n");
+    }
+
+    //SELECT - UNTESTED
+    template<Iterator>
+    using vector = std::vector<Iterator>;
+    
+    template <Iterator It, Container C>
+    vector<It> copy_to_vec(const It& start, const It& end, size_t size){
+        vector<It> vec;
+        for (auto c_it = start; c_it < end; ++c_it)
+            vec.push_back(c_it);
+
+        while (vec.size() < size)
+            vec.push_back(nullptr);
+        return vec;
+    } 
+
+    //sorts and returns k-th element
+    template <Iterator It, typename F>
+    It trivial_select(const size_t k, const It& start, const It& end, F f){
+        vector<It> vec = copy_to_vec(start, end, end-start);
+        if (k > end-start) k = end - start; //just to be sure
+        sort(vec.start(), vec.end(), f);
+        return *(vec.start() + k - 1);
+    }
+
+    //gets median of five elements, if we give it fewer elements, it adds nullpointers
+    template <Iterator It, typename F>
+    It five_median(const It& start, const It& end, F f){
+        const size = 5;
+        vector<It> vec = copy_to_vec(start, end, size);
+        sort(vec.begin(),vec.end(),f);
+        return *(vec.begin() + size / 2);
+    }
+
+    //quicksort algorithm
+    template <Iterator It, typename F>
+    It Select(const size_t k, const It& start, const It& end, F f){
+        if (end - start <= 5) 
+            return trivial();
+        vector<It> m;
+        for (auto& it = start; it+5 < end; it += 5){
+            m.push_back(five_median(it, it+5, f));
+        }
+        auto p = Select(m.size() / 2, m.begin(), m.end(), f);
+        vector<It> L_p, G_p, E_p;
+        for (auto& it = start; it < end; ++it){
+            if (f(*it,*p))
+                L_p.push_back(it);
+            else if (*it == *p){
+                E_p.push_back(it);
+                continue;
+            }
+            G_p.push_back(it);
+        }
+        if (k <= L_p.size()) return Select(k,L_p.begin(),L_p.end(),f);
+        else if (k <= L_p.size() + G_p.size()) return p;
+        return Select(k - L_p.size() - G_p.size(), G_p, f);
     }
 }
 #endif
