@@ -1,3 +1,5 @@
+#ifndef MATRIX_H
+#define MATRIX_H
 #include <iostream>
 #include <string>
 #include <vector>
@@ -187,3 +189,5 @@ private:
 	std::vector<std::vector<int> > m;
 
 };
+
+#endif
