@@ -6,6 +6,7 @@
 #include <queue>
 #include <memory>
 #include <vector>
+#include "heap.hpp"
 /*  Just to be clear, I'm pretending <algorithm> and <iterator> doesn't exist.
     It may seem dumb, since it's generally vary wise to use them, but this is more of an exercise.
     It may be even more funny, since I'm going for C++20 here and some stuff here doesn't work otherwise,
@@ -16,13 +17,6 @@
 constexpr void print(const std::string_view text, auto&&... args){
     fputs(std::vformat(text,std::make_format_args(args...)).c_str(),stdout);
 }
-
-template <class C>
-concept Container = requires(C lst){
-    lst.begin();
-    lst.end();
-    lst[0];
-};
 
 
 template <typename T>
@@ -56,7 +50,6 @@ namespace quick
     template <Iterator It>
     It three_med(It s, It e){
         It m = (s + (e - s)/2);
-        //Iterator f = s, l = e;
         if (*s > *m) std::swap(s,m);
         if (*m > *e) std::swap(m,e);
         if (*s > *m) std::swap(s,m);
@@ -124,11 +117,8 @@ namespace quick
     template <typename T, Iterator It>
     vector<T> copy_to_vec(const It& start, const It& end, size_t size){
         vector<T> vec{};
-        for (auto c_it = start; c_it < end; ++c_it)
+        for (auto c_it = start; c_it < end && c_it - start < size; ++c_it)
             vec.push_back(*c_it);
-
-        while (vec.size() < size)
-            vec.push_back(0);
         return vec;
     } 
 
@@ -137,6 +127,7 @@ namespace quick
     T trivial_select(const size_t k, const Iterator auto& start, const Iterator auto& end, F f){
         auto vec = copy_to_vec<T>(start, end, end-start);
         sort(vec.begin(), vec.end(), f);
+        print_vec(vec);
         if (k > end-start) return *(vec.end()-1); //just to be sure
         return *(vec.begin() + k - 1);
     }
@@ -148,35 +139,42 @@ namespace quick
         const int size = 5;
         auto vec = copy_to_vec<T>(start, end, size);
         sort(vec.begin(),vec.end(),f);
-        return *(vec.begin() + size / 2);
+        return *(vec.begin() + vec.size() / 2);
     }
 
     //quicksort algorithm divides the group into 3 smaller group and figures out where to look for the answer
     template <typename T, typename F>
     T select(const size_t k, const Iterator auto& start, const Iterator auto& end, F f){
         if (end - start <= 5) 
-            return trivial_select(k, start, end, f);
+            return trivial_select<T>(k, start, end, f);
         //getting median of five, I'll change it to heap later
         vector<T> m;
-        for (auto it = start; it+5 < end; it += 5){
-            m.push_back(five_median<T>(it, it+5, f));
+        for (auto it = start; it < end; it += 5){
+            int chunk_size = (it + 5 < end)? 5 : end - it;
+            m.push_back(five_median<T>(it, it+chunk_size, f));
         }
-        auto p = trivial_select(m.size() / 2, m.begin(), m.end(), f);
+        print_vec(m);
+        auto p = trivial_select<T>(m.size() / 2, m.begin(), m.end(), f);
+        print("the pivot is: {}\n", p);
         //3 smaller groups 
         vector<T> L_p, G_p, E_p;//less_than_p, greater, equal
         for (auto it = start; it < end; ++it){
-            if (f(*it,*p))
+            if (f(*it,p)){
                 L_p.push_back(*it);
-            else if (*it == *p){
+                continue;
+            }
+            else if (*it == p){
                 E_p.push_back(*it);
                 continue;
             }
             G_p.push_back(*it);
         }
         //figure out where to look
-        if (k <= L_p.size()) return select(k,L_p.begin(),L_p.end(),f);
-        else if (k <= L_p.size() + G_p.size()) return p;
-        return select(k - L_p.size() - G_p.size(), G_p, f);
+        if (k <= L_p.size()) {
+            return select<T>(k,L_p.begin(),L_p.end(),f);
+        }
+        else if (k <= L_p.size() + E_p.size()) return p;
+        return select<T>(k - L_p.size() - E_p.size(), G_p.begin(), G_p.end(), f);
     }
 }
 #endif

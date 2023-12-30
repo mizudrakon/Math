@@ -1,24 +1,23 @@
 #include "quick.hpp"
-//#include <vector>
 #include <iostream>
 
-
+//testing file
 int main(int argc, char** argv)
 {
     using std::cout;
     std::vector<double> vec{};
-    
+    constexpr size_t k = 6;
+
     for (double d; std::cin >> d;){
         vec.push_back(d);
     }
     auto f = [](double x, double y){ return x < y;};
     quick::print_vec(vec);
-    //Quick::sort(vec.begin(),vec.end(),[](double x, double y){ return x < y;});
-    //quick::select(3, vec.begin(), vec.end(),[](double x, double y){ return x < y;});
     auto itvec = quick::copy_to_vec<double>(vec.begin(),vec.end(),10);
-    auto kth = quick::trivial_select<double>(3,vec.begin(),vec.end(),f); 
+    quick::sort(itvec.begin(),itvec.end(),f);
+    auto ksel = quick::select<double>(k, vec.begin(), vec.end(),f);
+    auto kth = quick::trivial_select<double>(k,vec.begin(),vec.end(),f); 
     auto five = quick::five_median<double>(vec.begin(),vec.begin()+5,f);
-    print("{} median of five: {}\n", kth, five);
-    cout << kth << " median of five: " << five << '\n';
-    quick::print_vec(itvec.begin(), itvec.end());
+    print("{}rd member is {}\n", k, ksel);
+    quick::print_vec(vec.begin(), vec.end());
 }
