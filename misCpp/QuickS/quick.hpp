@@ -6,8 +6,13 @@
 #include <queue>
 #include <memory>
 #include <vector>
+/*  Just to be clear, I'm pretending <algorithm> and <iterator> doesn't exist.
+    It may seem dumb, since it's generally vary wise to use them, but this is more of an exercise.
+    It may be even more funny, since I'm going for C++20 here and some stuff here doesn't work otherwise,
+    like <format>, or <concepts>, I'm afraid.
+*/
 
-//convenient print function using format
+//convenient print function using format C++20
 constexpr void print(const std::string_view text, auto&&... args){
     fputs(std::vformat(text,std::make_format_args(args...)).c_str(),stdout);
 }
@@ -18,6 +23,7 @@ concept Container = requires(C lst){
     lst.end();
     lst[0];
 };
+
 
 template <typename T>
 concept Iterator = requires(T a, T b){
@@ -137,34 +143,37 @@ namespace quick
 
     //gets median of five elements, if we give it fewer elements, it adds nullpointers
     //I'm making this as an exercise without <algorithm>, so I will need my own heap
-    template <Iterator It, typename F>
-    It five_median(const It& start, const It& end, F f){
+    template <typename T, typename F>
+    T five_median(const Iterator auto& start, const Iterator auto& end, F f){
         const int size = 5;
-        vector<It> vec = copy_to_vec(start, end, size);
+        auto vec = copy_to_vec<T>(start, end, size);
         sort(vec.begin(),vec.end(),f);
         return *(vec.begin() + size / 2);
     }
 
-    //quicksort algorithm
-    template <Iterator It, typename F>
-    It select(const size_t k, const It& start, const It& end, F f){
+    //quicksort algorithm divides the group into 3 smaller group and figures out where to look for the answer
+    template <typename T, typename F>
+    T select(const size_t k, const Iterator auto& start, const Iterator auto& end, F f){
         if (end - start <= 5) 
             return trivial_select(k, start, end, f);
-        vector<It> m;
+        //getting median of five, I'll change it to heap later
+        vector<T> m;
         for (auto it = start; it+5 < end; it += 5){
-            m.push_back(five_median(it, it+5, f));
+            m.push_back(five_median<T>(it, it+5, f));
         }
-        auto p = select(m.size() / 2, m.begin(), m.end(), f);
-        vector<It> L_p, G_p, E_p;
+        auto p = trivial_select(m.size() / 2, m.begin(), m.end(), f);
+        //3 smaller groups 
+        vector<T> L_p, G_p, E_p;//less_than_p, greater, equal
         for (auto it = start; it < end; ++it){
             if (f(*it,*p))
-                L_p.push_back(it);
+                L_p.push_back(*it);
             else if (*it == *p){
-                E_p.push_back(it);
+                E_p.push_back(*it);
                 continue;
             }
-            G_p.push_back(it);
+            G_p.push_back(*it);
         }
+        //figure out where to look
         if (k <= L_p.size()) return select(k,L_p.begin(),L_p.end(),f);
         else if (k <= L_p.size() + G_p.size()) return p;
         return select(k - L_p.size() - G_p.size(), G_p, f);
