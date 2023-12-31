@@ -15,9 +15,9 @@ int main(int argc, char** argv)
     quick::print_vec(vec);
     auto itvec = quick::copy_to_vec<double>(vec.begin(),vec.end(),10);
     quick::sort(itvec.begin(),itvec.end(),f);
+    quick::print_vec(itvec);
     auto ksel = quick::select<double>(k, vec.begin(), vec.end(),f);
     auto kth = quick::trivial_select<double>(k,vec.begin(),vec.end(),f); 
     auto five = quick::five_median<double>(vec.begin(),vec.begin()+5,f);
     print("{}rd member is {}\n", k, ksel);
-    quick::print_vec(vec.begin(), vec.end());
 }

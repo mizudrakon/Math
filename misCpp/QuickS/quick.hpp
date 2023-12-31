@@ -6,6 +6,7 @@
 #include <queue>
 #include <memory>
 #include <vector>
+#include <utility>
 #include "heap.hpp"
 /*  Just to be clear, I'm pretending <algorithm> and <iterator> doesn't exist.
     It may seem dumb, since it's generally vary wise to use them, but this is more of an exercise.
@@ -19,54 +20,31 @@ constexpr void print(const std::string_view text, auto&&... args){
 }
 
 
-template <typename T>
-concept Iterator = requires(T a, T b){
-    //need to be comparable and point to comparable values
-    a + 1;
-    a - b;
-    a == b;
-    a < b;
-    *a;
-    *a < *b;
-    *a == *b;
-};
-
 namespace quick
 {
-    using std::vector;
-    template <Iterator It>
-    struct Range {
-        It start;
-        It end;
-        Range(const Iterator auto& s, const Iterator auto& e):start(s),end(e){
-            //print("range struct made\n");
-        }
-        size_t size() {return end - start; }
-        ~Range(){
-            //print("destr\n");
-        }
-    };
-
+    using std::vector, std::swap;
+    
     template <Iterator It>
     It three_med(It s, It e){
         It m = (s + (e - s)/2);
-        if (*s > *m) std::swap(s,m);
-        if (*m > *e) std::swap(m,e);
-        if (*s > *m) std::swap(s,m);
+        if (*s > *m) swap(s,m);
+        if (*m > *e) swap(m,e);
+        if (*s > *m) swap(s,m);
         return m;
     }
 
     template <Iterator It, typename F>
     void procedure_sort(const It& start,const It& end, F f){
+        using std::pair, std::make_unique, std::move;
         //we queue start and end iterators instead of calling the procedure recursively
-        std::queue<std::unique_ptr<Range<It>>> R;    
-        auto first = std::make_unique<Range<It>>(start,end);
-        R.push(std::move(first));
+        std::queue<std::unique_ptr<pair<It,It>>> R;    
+        auto first = make_unique<pair<It,It>>(start,end);
+        R.push(move(first));
         while (!R.empty())
         {   
             //copy fixed range pointers:
-            const auto s = R.front()->start;
-            const auto e = R.front()->end;
+            const auto s = R.front()->first;
+            const auto e = R.front()->second;
             //init moving pointers:
             auto i = s, j = e;
             //remove the range element from queue:
@@ -81,14 +59,14 @@ namespace quick
             while (i <= j){
                 while (f(*i,p)) ++i;
                 while (f(p,*j)) --j;
-                if (i < j) std::swap(*i,*j);
+                if (i < j) swap(*i,*j);
                 if (i <= j) ++i,--j;
             }
             //queuing the smaller ranges (s,e are constant borders and i,j the movin ones)
-            auto a = std::make_unique<Range<It>>(s, j);
-            auto b = std::make_unique<Range<It>>(i, e);
-            R.push(std::move(a));
-            R.push(std::move(b));
+            auto a = make_unique<pair<It,It>>(s, j);
+            auto b = make_unique<pair<It,It>>(i, e);
+            R.push(move(a));
+            R.push(move(b));
         } 
     }
 
