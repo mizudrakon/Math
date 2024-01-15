@@ -22,8 +22,17 @@ public:
             ++size;
         }
     }
-    lvector(const lvector& vec):data(vec.data),size(vec.size){}
+
+    lvector(const lvector& vec):size(vec.size),data(new T[vec.size]){
+        T* data_it = data;
+        for (auto it = vec.begin(); it < vec.end(); ++it){
+            *data_it = *it;
+            ++data_it;
+        }
+    }
+
     lvector(lvector&& vec):data(std::move(vec.data)),size(std::move(vec.size)){}
+    
     ~lvector(){
         print("vector_dtor\n");
         delete[] data;
@@ -33,7 +42,7 @@ public:
     const Iterator auto begin() const { return data; }//first element
     const Iterator auto end() const { return data+size; }//one past
 
-    T& operator[](size_t i){
+    T& operator[](size_t i) const {
         if (i < 0 || i > size - 1)
             throw std::out_of_range("Vector out of range error!");
         return data[i];
@@ -75,8 +84,6 @@ public:
         print("\n");
     }
 
-
-
 };
 
 
@@ -95,14 +102,32 @@ inline void SizeTest(const lvector<T>& a, const lvector<T>& b){
 template <Arithmetic T>
 inline lvector<T> operator+(const lvector<T>& a, const lvector<T>& b){
     SizeTest(a,b);
-    auto vec(a.Size());
-    auto itb = b.begin();
+    auto vec(a);
     for (size_t i = 0; i < vec.Size(); ++i){
-        T x = a[i];
-        T y = b[i];
-        vec[i] = x + y;
+        vec[i] += b[i];
     }
     return vec;
+}
+
+template <Arithmetic T>
+inline lvector<T> operator-(const lvector<T>& a, const lvector<T>& b){
+    SizeTest(a,b);
+    auto vec(a);
+    for (size_t i = 0; i < vec.Size(); ++i){
+        vec[i] -= b[i];
+    }
+    return vec;
+}
+
+//dot product
+template <Arithmetic T>
+inline T dot(const lvector<T>&a, const lvector<T>& b){
+    SizeTest(a,b);
+    T answ = T(0);
+    auto itb = b.begin();
+    for (auto it = a.begin(); it < a.end(); ++it, ++itb)
+        answ += (*it) * (*itb);
+    return answ;
 }
 
 #endif

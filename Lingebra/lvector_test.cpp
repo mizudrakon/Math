@@ -13,5 +13,8 @@ int main(){
     a += b;
     a.Print();
     lvector c = a + b;
+    print("c = ");
     c.Print();
+    b = c - a;
+    b.Print();
 }
