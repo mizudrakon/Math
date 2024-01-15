@@ -3,7 +3,7 @@
 #include <concepts>
 
 template <typename T>
-concept Numeric = requires(T a, T b){
+concept Arithmetic = requires(T a, T b){
     a + b;
     a - b;
     a == b;

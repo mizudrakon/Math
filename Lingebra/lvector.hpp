@@ -2,9 +2,10 @@
 #define LVECTOR_H
 
 #include <initializer_list>
+#include "my_concepts.hpp"
+#include "ratio.hpp"
 
-
-template <typename T>
+template <Arithmetic T>
 class lvector
 {
     T* data;
@@ -21,12 +22,87 @@ public:
             ++size;
         }
     }
-    ~lvector(){delete[] data;}
-
-    lvector& operator=(lvector vec){
-        
+    lvector(const lvector& vec):data(vec.data),size(vec.size){}
+    lvector(lvector&& vec):data(std::move(vec.data)),size(std::move(vec.size)){}
+    ~lvector(){
+        print("vector_dtor\n");
+        delete[] data;
     }
+    
+    size_t Size() const { return size; }
+    const Iterator auto begin() const { return data; }//first element
+    const Iterator auto end() const { return data+size; }//one past
+
+    T& operator[](size_t i){
+        if (i < 0 || i > size - 1)
+            throw std::out_of_range("Vector out of range error!");
+        return data[i];
+    }
+
+    lvector& operator=(const lvector& vec){
+        SizeTest(*this,vec);
+        for (auto i = 0; i < size; ++i){
+            data[i] = vec.data[i];
+        }
+        return *this;
+    }
+    lvector& operator+=(const lvector&vec){
+        SizeTest(*this,vec);
+        for (auto i = 0; i < size; ++i){
+            data[i] += vec.data[i];
+        }
+        return *this;
+    }
+    lvector operator-(){
+        //print("unary (-) called\n");
+        lvector new_vec(size);
+        auto data_it = data;
+        for (auto it = new_vec.begin(); it < new_vec.end(); ++it, ++data_it){
+            *it = 0 - *data_it;
+        }
+        return new_vec;
+    }
+
+    lvector& operator-=(const lvector&vec){
+        *this += -vec;
+        return *this;
+    }
+
+    void Print() const {
+        for (auto el : *this){
+            print("{} ", el);
+        }
+        print("\n");
+    }
+
+
+
 };
 
+
+template <Arithmetic T>
+inline bool SameSize(const lvector<T>& a, const lvector<T>& b){
+    return a.Size() == b.Size();
+}
+
+template <Arithmetic T>
+inline void SizeTest(const lvector<T>& a, const lvector<T>& b){
+    if (!SameSize(a,b))
+        throw std::out_of_range("Comparing vectors of different size!\n");
+}
+
+
+template <Arithmetic T>
+inline lvector<T> operator+(const lvector<T>& a, const lvector<T>& b){
+    SizeTest(a,b);
+    auto vec(a.Size());
+    auto itb = b.begin();
+    for (size_t i = 0; i < vec.Size(); ++i){
+        T x = a[i];
+        T y = b[i];
+        vec[i] = x + y;
+    }
+    return vec;
+}
 
 #endif
