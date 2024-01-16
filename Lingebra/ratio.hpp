@@ -4,6 +4,10 @@
 #include<format>
 #include<string>
 #include<tuple>
+#include<cmath>
+
+class rational;
+class exp_num;
 
 //print function
 constexpr void print(const std::string_view text, auto&&... args){
@@ -166,5 +170,44 @@ struct std::formatter<rational> : std::formatter<std::string> {
         return std::format_to(ctx.out(), "{}", frac.str());
     }
 };
+
+//OK, this would be a lot of work, so I need to check if I need to do it
+class exp_num
+{
+    int base {0};
+    rational exponent {1};
+public:
+    exp_num(int b = 0, rational exp = 1) : base(b),exponent(exp){}
+    exp_num(const exp_num& en) : base(en.base),exponent(en.exponent){}
+    exp_num(exp_num&& en) noexcept : base(std::move(en.base)),exponent(std::move(en.exponent)){}
+
+    int Base() const { return base; }
+    void SetBase(int x) { base = x; } 
+    rational Exp() const { return exponent; }
+    void SetExp(rational r) { exponent = r; }
+    void Reduce() {
+        if (exponent.denomin() == 1){
+            base = int(pow(base, exponent.nomin()));
+            exponent = 1;
+        }
+    }
+};
+
+
+//multiplies only if a nad b are of the same base or their exps are 1
+exp_num& operator*(const exp_num& a, const exp_num& b){
+    exp_num answ{0};
+    //exponents = 1 just makes them regular integers
+    if (a.Exp() == b.Exp() && a.Exp() == 1){
+        answ.SetBase(a.Base()*b.Base());
+    }
+    //same base allows us to add exponents
+    else if (a.Base() == b.Base()){
+        answ.SetBase(a.Base());
+        answ.SetExp(a.Exp() + b.Exp());
+    }
+    answ.Reduce(); 
+    return answ;
+}
 
 #endif
