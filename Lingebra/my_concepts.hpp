@@ -1,11 +1,13 @@
-#ifndef MY_CONCEPTS_H
-#define MY_CONCEPTS_H
+#pragma once
+
 #include <concepts>
 
 template <typename T>
 concept Arithmetic = requires(T a, T b){
     a + b;
     a - b;
+    a * b;
+    a % b;
     a == b;
     a < b;
 };
@@ -28,4 +30,3 @@ concept Container = requires(C lst){
     lst.end();
     lst[0];
 };
-#endif

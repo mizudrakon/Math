@@ -1,5 +1,4 @@
-#ifndef LVECTOR_H
-#define LVECTOR_H
+#pragma once
 
 #include <initializer_list>
 #include "my_concepts.hpp"
@@ -129,5 +128,3 @@ inline T dot(const lvector<T>&a, const lvector<T>& b){
         answ += (*it) * (*itb);
     return answ;
 }
-
-#endif

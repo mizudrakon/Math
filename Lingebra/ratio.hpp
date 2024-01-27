@@ -1,21 +1,24 @@
-#ifndef RATIO_H
-#define RATIO_H
+#pragma once
 
 #include<format>
 #include<string>
 #include<tuple>
 #include<cmath>
 
-class rational;
-class exp_num;
+#include "my_concepts.hpp"
+
+//class declarations
+template <Arithmetic T> class rational;
+template <Arithmetic T> class exp_num;
 
 //print function
 constexpr void print(const std::string_view text, auto&&... args){
     fputs(std::vformat(text, std::make_format_args(args...)).c_str(),stdout);
 }
 
+template <Arithmetic T>
 //greatest common divisor... classic Eukleides
-inline int gcd(int a, int b){ 
+inline T gcd(T a, T b){ 
     while(true)
     {
         if (a < b) std::swap(a,b);
@@ -25,9 +28,10 @@ inline int gcd(int a, int b){
     return 1;
 }
 
+template <Arithmetic T>
 //lowest common multiple returing a tuple with the required multiplier to a and b
-inline std::tuple<int,int,int> lcm(int a, int b){ 
-    int x = a,
+inline std::tuple<T,T,T> lcm(T a, T b){ 
+    T x = a,
         y = b,
         am = 1,
         bm = 1;
@@ -46,14 +50,16 @@ inline std::tuple<int,int,int> lcm(int a, int b){
     we need to simplify the fractions wherever possible...
     -should I leave it with implicite cast to int, or make it explicite?...
 */
+
+template <Arithmetic T>
 class rational 
 {
-    int nom {0};
-    int den {1};
+    T nom {0};
+    T den {1};
 public:
     rational() = delete;
     //default c_tor, implicit 0/1, one argument n gives us n/1
-    rational(int n = 0, int d = 1):nom(n),den(d){}
+    rational(T n = 0, T d = 1):nom(n),den(d){}
     //copy c_tor
     rational(const rational& rn):nom(rn.nom),den(rn.den){}
     //move c_tor
@@ -94,10 +100,10 @@ public:
     ~rational(){}
 
     //getters and setters for the two int numbers
-    int nomin() const { return nom;}
-    void set_nom(int n) { nom = n; }
-    int denomin() const { return den; }
-    void set_den(int d) { den = d; }
+    T nomin() const { return nom;}
+    void set_nom(T n) { nom = n; }
+    T denomin() const { return den; }
+    void set_den(T d) { den = d; }
     //functions to get the number as a floating point rather than a fraction
     double dbl() const { return static_cast<double>(nom) / static_cast<double>(den);}
     float flt() const { return static_cast<float>(nom) / static_cast<float>(den);}
@@ -112,15 +118,18 @@ public:
     }
 };
 
+template <Arithmetic T>
 //just divide everything with greatest common denominator, which could be one therefore no change
-inline void rational::reduce(){
-    int c = gcd(nom,den);
+inline void rational<T>::reduce(){
+    T c = gcd(nom,den);
     nom /= c;
     den /= c;
 }
 
+
+template <Arithmetic T>
 //spaceship operator for comparison
-inline auto operator<=>(const rational& lhs, const rational& rhs){
+inline auto operator<=>(const rational<T>& lhs, const rational<T>& rhs){
     if (lhs.denomin() == rhs.denomin()) return lhs.nomin() <=> rhs.nomin();
     auto a = lhs, b = rhs;
     a.reduce();
@@ -130,7 +139,8 @@ inline auto operator<=>(const rational& lhs, const rational& rhs){
     return (a.nomin()*am) <=> (b.nomin()*bm);
 };
 
-inline auto operator==(const rational& lhs, const rational& rhs){
+template <Arithmetic T>
+inline auto operator==(const rational<T>& lhs, const rational<T>& rhs){
     if (lhs.nomin() == rhs.nomin() && lhs.denomin() == rhs.denomin())
         return true;
     auto a = lhs, b = rhs;
@@ -139,18 +149,21 @@ inline auto operator==(const rational& lhs, const rational& rhs){
     return a.nomin() == b.nomin() && a.denomin() == b.denomin();
 };
 
-inline auto operator* (const rational& lhs, const rational& rhs){
+template <Arithmetic T>
+inline auto operator* (const rational<T>& lhs, const rational<T>& rhs){
     rational new_r(lhs.nomin()*rhs.nomin(),lhs.denomin()*rhs.denomin());
     return new_r;
 };
 
 
-inline auto operator/ (const rational& lhs, const rational& rhs){
+template <Arithmetic T>
+inline auto operator/ (const rational<T>& lhs, const rational<T>& rhs){
     rational new_r(lhs.nomin()*rhs.denomin(),lhs.denomin()+rhs.nomin());
     return new_r;
 };
 
-inline auto operator%(rational lhs, rational rhs){
+template <Arithmetic T>
+inline auto operator%(rational<T> lhs, rational<T> rhs){
     if (lhs < rhs) return lhs;
     rational result(0);
     if (lhs == rhs) return result;
@@ -162,7 +175,8 @@ inline auto operator%(rational lhs, rational rhs){
     return result;
 }
 
-inline auto operator+ (rational lhs, rational rhs){
+template <Arithmetic T>
+inline auto operator+ (const rational<T>& lhs, const rational<T>& rhs){
     if (lhs.denomin() != rhs.denomin()){
         lhs.reduce();
         rhs.reduce();
@@ -172,7 +186,8 @@ inline auto operator+ (rational lhs, rational rhs){
     return result;
 };
 
-inline auto operator- (rational lhs, rational rhs){
+template <Arithmetic T>
+inline auto operator- (const rational<T>& lhs, const rational<T>& rhs){
     if (lhs.denomin() != rhs.denomin()){
         lhs.reduce();
         rhs.reduce();
@@ -182,14 +197,15 @@ inline auto operator- (rational lhs, rational rhs){
     return result;
 };
 
+template <Arithmetic T>
 //for negation with -
-inline auto operator-(rational frac){
+inline auto operator-(const rational<T>& frac){
     return 0-frac;
 }
 
 //formater for rational class to print it directly with print()
-template<>
-struct std::formatter<rational> : std::formatter<std::string> {
+template<typename T>
+struct std::formatter<rational<T>> : std::formatter<std::string> {
     template<typename Context>
     auto format(const rational& frac, Context& ctx) const {
         return std::format_to(ctx.out(), "{}", frac.str());
@@ -197,22 +213,26 @@ struct std::formatter<rational> : std::formatter<std::string> {
 };
 
 /*
-    exp_num is meant to keep numbers as possibly primes with exponent for use in fractions
+    -exp_num is meant to keep numbers as possibly primes with exponent for use in fractions
     I mostly want them to keep irrational numbers like sqr(2) 
+    -like rational they keep two numbers, but the exponent is kept as rational, since it's 
+    mostly intended to use for 0 < exp <= 1
 */
+//I need to figure out if I need to force rational into the exponent here...
+template <Arithmetic T>
 class exp_num
 {
     int base {0};
-    rational exponent {1};
+    rational<T> exponent {1};
 public:
-    exp_num(int b = 0, rational exp = 1) : base(b),exponent(exp){}
+    exp_num(int b = 0, rational<T> exp = 1) : base(b),exponent(exp){}
     exp_num(const exp_num& en) : base(en.base),exponent(en.exponent){}
     exp_num(exp_num&& en) noexcept : base(std::move(en.base)),exponent(std::move(en.exponent)){}
 
     int Base() const { return base; }
     void SetBase(int x) { base = x; } 
-    rational Exp() const { return exponent; }
-    void SetExp(rational r) { exponent = r; }
+    rational<T> Exp() const { return exponent; }
+    void SetExp(rational<T> r) { exponent = r; }
     void Reduce() {
         if (exponent.denomin() == 1){
             base = int(pow(base, exponent.nomin()));
@@ -221,9 +241,9 @@ public:
     }
 };
 
-
+template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
-exp_num& operator*(const exp_num& a, const exp_num& b){
+exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
     exp_num answ{0};
     //exponents = 1 just makes them regular integers
     if (a.Exp() == b.Exp() && a.Exp() == 1){
@@ -237,5 +257,10 @@ exp_num& operator*(const exp_num& a, const exp_num& b){
     answ.Reduce(); 
     return answ;
 }
+//assuming this goes the same as with rational...
 
-#endif
+//op /
+
+//op +
+
+//op -
