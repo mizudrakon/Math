@@ -113,7 +113,8 @@ public:
 
     //getting it as string for printing
     std::string str() const{
-        
+        if (nom == den) return "1";
+        if (nom == 0) return "0";
         return std::to_string(nom) + "/" + std::to_string(den);
     }
 };
@@ -239,6 +240,12 @@ public:
             exponent = 1;
         }
     }
+    std::string str() const {
+        if (exponent == 0) return "1"; //reduce to 1
+        std::string text = std::to_string(base); 
+        if (exponent == 1) return text;//no need to print exponent
+        return text + "^{" + exponent.str() + '}';//also print exponent, if it's nontrivial
+    }
 };
 
 template <Arithmetic T>
@@ -264,3 +271,13 @@ exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
 //op +
 
 //op -
+
+
+//formater for rational class to print it directly with print()
+template<typename T>
+struct std::formatter<exp_num<T>> : std::formatter<std::string> {
+    template<typename Context>
+    auto format(const exp_num& num, Context& ctx) const {
+        return std::format_to(ctx.out(), "{}", num.str());
+    }
+};
