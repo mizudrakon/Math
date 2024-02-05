@@ -44,6 +44,7 @@ inline std::tuple<T,T,T> lcm(T a, T b){
     return std::make_tuple(a,am,bm);
 }
 
+//RATIONAL CLASS DEFINITIONS:
 /*
     -rational is meant to keep numbers as fractions rather than doubles,
     but we can't just keep every number as a fraction recursively, and 
@@ -74,13 +75,13 @@ public:
     rational& operator*=(const rational& frac){
         nom *= frac.nom;
         den *= frac.den;
-        reduce();
+        if (den != 1) reduce();
         return *this;
     }
     rational& operator/=(const rational& frac){
         nom /= frac.nom;
         den /= frac.den;
-        reduce();
+        if (den != 1) reduce();
         return *this;
     }
     rational& operator%=(rational frac){
@@ -99,7 +100,7 @@ public:
     //d_tor doesn't really have anything special to do
     ~rational(){}
 
-    //getters and setters for the two int numbers
+    //GETTERS and SETTERS for the two int numbers
     T nomin() const { return nom;}
     void set_nom(T n) { nom = n; }
     T denomin() const { return den; }
@@ -109,25 +110,38 @@ public:
     float flt() const { return static_cast<float>(nom) / static_cast<float>(den);}
     
     //function for reducing the fraction
-    void reduce();
+    //just divide everything with greatest common denominator, which could be one therefore no change
+    void reduce(){
+        T c = gcd(nom,den);
+        nom /= c;
+        den /= c;
+        //we wnat to move a (-) sign to nom (or make two - into +)
+        if (den < 0){
+            nom *= -1;
+            den *= -1;
+        }
+    }
 
     //getting it as string for printing
+    /*
+       * We want x/1 to be printed as simple x, 
+       * and x/x as 1 (which should be already kept as 1/1)
+       * 0/anything should just be 0
+       * any farc < 0 should be written as (-p/q)
+    */
     std::string str() const{
         if (nom == den) return "1";
         if (nom == 0) return "0";
-        return std::to_string(nom) + "/" + std::to_string(den);
+        std::string answ {};
+        if (nom < 0) answ += "(-";
+        answ += std::to_string(nom);
+        if (den != 1) answ += "/" + std::to_string(den);
+        if (nom < 0) answ += ")";
+        return answ;
     }
 };
 
-template <Arithmetic T>
-//just divide everything with greatest common denominator, which could be one therefore no change
-inline void rational<T>::reduce(){
-    T c = gcd(nom,den);
-    nom /= c;
-    den /= c;
-}
-
-
+//RATIONAL NONMEMBER OPERATORS
 template <Arithmetic T>
 //spaceship operator for comparison
 inline auto operator<=>(const rational<T>& lhs, const rational<T>& rhs){
@@ -213,6 +227,8 @@ struct std::formatter<rational<T>> : std::formatter<std::string> {
     }
 };
 
+
+//EXP_NUM CALSS DEFINITIONS:
 /*
     -exp_num is meant to keep numbers as possibly primes with exponent for use in fractions
     I mostly want them to keep irrational numbers like sqr(2) 
@@ -234,12 +250,19 @@ public:
     void SetBase(int x) { base = x; } 
     rational<T> Exp() const { return exponent; }
     void SetExp(rational<T> r) { exponent = r; }
+    
+    /*
+        * numbers with positive nonfractional exponen get pow-ed
+        * otherwise the exponent is a fraction itself and should get reduced
+    */
     void Reduce() {
+        exponent.reduce();
         if (exponent.denomin() == 1){
             base = int(pow(base, exponent.nomin()));
             exponent = 1;
         }
     }
+
     std::string str() const {
         if (exponent == 0) return "1"; //reduce to 1
         std::string text = std::to_string(base); 
@@ -251,6 +274,7 @@ public:
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
 exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
+    if (a.exponent > )
     exp_num answ{0};
     //exponents = 1 just makes them regular integers
     if (a.Exp() == b.Exp() && a.Exp() == 1){
@@ -260,6 +284,9 @@ exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
     else if (a.Base() == b.Base()){
         answ.SetBase(a.Base());
         answ.SetExp(a.Exp() + b.Exp());
+    }
+    else {
+        
     }
     answ.Reduce(); 
     return answ;
