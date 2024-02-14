@@ -1,0 +1,14 @@
+{
+	"nodes":[
+		{"id":"7c4e4acbf55f674b","x":-240,"y":-520,"width":320,"height":180,"type":"text","text":"class Matrix  \n* collects multiple vectors into rows or columns of the matrix\n* allows operations that will be listed"},
+		{"id":"d11c1fbfdfc9a74e","x":-440,"y":-160,"width":240,"height":180,"type":"text","text":"#### class lvector\n* data: array of values"},
+		{"id":"42cecf5831cce77d","x":-20,"y":-160,"width":240,"height":180,"type":"text","text":"#### class rational $\\mathbb{Q}$\n* nominator\n* denominator"},
+		{"id":"8d97aaf8c273d93c","x":-120,"y":160,"width":360,"height":240,"type":"text","text":"#### class exp_num\n* base number : $\\mathbb{Z}$\n* exponent : $\\mathbb{Q}$"}
+	],
+	"edges":[
+		{"id":"560af9ba977ca854","fromNode":"42cecf5831cce77d","fromSide":"left","toNode":"d11c1fbfdfc9a74e","toSide":"right"},
+		{"id":"7c7f7eaf89e4e9b5","fromNode":"d11c1fbfdfc9a74e","fromSide":"top","toNode":"7c4e4acbf55f674b","toSide":"bottom"},
+		{"id":"1b6cfe7f5757189e","fromNode":"8d97aaf8c273d93c","fromSide":"top","toNode":"42cecf5831cce77d","toSide":"bottom"},
+		{"id":"ab29fb0d587c7c2e","fromNode":"42cecf5831cce77d","fromSide":"right","toNode":"8d97aaf8c273d93c","toSide":"right"}
+	]
+}
