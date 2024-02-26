@@ -6,9 +6,11 @@
 //let's have us a structure with all info coupled in
 //basically a supplement for the long-number-kept-as-string class
 
+//STR_INT_PART is a certain chunk (of size part_sz) of the number we're trying to save as STR_INT
 typedef struct str_int_part 
 {
     unsigned short partNumber;
+    size_t partSz;
     STR_INT_PART* prev;
     STR_INT_PART* next;
     STR_INT* mother;
@@ -18,7 +20,8 @@ typedef struct str_int_part
 typedef struct
 {
     unsigned short totalParts;
-    size_t length;
+    size_t lastPartLength;
+    size_t partSz;
     char base;
     STR_INT_PART* head;
     STR_INT_PART* tail;
@@ -26,20 +29,52 @@ typedef struct
 
 char max_digit(size_t b);//given a base b, get the char representing the maximum single digit
 int is_digit(char c, char base);//tests a char for being a numeric given the base
-size_t read_num(char* num, char base, FILE* f);//read from input
-void print_num(char* num, FILE* f);
-void print_str_int(STR_INT* num, FILE* f);
+int read_num(STR_INT* num, FILE* f);//read from input
+void formated_print_str_int(STR_INT* num, FILE* f,int brk, size_t line_len);//print with possibility of adding new_lines
+void print_str_int(STR_INT* num, FILE* f);//just print 
 int mark(char* num, char base);//mark the end of the number with \0
 
-STR_INT_PART* new_si_part()
+STR_INT_PART* new_si_part(STR_INT* mom, STR_INT_PART* prev, STR_INT_PART* next)
+{
+    STR_INT_PART* part;
+    if ( (part = (STR_INT_PART*) malloc(sizeof(STR_INT_PART))) == NULL )
+        printf("str_int_part basic malloc failed\n");
+    mom->totalParts++;
+    mom->tail = part;
+    part->partNumber = mom->totalParts;
+    if ((part->data = (char*)malloc(mom->partSz)) == NULL)
+        printf("str_int_part data malloc failed\n");
+    part->mother = mom;
+    part->prev = prev;
+    part->next = next;
+    return part;
+}
 
 STR_INT* new_str_int(size_t base, size_t part_len, FILE* f)
 {
-    STR_INT* strnum = (STR_INT*) malloc(sizeof(STR_INT));
-    strnum->head = (char*) malloc(max_len*sizeof(char));
+    STR_INT* strnum;
+    if ((strnum = (STR_INT*) malloc(sizeof(STR_INT))) == NULL)
+        printf("new_str_int malloc failed\n");
+    strnum->head = new_si_part(strnum, NULL, NULL);
+    strnum->tail = strnum->head;
     strnum->base = max_digit(base);
-    strnum->length = read_num(strnum->value, strnum->base, f);
+    strnum->lastPartLength = 1;
+    strnum->head->data[0] = '0';//init to 0
     return strnum;
+}
+
+//cleaning STR_INT data
+int deleteSTR_INT(STR_INT* corpse)
+{
+    STR_INT_PART* part_it = corpse->head;
+    for (; part_it != NULL; part_it = part_it->next)
+    {
+        free((void*)part_it->data);
+        if (part_it->prev!=NULL)
+            free((void*)part_it->prev);
+    }
+    free((void*)part_it);
+    free((void*)corpse);
 }
 
 STR_INT* convert(){}
@@ -72,42 +107,63 @@ int is_digit(char c, char base){
     return c >= '0' && c <= '9';
 }
 
-size_t read_num(char* num, char base, FILE* f)
+int read_num(STR_INT* num, FILE* f)
 {
     int c;
-    int len = 0;
+    num->lastPartLength = 0;
     //we need to allow only numbers < base
     //ignore white spaces or any possibly separating symbols in front
     c = getc(f);
-    while (is_digit(c, base) == 0)
+    while (is_digit(c, num->base) == 0)
     {
-        if (c == '$') return 0;
+        if (c == '$') return 1;//$ is escape character
         c = getc(f);
     }
-    char* num_it = num; //iterator
-    while (is_digit(c,base))
+    STR_INT_PART* part_it = num->head;
+    char* num_it = num->head->data; //iterator
+    while (is_digit(c,num->base))
     {
+        //if we reach the end of the data array:
+        if (num_it == part_it->data+num->partSz){
+            part_it->next = new_si_part(num,part_it,NULL);//create new part and switch to it
+            part_it = part_it->next;
+            num_it = part_it->data;
+            num->lastPartLength = 0;//we start from 0, the previous parts are all full
+        }
         *num_it++ = c;
-        len++;
+        num->lastPartLength++;
         c = getc(f);
+
     }
-    if (num_it < num+100) *num_it = '\0';//marks the end with $
-    return len;
+    if (num_it < part_it->data+num->partSz) *num_it = '\0';//marks the end with $
+
+//HERE I NEED TO MIRROR THE ELEMENTS
+
+
+    return 0;//zero errors
 }
 
-void print_num(char* num, FILE* f)//prints a number string to chosen output
+void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//prints a number string to chosen output
 {
-    for (char* num_it = num; num_it < num+100 && *num_it != '\0'; num_it++)
+    size_t len = 0;
+    for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it++)
     {
-        fprintf(f,"%c",*num_it);   
+        for (char* num_it = part_it->data; num_it < part_it->data+num->partSz && *num_it != '\0'; num_it++)
+        {
+            if (brk && (len % line_len == 0))
+                putc(f,'\n');
+            fprintf(f,"%c",*num_it);
+            len++;   
+        }
     }
-    putchar('\n');
+    putc(f,'\n');
 }
 
 void print_str_int(STR_INT* num, FILE* f)
 {
-    print_num(num->value, f);
+    formated_print_str_int(num, f, 0, 0);
 }
+
 
 int mark(char* num, char base)
 {
