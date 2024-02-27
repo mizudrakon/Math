@@ -6,18 +6,20 @@
 //let's have us a structure with all info coupled in
 //basically a supplement for the long-number-kept-as-string class
 
+//typedef struct STR_INT;
 //STR_INT_PART is a certain chunk (of size part_sz) of the number we're trying to save as STR_INT
+
 typedef struct str_int_part 
 {
     unsigned short partNumber;
     size_t partSz;
-    STR_INT_PART* prev;
-    STR_INT_PART* next;
-    STR_INT* mother;
+    struct str_int_part* prev;
+    struct str_int_part* next;
+    struct str_int* mother;
     char* data;
 } STR_INT_PART;
 
-typedef struct
+typedef struct str_int
 {
     unsigned short totalParts;
     size_t lastPartLength;
@@ -50,7 +52,7 @@ STR_INT_PART* new_si_part(STR_INT* mom, STR_INT_PART* prev, STR_INT_PART* next)
     return part;
 }
 
-STR_INT* new_str_int(size_t base, size_t part_len, FILE* f)
+STR_INT* new_str_int(size_t base, size_t part_len)
 {
     STR_INT* strnum;
     if ((strnum = (STR_INT*) malloc(sizeof(STR_INT))) == NULL)
@@ -92,6 +94,7 @@ char max_digit(size_t b)
     }
     return '$';
 }
+
 /*numbers 10+ are represented by letters, so we need to test characters and not just regular numerals
 c is char to be tested against the base (c < base, since base isn't a numeral in it's own system)*/
 int is_digit(char c, char base){
@@ -102,7 +105,7 @@ int is_digit(char c, char base){
     }
     //the case we need to deal with the 10+ base
     if (base >= 'a' && base <= 'z'){
-        return (c >= '0' && c <= '9') || (c >= 'a' && c <= base);
+        return (c >= '0' && c <= '9') || (c >= 'a' && c < base);
     }
     return c >= '0' && c <= '9';
 }
@@ -151,12 +154,12 @@ void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//pr
         for (char* num_it = part_it->data; num_it < part_it->data+num->partSz && *num_it != '\0'; num_it++)
         {
             if (brk && (len % line_len == 0))
-                putc(f,'\n');
+                putc('\n',f);
             fprintf(f,"%c",*num_it);
             len++;   
         }
     }
-    putc(f,'\n');
+    putc('\n',f);
 }
 
 void print_str_int(STR_INT* num, FILE* f)
