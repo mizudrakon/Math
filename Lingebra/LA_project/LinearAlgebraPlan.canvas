@@ -1,14 +1,36 @@
 {
 	"nodes":[
-		{"id":"7c4e4acbf55f674b","type":"text","text":"class Matrix  \n* collects multiple vectors into rows or columns of the matrix\n* allows operations that will be listed\n* make_rows(lvector list)\n* make_columns(lvector list)","x":-240,"y":-520,"width":320,"height":180},
 		{"id":"d11c1fbfdfc9a74e","type":"text","text":"#### class lvector\n* data: $\\mathbb{Q}$[]\n* sz : $\\mathbb{N}$","x":-440,"y":-160,"width":240,"height":180},
-		{"id":"42cecf5831cce77d","type":"text","text":"#### class rational $\\mathbb{Q}$\n* nominator : exp_num\n* denominator : exp_num","x":-20,"y":-160,"width":280,"height":200},
-		{"id":"8d97aaf8c273d93c","type":"text","text":"#### class exp_num\n* base number : $\\mathbb{Z}$\n* exponent : $\\mathbb{Q}$","x":-120,"y":160,"width":360,"height":240}
+		{"id":"8d97aaf8c273d93c","type":"text","text":"#### exp_num $\\lt\\mathbb{Z}^{\\mathbb{Q}}\\gt$\n* base number : $\\mathbb{Z}$\n* exponent : $\\mathbb{Q}\\lt\\mathbb{Z} \\gt$","x":20,"y":220,"width":235,"height":180},
+		{"id":"64d5554cbc762905","type":"text","text":"### expression\n* tree of nodes:  \n\t* $\\mathbb{Z}^{\\mathbb{Q}}$\n\t* operator or function\n\t* variable symbols","x":-118,"y":-150,"width":276,"height":190},
+		{"id":"42cecf5831cce77d","type":"text","text":"#### class rational $\\mathbb{Q}$\n* nominator\n* denominator","x":521,"y":-300,"width":359,"height":180},
+		{"id":"05fa5ddf48344fad","x":255,"y":40,"width":266,"height":155,"type":"text","text":"#### rational $\\mathbb{Q}\\lt \\mathbb{Z}^{\\mathbb{Q}} \\gt$\n* nominator : exp_num\n* denominator : exp_num"},
+		{"id":"00d3e6ddba8e15cd","x":450,"y":460,"width":230,"height":200,"type":"text","text":"#### rational $\\mathbb{Q}$<$\\frac{\\mathbb{Z}}{\\mathbb{Z}}$>\n* rational object  \n* nomonator: $\\mathbb{Z}$\n* denominator: $\\mathbb{Z}$"},
+		{"id":"3916111e3b319a3a","x":632,"y":137,"width":288,"height":173,"type":"text","text":"### class exp_num\n* base number\n* exponent"},
+		{"id":"b9ec601142ab7cc9","type":"text","text":"#### class Polynimial\n* represented with lvector\n* but maybe could be parsed from some input string","x":-1040,"y":150,"width":320,"height":160},
+		{"id":"a18cc13a2c5594ea","x":-680,"y":150,"width":275,"height":177,"type":"text","text":"### operators\n* +, -, $\\star$, $\\div$\n* need to be overloades in code, since they can't always be executed."},
+		{"id":"c0952ceb1dd112cd","x":-680,"y":380,"width":282,"height":203,"type":"text","text":"### functions\n* goniometric, log\n* just symbols here except for special cases to be implemented later"},
+		{"id":"1245d2dcd5afa7c8","x":-669,"y":640,"width":271,"height":173,"type":"text","text":"### unknown_variables\n* only symbols\n* mother: numeric -> 1 as fiiller\n* daughter: numeric"},
+		{"id":"c6cfdb11b675f85b","x":-310,"y":160,"width":221,"height":167,"type":"text","text":"### struct expreasion node\n* runtime polymorphic node"},
+		{"id":"1ca1b76e0c90e6bc","x":-648,"y":-400,"width":250,"height":60,"type":"text","text":"### row space"},
+		{"id":"3b1610be58f4c37f","x":-199,"y":-400,"width":250,"height":60,"type":"text","text":"### column space"},
+		{"id":"7c4e4acbf55f674b","type":"text","text":"#### class Matrix  \n* collects multiple vectors into rows or columns of the matrix\n* allows operations that will be listed\n* make_rows(lvector list)\n* make_columns(lvector list)","x":-449,"y":-800,"width":360,"height":260}
 	],
 	"edges":[
-		{"id":"560af9ba977ca854","fromNode":"42cecf5831cce77d","fromSide":"left","toNode":"d11c1fbfdfc9a74e","toSide":"right"},
-		{"id":"7c7f7eaf89e4e9b5","fromNode":"d11c1fbfdfc9a74e","fromSide":"top","toNode":"7c4e4acbf55f674b","toSide":"bottom"},
-		{"id":"1b6cfe7f5757189e","fromNode":"8d97aaf8c273d93c","fromSide":"top","toNode":"42cecf5831cce77d","toSide":"bottom"},
-		{"id":"ab29fb0d587c7c2e","fromNode":"42cecf5831cce77d","fromSide":"right","toNode":"8d97aaf8c273d93c","toSide":"right"}
+		{"id":"d60ac969dd31f202","fromNode":"b9ec601142ab7cc9","fromSide":"top","toNode":"d11c1fbfdfc9a74e","toSide":"bottom"},
+		{"id":"fa9e49cc263df8e5","fromNode":"64d5554cbc762905","fromSide":"left","toNode":"d11c1fbfdfc9a74e","toSide":"right"},
+		{"id":"6f545aa3f46961fb","fromNode":"00d3e6ddba8e15cd","fromSide":"left","toNode":"8d97aaf8c273d93c","toSide":"bottom"},
+		{"id":"1507bd9ff541871f","fromNode":"d11c1fbfdfc9a74e","fromSide":"top","toNode":"1ca1b76e0c90e6bc","toSide":"bottom"},
+		{"id":"bd33f8c655fa7e5f","fromNode":"d11c1fbfdfc9a74e","fromSide":"top","toNode":"3b1610be58f4c37f","toSide":"bottom"},
+		{"id":"2c5ff62a1a58b3e3","fromNode":"1ca1b76e0c90e6bc","fromSide":"top","toNode":"7c4e4acbf55f674b","toSide":"bottom"},
+		{"id":"10d6bd59bb881eb1","fromNode":"3b1610be58f4c37f","fromSide":"top","toNode":"7c4e4acbf55f674b","toSide":"bottom"},
+		{"id":"83824c667bb3f40e","fromNode":"42cecf5831cce77d","fromSide":"left","toNode":"05fa5ddf48344fad","toSide":"top"},
+		{"id":"fc4a0cdfdaa4bfb2","fromNode":"8d97aaf8c273d93c","fromSide":"top","toNode":"05fa5ddf48344fad","toSide":"bottom"},
+		{"id":"2912a62b18da214e","fromNode":"05fa5ddf48344fad","fromSide":"left","toNode":"64d5554cbc762905","toSide":"right"},
+		{"id":"699a0084ccd53156","fromNode":"3916111e3b319a3a","fromSide":"left","toNode":"8d97aaf8c273d93c","toSide":"right"},
+		{"id":"62323c77343dd8f4","fromNode":"c6cfdb11b675f85b","fromSide":"top","toNode":"64d5554cbc762905","toSide":"bottom"},
+		{"id":"b2695c74f066e90b","fromNode":"a18cc13a2c5594ea","fromSide":"right","toNode":"c6cfdb11b675f85b","toSide":"left"},
+		{"id":"d1940c89456bb63d","fromNode":"c0952ceb1dd112cd","fromSide":"right","toNode":"c6cfdb11b675f85b","toSide":"bottom"},
+		{"id":"5edfc8d72258785f","fromNode":"1245d2dcd5afa7c8","fromSide":"right","toNode":"c6cfdb11b675f85b","toSide":"right"}
 	]
 }
