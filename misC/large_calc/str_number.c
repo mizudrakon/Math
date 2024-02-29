@@ -134,28 +134,16 @@ int read_num(STR_INT* num, FILE* f)
 
 void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//prints a number string to chosen output
 {
-    //debug stuff
-    //printf("attempting to print\n");
     int p = 0;
-    //debug stuff
-    //size_t len = 0;
-    //printf("element 0: %c\n",num->head->data[0]);
-    for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it++)
+    for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it = part_it->next)
+    //having part_it++ in there cases the NULL check to fail, obviously
     {
-        //printf("part number: %ld",part_it->partNumber);
-        //printf("access through part_it %c:\n", part_it->data[0]);   
         for (char* data_it = part_it->data; *data_it != '\0'; data_it++)
         {
-            if (part_it == num->tail && data_it == part_it->data+num->lastPartLength)
+            if (part_it->next == NULL && data_it >= part_it->data+num->lastPartLength)
                 break;
-            //printf("next %d\n",p++);
 
-            //if (brk && (len % line_len == 0))
-            //    putc('\n',f);
-            //printf("%c",*data_it);
-            //fprintf(f,"%c",*data_it);
             putc(*data_it,f);
-            //len++;   
         }
     }
     putc('\n',f);
