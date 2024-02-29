@@ -17,8 +17,9 @@ int main(int argc, char** argv)
     }
     putchar('\n');
     STR_INT* a = new_str_int('f',5);
+    printf("%c\n", a->head->data[0]);
     print_str_int(a,stdout);
-    read_num(a, stdin);
+    //read_num(a, stdin);
 #endif
 #ifdef RUN
 #endif

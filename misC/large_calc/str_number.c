@@ -114,15 +114,23 @@ int read_num(STR_INT* num, FILE* f)
 
 void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//prints a number string to chosen output
 {
-    size_t len = 0;
+    //debug stuff
+    printf("attempting to print\n");
+    int p = 0;
+    //debug stuff
+    //size_t len = 0;
+    printf("element 0: %c\n",num->head->data[0]);
     for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it++)
     {
-        for (char* num_it = part_it->data; num_it < part_it->data+num->partSz && *num_it != '\0'; num_it++)
+        printf("access through part_it %c:\n", part_it->data[0]);   
+        for (char* data_it = num->head->data; data_it < (part_it->data)+(num->lastPartLength) && *data_it != '\0'; data_it++)
         {
-            if (brk && (len % line_len == 0))
-                putc('\n',f);
-            fprintf(f,"%c",*num_it);
-            len++;   
+            
+            //if (brk && (len % line_len == 0))
+            //    putc('\n',f);
+            printf("%c",*data_it);
+            fprintf(f,"%c",*data_it);
+            //len++;   
         }
     }
     putc('\n',f);
