@@ -127,7 +127,37 @@ int read_num(STR_INT* num, FILE* f)
     if (num_it < part_it->data+num->partSz) *num_it = '\0';//marks the end with $
 
 //HERE I NEED TO MIRROR THE ELEMENTS
-    
+    char tmp;
+    STR_INT_PART* fw_part = num->head;
+    STR_INT_PART* bw_part = num->tail;
+    char* fw_data = fw_part->data;
+    char* bw_data = bw_part->data+num->lastPartLength-1;
+
+    while (1)
+    {
+        if (fw_part != bw_part){
+            if (fw_data == fw_part + num->partSz)
+            {
+                fw_part = fw_part->next;
+                fw_data = fw_part->data;
+            }
+            if (bw_data == bw_part->data-1)
+            {
+                bw_part = bw_part->prev;
+                bw_data = bw_part->data+num->partSz-1;
+            }
+            
+        }
+        if (fw_data == bw_data) break;
+
+        tmp = *fw_data;
+        *fw_data = *bw_data;
+        *bw_data = tmp;
+        fw_data++;
+        bw_data--;
+
+    }
+     
 
     return 0;//zero errors
 }
