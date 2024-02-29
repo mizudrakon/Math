@@ -10,7 +10,7 @@ STR_INT_PART* new_si_part(STR_INT* mom, STR_INT_PART* prev, STR_INT_PART* next)
     mom->totalParts++;
     mom->tail = part;
     part->partNumber = mom->totalParts;
-    if ((part->data = (char*)malloc(mom->partSz)) == NULL)
+    if ((part->data = (char*)malloc(mom->partSz * sizeof(char))) == NULL)
         printf("str_int_part data malloc failed\n");
     part->mother = mom;
     part->prev = prev;
@@ -23,6 +23,7 @@ STR_INT* new_str_int(size_t base, size_t part_len)
     STR_INT* strnum;
     if ((strnum = (STR_INT*) malloc(sizeof(STR_INT))) == NULL)
         printf("new_str_int malloc failed\n");
+    strnum->partSz = part_len;
     strnum->head = new_si_part(strnum, NULL, NULL);
     strnum->tail = strnum->head;
     strnum->base = max_digit(base);
