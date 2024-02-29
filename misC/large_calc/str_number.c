@@ -127,7 +127,7 @@ int read_num(STR_INT* num, FILE* f)
     if (num_it < part_it->data+num->partSz) *num_it = '\0';//marks the end with $
 
 //HERE I NEED TO MIRROR THE ELEMENTS
-
+    
 
     return 0;//zero errors
 }
