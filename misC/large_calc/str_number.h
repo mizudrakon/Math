@@ -8,7 +8,7 @@
  it also has a pointer to it's mother which is the str_int struct defined next*/
 typedef struct str_int_part 
 {
-    unsigned short partNumber;//it a kth part in str_int::totalParts
+    size_t partNumber;//it a kth part in str_int::totalParts
     struct str_int_part* prev;
     struct str_int_part* next;
     struct str_int* mother;//pointer to str_int struct that collects the overlaying info
@@ -18,7 +18,7 @@ typedef struct str_int_part
 //structure with all info about the str_int coupled in
 typedef struct str_int
 {
-    unsigned short totalParts;//number of str_int_parts in total
+    size_t totalParts;//number of str_int_parts in total
     size_t lastPartLength;//how far is the last part of allocated memory filled
     size_t partSz;//size of a single part
     //-> so the length of the whole number is totlaParts * partSz + lastPartLength
@@ -29,12 +29,15 @@ typedef struct str_int
 } STR_INT;
 
 
-STR_INT_PART* new_si_part(STR_INT* mom, STR_INT_PART* prev, STR_INT_PART* next);
+int new_si_part(STR_INT* mom);
 /*create new str_int_part = c array that we can read the number into
+returns int as a truth value: 1 = error, 0 = no error
 prev = NULL for head, or some other str_int_part
-next = NULL untill we need more space, when it gets allocated and filled by the read_num function*/
+next = NULL untill we need more space, when it gets allocated and filled by the read_num function
+parts are always added to the str_int struct, and it can eitehr become the head AND tail, or the new tail, with the
+old one as its prev*/
 
-STR_INT* new_str_int(size_t base, size_t part_len);
+STR_INT* new_str_int(char base, size_t part_len);
 /*creating a new handle for a number*/
 
 int deleteSTR_INT(STR_INT* corpse);

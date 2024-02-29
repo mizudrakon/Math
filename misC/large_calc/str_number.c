@@ -1,34 +1,49 @@
 #include "str_number.h"
 
 
-
-STR_INT_PART* new_si_part(STR_INT* mom, STR_INT_PART* prev, STR_INT_PART* next)
+//this adds a new part to a specified mother, does it need to return a pointer?
+int new_si_part(STR_INT* mom)
 {
     STR_INT_PART* part;
     if ( (part = (STR_INT_PART*) malloc(sizeof(STR_INT_PART))) == NULL )
-        printf("str_int_part basic malloc failed\n");
-    mom->totalParts++;
+    {    printf("str_int_part basic malloc failed\n"); return 1;}
+    part->mother = mom;//assign mother
+    if (mom->head == NULL)//if mother doesn't have a head -> part is head
+    {
+        mom->head = part;
+        part->prev = NULL;
+    }
+    else 
+    {
+        part->prev = mom->tail;//new part's prev is mother's current tail
+        mom->tail->next = part;//the part becomes the new tail
+    }
     mom->tail = part;
-    part->partNumber = mom->totalParts;
-    if ((part->data = (char*)malloc(mom->partSz * sizeof(char))) == NULL)
-        printf("str_int_part data malloc failed\n");
-    part->mother = mom;
-    part->prev = prev;
-    part->next = next;
-    return part;
+    mom->totalParts++;//motehr now hes +1 part
+    part->partNumber = mom->totalParts;//the new part's number is the current total n/n
+    if ((part->data = (char*)malloc(mom->partSz * sizeof(char))) == NULL)//allocate storage
+    {    printf("str_int_part data malloc failed\n"); return 1;}
+    return 0;//no failure
 }
 
-STR_INT* new_str_int(size_t base, size_t part_len)
+STR_INT* new_str_int(char base, size_t part_len)
 {
     STR_INT* strnum;
-    if ((strnum = (STR_INT*) malloc(sizeof(STR_INT))) == NULL)
+    if ((strnum = (STR_INT*) malloc(sizeof(STR_INT))) == NULL)//allocate struct
         printf("new_str_int malloc failed\n");
     strnum->partSz = part_len;
-    strnum->head = new_si_part(strnum, NULL, NULL);
+    strnum->base = base;
+    strnum->head = NULL;
+    //create the first part that is both head and tail
+    if (new_si_part(strnum))
+    {
+        fprintf(stderr, "failed creating a new string_int_part!");
+        return NULL;
+    }//no prev or next yet
     strnum->tail = strnum->head;
-    strnum->base = max_digit(base);
+    //we want init as 0 to be safe-r...
     strnum->lastPartLength = 1;
-    strnum->head->data[0] = '0';//init to 0
+    strnum->head->data[0] = '0';
     return strnum;
 }
 
@@ -94,9 +109,13 @@ int read_num(STR_INT* num, FILE* f)
     while (is_digit(c,num->base))
     {
         //if we reach the end of the data array:
-        if (num_it == part_it->data+num->partSz){
-            part_it->next = new_si_part(num,part_it,NULL);//create new part and switch to it
-            part_it = part_it->next;
+        if (num_it == part_it->data+num->partSz) //last element is data+num->partSZ-1, so this is the overflow
+        {
+            if (new_si_part(num)){
+                fprintf(stderr, "new part creation failed!\n");
+                return 1;
+            }
+            part_it = part_it->next;//created new part is already next in the linked list
             num_it = part_it->data;
             num->lastPartLength = 0;//we start from 0, the previous parts are all full
         }
@@ -116,21 +135,26 @@ int read_num(STR_INT* num, FILE* f)
 void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//prints a number string to chosen output
 {
     //debug stuff
-    printf("attempting to print\n");
+    //printf("attempting to print\n");
     int p = 0;
     //debug stuff
     //size_t len = 0;
-    printf("element 0: %c\n",num->head->data[0]);
+    //printf("element 0: %c\n",num->head->data[0]);
     for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it++)
     {
-        printf("access through part_it %c:\n", part_it->data[0]);   
-        for (char* data_it = num->head->data; data_it < (part_it->data)+(num->lastPartLength) && *data_it != '\0'; data_it++)
+        //printf("part number: %ld",part_it->partNumber);
+        //printf("access through part_it %c:\n", part_it->data[0]);   
+        for (char* data_it = part_it->data; *data_it != '\0'; data_it++)
         {
-            
+            if (part_it == num->tail && data_it == part_it->data+num->lastPartLength)
+                break;
+            //printf("next %d\n",p++);
+
             //if (brk && (len % line_len == 0))
             //    putc('\n',f);
-            printf("%c",*data_it);
-            fprintf(f,"%c",*data_it);
+            //printf("%c",*data_it);
+            //fprintf(f,"%c",*data_it);
+            putc(*data_it,f);
             //len++;   
         }
     }
