@@ -18,3 +18,6 @@
 ### To Do:   
  * shift left and right (which is mostly useful in multiplication)
  * arithmetics: addition, subtraction, multiplication and difision... that might be it
+
+### Additional info   
+ * str_num folder contains an Obsidian canvas somewhat illustrating the function
