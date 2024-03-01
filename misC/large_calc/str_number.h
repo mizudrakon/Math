@@ -68,5 +68,7 @@ int mark(char* num, char base);
  * this is only useful when we need to assess an unknown array of digits
 */
 
+//ARITHEMTICS:
+
 #include "str_number.c"
 #endif

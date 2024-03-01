@@ -92,18 +92,20 @@ int is_digit(char c, char base){
     return c >= '0' && c <= '9';
 }
 
+//READ NUBMER FROM INPUT:
 int read_num(STR_INT* num, FILE* f)
 {
     int c;
     num->lastPartLength = 0;
     //we need to allow only numbers < base
-    //ignore white spaces or any possibly separating symbols in front
+    //IGNORE white spaces or any possibly separating symbols in front
     c = getc(f);
-    while (is_digit(c, num->base) == 0)
+    while (c == '0' || is_digit(c, num->base) == 0)//ignore leading zeros
     {
         if (c == '$') return 1;//$ is escape character
         c = getc(f);
     }
+    //READING THE NUMBER:
     STR_INT_PART* part_it = num->head;
     char* num_it = num->head->data; //iterator
     while (is_digit(c,num->base))
@@ -126,21 +128,30 @@ int read_num(STR_INT* num, FILE* f)
     }
     if (num_it < part_it->data+num->partSz) *num_it = '\0';//marks the end with $
 
-//HERE I NEED TO MIRROR THE ELEMENTS
+    //HERE we mirror the elements of the linked arrays of char, so that every number has its lowest digit on 1
+    //VARIABLES:
+    int fw_count = 0;
+    int bw_count = 0;
     char tmp;
     STR_INT_PART* fw_part = num->head;
     STR_INT_PART* bw_part = num->tail;
     char* fw_data = fw_part->data;
     char* bw_data = bw_part->data+num->lastPartLength-1;
-
+    //MIRRORING loop:
     while (1)
     {
+        //CHECKS if the mirroring should stop:
+        //we only need to cross into other parts when the two pointers point to different parts
+        if (fw_part == bw_part->next)
+            break;
         if (fw_part != bw_part){
-            if (fw_data == fw_part + num->partSz)
+            //forward data iterator overflowing
+            if (fw_data == fw_part->data + num->partSz)
             {
                 fw_part = fw_part->next;
                 fw_data = fw_part->data;
             }
+            //backward data iterator underflowing
             if (bw_data == bw_part->data-1)
             {
                 bw_part = bw_part->prev;
@@ -148,8 +159,10 @@ int read_num(STR_INT* num, FILE* f)
             }
             
         }
-        if (fw_data == bw_data) break;
-
+        //reached the middle
+        if (fw_data == bw_data) 
+            break;
+        //SWITCH:
         tmp = *fw_data;
         *fw_data = *bw_data;
         *bw_data = tmp;
@@ -157,18 +170,35 @@ int read_num(STR_INT* num, FILE* f)
         bw_data--;
 
     }
-     
 
     return 0;//zero errors
 }
 
 void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//prints a number string to chosen output
 {
-    int p = 0;
-    for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it = part_it->next)
-    //having part_it++ in there cases the NULL check to fail, obviously
+    //we keep the numbers so the least index is the least digit of the number, so we write out backwards
+    for (STR_INT_PART* bw_part_it = num->tail; bw_part_it != NULL; bw_part_it = bw_part_it->prev)
     {
-        for (char* data_it = part_it->data; *data_it != '\0'; data_it++)
+        /*we're moving from the last part at a specific place accross all the parts where we just start from the last element
+         hence the ugly conditional assignment*/
+        for (char* bw_data_it = (bw_part_it->next == NULL) ? bw_part_it->data+num->lastPartLength-1 : bw_part_it->data+num->partSz-1; 
+        bw_data_it >= bw_part_it->data; bw_data_it--)
+        {
+            if (bw_part_it->prev == NULL && bw_data_it < bw_part_it->data)
+                break;
+
+            putc(*bw_data_it,f);
+        }
+    }
+    putc('\n',f);
+}
+
+//BACKWARD PRINTING is actually just straightforward printing, because we keep the data backward
+void backward_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)
+{
+    for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it = part_it->next)
+    {
+        for (char* data_it = part_it->data; data_it != part_it->data + num->partSz; data_it++)
         {
             if (part_it->next == NULL && data_it >= part_it->data+num->lastPartLength)
                 break;
