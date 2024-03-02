@@ -228,12 +228,11 @@ int mark(char* num, const char base)
 int digit_lt(char a, char b)
 {
     if (a >= '0' && a <= '9'){
-        if (b >= '0' && b <= '9' )
-            return a < b;
-        return 1;
+        if (b <= '0' || b >= '9' )
+            return 1;
+        return a < b;
     }
     if (b >= '0' && b <= '9')
         return 0;
-    a = a - 'A';
-    return 1;
+    return a < b;
 }

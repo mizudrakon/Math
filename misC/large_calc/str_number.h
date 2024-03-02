@@ -69,7 +69,7 @@ int mark(char* num, char base);
 */
 
 //COMPARE:
-int digit_compare(char a, char b);
+int digit_lt(char a, char b);
 
 //ARITHEMTICS:
 
