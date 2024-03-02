@@ -47,7 +47,7 @@ int deleteSTR_INT(STR_INT* corpse);
 char max_digit(size_t b);
 //given a base b, get the char representing the maximum single digit
 
-int is_digit(char c, char base);
+int is_digit(char* c, const char* base);
 //tests a char for being a numeric given the base
 
 int read_num(STR_INT* num, FILE* f);
@@ -68,7 +68,12 @@ int mark(char* num, char base);
  * this is only useful when we need to assess an unknown array of digits
 */
 
+//COMPARE:
+int digit_compare(char a, char b);
+
 //ARITHEMTICS:
+
+int addition(STR_INT* numA, STR_INT* numB, STR_INT* target);
 
 #include "str_number.c"
 #endif

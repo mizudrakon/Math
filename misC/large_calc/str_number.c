@@ -79,54 +79,55 @@ char max_digit(size_t b)
 
 /*numbers 10+ are represented by letters, so we need to test characters and not just regular numerals
 c is char to be tested against the base (c < base, since base isn't a numeral in it's own system)*/
-int is_digit(char c, char base){
+int is_digit(char* c, const char* base){
     //reduce capital letters to small, since we're not sure which come first
-    if (c >= 'A' && c <= 'Z')
+    if (*c >= 'A' && *c <= 'Z')
     {
-        c = 'a' + (c - 'A');
+        //we're KNOWINGLY changing the read char to lower case
+        *c = 'a' + (*c - 'A');
     }
     //the case we need to deal with the 10+ base
-    if (base >= 'a' && base <= 'z'){
-        return (c >= '0' && c <= '9') || (c >= 'a' && c < base);
+    if (*base >= 'a' && *base <= 'z'){
+        return (*c >= '0' && *c <= '9') || (*c >= 'a' && *c < *base);
     }
-    return c >= '0' && c <= '9';
+    return *c >= '0' && *c <= '9';
 }
 
 //READ NUBMER FROM INPUT:
 int read_num(STR_INT* num, FILE* f)
 {
-    int c;
+    char c;
     num->lastPartLength = 0;
     //we need to allow only numbers < base
     //IGNORE white spaces or any possibly separating symbols in front
     c = getc(f);
-    while (c == '0' || is_digit(c, num->base) == 0)//ignore leading zeros
+    while (c == '0' || is_digit(&c, &num->base) == 0)//ignore leading zeros
     {
         if (c == '$') return 1;//$ is escape character
         c = getc(f);
     }
     //READING THE NUMBER:
     STR_INT_PART* part_it = num->head;
-    char* num_it = num->head->data; //iterator
-    while (is_digit(c,num->base))
+    char* data_it = num->head->data; //iterator
+    while (is_digit(&c,&num->base))
     {
         //if we reach the end of the data array:
-        if (num_it == part_it->data+num->partSz) //last element is data+num->partSZ-1, so this is the overflow
+        if (data_it == part_it->data+num->partSz) //last element is data+num->partSZ-1, so this is the overflow
         {
             if (new_si_part(num)){
                 fprintf(stderr, "new part creation failed!\n");
                 return 1;
             }
             part_it = part_it->next;//created new part is already next in the linked list
-            num_it = part_it->data;
+            data_it = part_it->data;
             num->lastPartLength = 0;//we start from 0, the previous parts are all full
         }
-        *num_it++ = c;
+        *data_it++ = c;
         num->lastPartLength++;
         c = getc(f);
 
     }
-    if (num_it < part_it->data+num->partSz) *num_it = '\0';//marks the end with $
+    if (data_it < part_it->data+num->partSz) *data_it = '\0';//marks the end with $
 
     //HERE we mirror the elements of the linked arrays of char, so that every number has its lowest digit on 1
     //VARIABLES:
@@ -215,10 +216,24 @@ void print_str_int(STR_INT* num, FILE* f)
 }
 
 
-int mark(char* num, char base)
+int mark(char* num, const char base)
 {
     char* num_it = num;
-    while (is_digit(*num_it,base)) num_it++;
+    while (is_digit(num_it,&base)) num_it++;
     *num_it = '\0';
     return 0;
+}
+
+//COMPARE:
+int digit_lt(char a, char b)
+{
+    if (a >= '0' && a <= '9'){
+        if (b >= '0' && b <= '9' )
+            return a < b;
+        return 1;
+    }
+    if (b >= '0' && b <= '9')
+        return 0;
+    a = a - 'A';
+    return 1;
 }
