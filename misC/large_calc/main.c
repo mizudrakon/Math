@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define TEST 
 #include "str_number.h"
+#define TEST 
 #ifdef DEFS
 //test definitions
 #endif
@@ -32,6 +32,13 @@ int main(int argc, char** argv)
     printf("regular print: ");
     print_str_int(a,stdout);
 #endif
-#ifdef RUN
+#ifdef TEST2
+    //realization: char IS an 8 bit number...
+    //C doesn't support overloading
+    char a = 3;
+    char b = 5;
+    if (b < 10)
+        b += a;
+    printf("%d\n",b);
 #endif
 }

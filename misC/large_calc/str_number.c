@@ -49,11 +49,6 @@ STR_INT* new_str_int(char base, size_t part_len)
     return strnum;
 }
 
-STR_INT* new_str_int(size_t base_num, size_t part_len)
-{
-    return new_str_int(max_digit(base_num),part_len);
-}
-
 //cleaning STR_INT data
 int deleteSTR_INT(STR_INT* corpse)
 {
@@ -82,15 +77,6 @@ char max_digit(size_t b)
         return b - 10 + 'a' - 1;
     }
     return '$';
-}
-
-char max_digit(char c_b)
-{
-    if (c_b >= '0' && c_b <= '9')
-        return max_digit(c_b - '0');
-    if (c_b >= 'a' && c_b <= 'z')
-        return max_digit(c_b - 'a');
-    return max_digit(c_b - 'A');
 }
 
 /*numbers 10+ are represented by letters, so we need to test characters and not just regular numerals
