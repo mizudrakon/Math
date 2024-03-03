@@ -18,6 +18,7 @@ int new_si_part(STR_INT* mom)
         part->prev = mom->tail;//new part's prev is mother's current tail
         mom->tail->next = part;//the part becomes the new tail
     }
+    part->next = NULL;
     mom->tail = part;
     mom->totalParts++;//motehr now hes +1 part
     part->partNumber = mom->totalParts;//the new part's number is the current total n/n
@@ -44,7 +45,13 @@ STR_INT* new_str_int(char base, size_t part_len)
     //we want init as 0 to be safe-r...
     strnum->lastPartLength = 1;
     strnum->head->data[0] = '0';
+    strnum->end = strnum->head->data+1;
     return strnum;
+}
+
+STR_INT* new_str_int(size_t base_num, size_t part_len)
+{
+    return new_str_int(max_digit(base_num),part_len);
 }
 
 //cleaning STR_INT data
@@ -77,6 +84,15 @@ char max_digit(size_t b)
     return '$';
 }
 
+char max_digit(char c_b)
+{
+    if (c_b >= '0' && c_b <= '9')
+        return max_digit(c_b - '0');
+    if (c_b >= 'a' && c_b <= 'z')
+        return max_digit(c_b - 'a');
+    return max_digit(c_b - 'A');
+}
+
 /*numbers 10+ are represented by letters, so we need to test characters and not just regular numerals
 c is char to be tested against the base (c < base, since base isn't a numeral in it's own system)*/
 int is_digit(char c, char base){
@@ -107,26 +123,27 @@ int read_num(STR_INT* num, FILE* f)
     }
     //READING THE NUMBER:
     STR_INT_PART* part_it = num->head;
-    char* num_it = num->head->data; //iterator
+    char* data_it = num->head->data; //iterator
     while (is_digit(c,num->base))
     {
         //if we reach the end of the data array:
-        if (num_it == part_it->data+num->partSz) //last element is data+num->partSZ-1, so this is the overflow
+        if (data_it == part_it->data+num->partSz) //last element is data+num->partSZ-1, so this is the overflow
         {
             if (new_si_part(num)){
                 fprintf(stderr, "new part creation failed!\n");
                 return 1;
             }
             part_it = part_it->next;//created new part is already next in the linked list
-            num_it = part_it->data;
+            data_it = part_it->data;
             num->lastPartLength = 0;//we start from 0, the previous parts are all full
         }
-        *num_it++ = c;
+        *data_it++ = c;
         num->lastPartLength++;
         c = getc(f);
 
     }
-    if (num_it < part_it->data+num->partSz) *num_it = '\0';//marks the end with $
+    if (data_it < part_it->data+num->partSz) *data_it = '\0';//marks the end with $
+    num->end = data_it;
 
     //HERE we mirror the elements of the linked arrays of char, so that every number has its lowest digit on 1
     //VARIABLES:
@@ -160,7 +177,7 @@ int read_num(STR_INT* num, FILE* f)
             
         }
         //reached the middle
-        if (fw_data == bw_data) 
+        if (fw_part == bw_part && fw_data >= bw_data) 
             break;
         //SWITCH:
         tmp = *fw_data;
@@ -181,10 +198,10 @@ void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//pr
     {
         /*we're moving from the last part at a specific place accross all the parts where we just start from the last element
          hence the ugly conditional assignment*/
-        for (char* bw_data_it = (bw_part_it->next == NULL) ? bw_part_it->data+num->lastPartLength-1 : bw_part_it->data+num->partSz-1; 
+        for (char* bw_data_it = (bw_part_it == num->tail) ? num->end-1 : bw_part_it->data+num->partSz-1; 
         bw_data_it >= bw_part_it->data; bw_data_it--)
         {
-            if (bw_part_it->prev == NULL && bw_data_it < bw_part_it->data)
+            if (bw_part_it == num->head && bw_data_it < bw_part_it->data)
                 break;
 
             putc(*bw_data_it,f);
@@ -196,12 +213,18 @@ void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//pr
 //BACKWARD PRINTING is actually just straightforward printing, because we keep the data backward
 void backward_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)
 {
+    int fin = 0;
     for (STR_INT_PART* part_it = num->head; part_it != NULL; part_it = part_it->next)
-    {
-        for (char* data_it = part_it->data; data_it != part_it->data + num->partSz; data_it++)
+    {   
+        int i = 0;
+        if (fin) break;
+        for (char* data_it = part_it->data; data_it < part_it->data + num->partSz; data_it++)
         {
-            if (part_it->next == NULL && data_it >= part_it->data+num->lastPartLength)
+            if (part_it == num->tail && data_it == num->end)
+            {    
+                fin = 1;
                 break;
+            }
 
             putc(*data_it,f);
         }

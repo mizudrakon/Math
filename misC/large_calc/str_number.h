@@ -20,6 +20,7 @@ typedef struct str_int
 {
     size_t totalParts;//number of str_int_parts in total
     size_t lastPartLength;//how far is the last part of allocated memory filled
+    char* end;
     size_t partSz;//size of a single part
     //-> so the length of the whole number is totlaParts * partSz + lastPartLength
     char base;//numeric base of the number
@@ -38,6 +39,7 @@ parts are always added to the str_int struct, and it can eitehr become the head 
 old one as its prev*/
 
 STR_INT* new_str_int(char base, size_t part_len);
+//STR_INT* new_str_int(size_t base_num, size_t part_len);
 /*creating a new handle for a number*/
 
 int deleteSTR_INT(STR_INT* corpse);

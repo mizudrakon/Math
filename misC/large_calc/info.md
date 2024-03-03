@@ -12,8 +12,9 @@
    
 
 ### Done:  
- * Storage and input/output of the numbers pretty much dealt with.
- * Can read numbers of different base, and write them 
+ * Storage and input/output of the numbers pretty much dealt with. !
+ * Can read numbers of different base, and write them !
+ * issues with Windows and needs more dubbug
    
 ### To Do:   
  * shift left and right (which is mostly useful in multiplication)

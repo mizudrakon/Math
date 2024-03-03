@@ -19,10 +19,10 @@ int main(int argc, char** argv)
     printf("list of all numeric characters for base %c:\n",base);
     for (int i = 1; i <= 140; i++){
         if (is_digit(i,base))
-            printf("%c is digit for base %c\n",i,base);
+            printf("%c is digit for base %c = %d\n",i,base,b);
     }
     putchar('\n');
-    STR_INT* a = new_str_int('f',5);
+    STR_INT* a = new_str_int('g',5);
     printf("print empty init str_int: ");
     print_str_int(a,stdout);
     printf("enter number: ");
