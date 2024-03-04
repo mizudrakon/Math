@@ -19,7 +19,7 @@ typedef struct str_int_part
 typedef struct str_int
 {
     size_t totalParts;//number of str_int_parts in total
-    size_t lastPartLength;//how far is the last part of allocated memory filled
+    size_t tailLength;//how far is the last part of allocated memory filled
     char* end;
     size_t partSz;//size of a single part
     //-> so the length of the whole number is totlaParts * partSz + lastPartLength
@@ -49,8 +49,11 @@ int deleteSTR_INT(STR_INT* corpse);
 char max_digit(size_t b);
 //given a base b, get the char representing the maximum single digit
 
-int is_digit(char c, char base);
+int is_digit(char c, const char base);
 //tests a char for being a numeric given the base
+
+int is_digit_convert(char* p_c, const char* p_base);
+//also converts the *p_c into form used in str_int (char with required ordinal value)
 
 int read_num(STR_INT* num, FILE* f);
 /*read from the specified input into the specified number handler

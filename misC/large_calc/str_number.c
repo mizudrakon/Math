@@ -43,7 +43,7 @@ STR_INT* new_str_int(char base, size_t part_len)
     }//no prev or next yet
     strnum->tail = strnum->head;
     //we want init as 0 to be safe-r...
-    strnum->lastPartLength = 1;
+    strnum->tailLength = 1;
     strnum->head->data[0] = '0';
     strnum->end = strnum->head->data+1;
     return strnum;
@@ -80,8 +80,9 @@ char max_digit(size_t b)
 }
 
 /*numbers 10+ are represented by letters, so we need to test characters and not just regular numerals
-c is char to be tested against the base (c < base, since base isn't a numeral in it's own system)*/
-int is_digit(char c, char base){
+c is char to be tested against the base (c < base, since base isn't a numeral in it's own system)
+* this is a basic is_digit function only to tell us if the number is */
+int is_digit(char c, const char base){
     //reduce capital letters to small, since we're not sure which come first
     if (c >= 'A' && c <= 'Z')
     {
@@ -94,11 +95,27 @@ int is_digit(char c, char base){
     return c >= '0' && c <= '9';
 }
 
+/*A horrible function that returns a truth value BUT also changes the char value that is being evaluated
+ * the thing is our str_int uses char ordinal values of chars, not the symbols, so this is how we want to keep them
+ * the value used by reference is actually a copy from the source already and we don't care what happens to it here*/
+int is_digit_convert(char* p_c, const char* p_base){
+    //reduce capital letters to small, since we're not sure which come first
+    if (*p_c >= '0' && *p_c <= '9')
+        *p_c = *p_c - '0';
+    else if (*p_c >= 'A' && *p_c <= 'Z')
+        *p_c = 10 + (*p_c - 'A');
+    else if (*p_c >= 'a' && *p_c <= 'z')
+        *p_c = 10 + (*p_c - 'a');
+    
+    //return truth value
+        return *p_c >= 0 && *p_c < *p_base;
+}
+
 //READ NUBMER FROM INPUT:
 int read_num(STR_INT* num, FILE* f)
 {
-    int c;
-    num->lastPartLength = 0;
+    char c;
+    num->tailLength = 0;
     //we need to allow only numbers < base
     //IGNORE white spaces or any possibly separating symbols in front
     c = getc(f);
@@ -110,7 +127,7 @@ int read_num(STR_INT* num, FILE* f)
     //READING THE NUMBER:
     STR_INT_PART* part_it = num->head;
     char* data_it = num->head->data; //iterator
-    while (is_digit(c,num->base))
+    while (is_digit_convert(&c,&num->base))
     {
         //if we reach the end of the data array:
         if (data_it == part_it->data+num->partSz) //last element is data+num->partSZ-1, so this is the overflow
@@ -121,10 +138,10 @@ int read_num(STR_INT* num, FILE* f)
             }
             part_it = part_it->next;//created new part is already next in the linked list
             data_it = part_it->data;
-            num->lastPartLength = 0;//we start from 0, the previous parts are all full
+            num->tailLength = 0;//we start from 0, the previous parts are all full
         }
         *data_it++ = c;
-        num->lastPartLength++;
+        num->tailLength++;
         c = getc(f);
 
     }
@@ -139,7 +156,7 @@ int read_num(STR_INT* num, FILE* f)
     STR_INT_PART* fw_part = num->head;
     STR_INT_PART* bw_part = num->tail;
     char* fw_data = fw_part->data;
-    char* bw_data = bw_part->data+num->lastPartLength-1;
+    char* bw_data = bw_part->data+num->tailLength-1;
     //MIRRORING loop:
     while (1)
     {
@@ -190,7 +207,10 @@ void formated_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)//pr
             if (bw_part_it == num->head && bw_data_it < bw_part_it->data)
                 break;
 
-            putc(*bw_data_it,f);
+            if (*bw_data_it < 10)
+                putc(*bw_data_it + '0',f);
+            else
+                putc(*bw_data_it - 10 + 'A',f);
         }
     }
     putc('\n',f);
@@ -212,7 +232,10 @@ void backward_print_str_int(STR_INT* num, FILE* f, int brk, size_t line_len)
                 break;
             }
 
-            putc(*data_it,f);
+            if (*data_it < 10)
+                putc(*data_it + '0',f);
+            else
+                putc(*data_it - 10 + 'A',f);
         }
     }
     putc('\n',f);
