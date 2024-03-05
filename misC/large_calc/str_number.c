@@ -106,7 +106,7 @@ int is_digit_convert(char* p_c, const char* p_base){
         *p_c = 10 + (*p_c - 'A');
     else if (*p_c >= 'a' && *p_c <= 'z')
         *p_c = 10 + (*p_c - 'a');
-    
+    else return 0; 
     //return truth value
         return *p_c >= 0 && *p_c < *p_base;
 }
