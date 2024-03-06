@@ -1,5 +1,6 @@
 #include "str_number.h"
 
+//added iterator
 STR_INT_ITERATOR* make_iterator(STR_INT* mom)
 {
     STR_INT_ITERATOR* it;

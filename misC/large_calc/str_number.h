@@ -29,6 +29,8 @@ typedef struct str_int
     STR_INT_PART* tail;
 } STR_INT;
 
+//ADDED ITERATOR HERE:
+
 /*we need to iterate over the data every time we do anything with str_int
  * that means A LOT of repeating pointer declarations */
 typedef struct
