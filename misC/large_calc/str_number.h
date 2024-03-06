@@ -29,6 +29,20 @@ typedef struct str_int
     STR_INT_PART* tail;
 } STR_INT;
 
+/*we need to iterate over the data every time we do anything with str_int
+ * that means A LOT of repeating pointer declarations */
+typedef struct
+{
+    STR_INT* mom;
+    STR_INT_PART* part_it;
+    char* data_it;
+} STR_INT_ITERATOR;
+
+STR_INT_ITERATOR* make_iterator(STR_INT* mom);
+
+int iterator_fw(STR_INT_ITERATOR* it);
+
+int iterator_bw(STR_INT_ITERATOR* it);
 
 int new_si_part(STR_INT* mom);
 /*create new str_int_part = c array that we can read the number into
@@ -74,6 +88,11 @@ int mark(char* num, char base);
 */
 
 //ARITHEMTICS:
+int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target);
+/* target = a + b
+ * target can be specified as a or b as well, but we don't rewrite implicitly 
+ * target = new_str_int() must be run first and result provided here as a parameter
+ */
 
 #include "str_number.c"
 #endif

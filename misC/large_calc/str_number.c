@@ -1,5 +1,39 @@
 #include "str_number.h"
 
+STR_INT_ITERATOR* make_iterator(STR_INT* mom)
+{
+    STR_INT_ITERATOR* it;
+    it->mom = mom;
+    it->part_it = mom->head;
+    it->data_it = mom->head->data;
+}
+
+int iterator_fw(STR_INT_ITERATOR* it)
+{
+    if (it->part_it == it->mom->tail && it->data_it > it->mom->end) return 0;
+    
+    it->data_it++;
+    
+    if (it->data_it == it->part_it->data + it->mom->partSz)
+    {
+        it->part_it = it->part_it->next;
+        it->data_it = it->part_it->data;
+    }
+    return 1; //return true 
+}
+
+int iterator_bw(STR_INT_ITERATOR* it)
+{
+    it->data_it--;
+
+    if (it->data_it < it->part_it->data)
+    {
+        if (it->part_it == it->mom->head) return 0;
+        it->part_it = it->part_it->prev;
+        it->data_it = it->part_it->data + it->mom->partSz - 1;
+    }
+    return 1;
+}
 
 //this adds a new part to a specified mother, does it need to return a pointer?
 int new_si_part(STR_INT* mom)
@@ -252,5 +286,22 @@ int mark(char* num, char base)
     char* num_it = num;
     while (is_digit(*num_it,base)) num_it++;
     *num_it = '\0';
+    return 0;
+}
+
+int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target)
+{
+    if (a->base != b->base) return 1;
+    target->base = a->base;//target needs to be created first with the base specified, but it can be changed
+    char ovf = 0;
+    STR_INT_PART* a_pt_it = a->head;
+    STR_INT_PART* b_pt_it = b->head;
+    char* a_it = a->head->data,
+          b_it = b->head->data;
+
+    while (a_it != a->end && b_it != b->end)
+    {
+        if (a_it == a_pt_it->data + a->partSz){}
+    }
     return 0;
 }
