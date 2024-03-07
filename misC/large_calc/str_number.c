@@ -3,22 +3,26 @@
 //added iterator
 STR_INT_ITERATOR* make_iterator(STR_INT* mom)
 {
-    STR_INT_ITERATOR* it;
+    STR_INT_ITERATOR* it = (STR_INT_ITERATOR*) malloc(sizeof(STR_INT_ITERATOR));
     it->mom = mom;
     it->part_it = mom->head;
     it->data_it = mom->head->data;
+    return it;
 }
 
 int iterator_fw(STR_INT_ITERATOR* it)
 {
-    if (it->part_it == it->mom->tail && it->data_it > it->mom->end) return 0;
+    if (it->data_it > it->mom->end) {
+        printf("fw called on end\n");
+        return 0;
+    }
     
     it->data_it++;
-    
     if (it->data_it == it->part_it->data + it->mom->partSz)
     {
         it->part_it = it->part_it->next;
         it->data_it = it->part_it->data;
+        return 1;
     }
     return 1; //return true 
 }
@@ -197,8 +201,6 @@ int read_num(STR_INT* num, FILE* f)
     {
         //CHECKS if the mirroring should stop:
         //we only need to cross into other parts when the two pointers point to different parts
-        if (fw_part == bw_part->next)
-            break;
         if (fw_part != bw_part){
             //forward data iterator overflowing
             if (fw_data == fw_part->data + num->partSz)
@@ -207,23 +209,26 @@ int read_num(STR_INT* num, FILE* f)
                 fw_data = fw_part->data;
             }
             //backward data iterator underflowing
-            if (bw_data == bw_part->data-1)
+            if (bw_data == (bw_part->data-1))
             {
                 bw_part = bw_part->prev;
-                bw_data = bw_part->data+num->partSz-1;
+                bw_data = bw_part->data+(num->partSz-1);
             }
             
         }
+        if (fw_part == bw_part->next)
+            break;
         //reached the middle
         if (fw_part == bw_part && fw_data >= bw_data) 
             break;
         //SWITCH:
+        printf("switching %c <-> %c\n", *fw_data+'0', *bw_data+'0');
         tmp = *fw_data;
         *fw_data = *bw_data;
         *bw_data = tmp;
+        //point to next
         fw_data++;
         bw_data--;
-
     }
 
     return 0;//zero errors
@@ -297,12 +302,25 @@ int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target)
     char ovf = 0;
     STR_INT_PART* a_pt_it = a->head;
     STR_INT_PART* b_pt_it = b->head;
-    char* a_it = a->head->data,
-          b_it = b->head->data;
+    char* a_it = a->head->data;
+    char* b_it = b->head->data;
 
     while (a_it != a->end && b_it != b->end)
     {
         if (a_it == a_pt_it->data + a->partSz){}
     }
     return 0;
+}
+
+int it_eq(const STR_INT_ITERATOR* a, const STR_INT_ITERATOR* b)
+{
+    return a->data_it == b->data_it;
+}
+
+int it_test(STR_INT_ITERATOR s,STR_INT_ITERATOR e)
+{
+    for (;it_eq(&s,&e) == 0; iterator_fw(&s)){
+        putchar(*s.data_it + '0');
+    }
+    putchar('\n');
 }

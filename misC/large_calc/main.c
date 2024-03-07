@@ -32,6 +32,15 @@ int main(int argc, char** argv)
     backward_print_str_int(a,stdout,0,0);
     printf("regular print: ");
     print_str_int(a,stdout);
+    printf("testing iterator:\n");
+    STR_INT_ITERATOR* start = make_iterator(a);
+    STR_INT_ITERATOR* end = make_iterator(a);
+    end->part_it = a->tail;
+    end->data_it = a->end;
+    it_test(*start, *end);
+    free((void*)start);
+    free((void*)end);
+
 #endif
 #ifdef TEST2
     //realization: char IS an 8 bit number...
