@@ -139,17 +139,17 @@ char max_digit(size_t b)
 /*numbers 10+ are represented by letters, so we need to test characters and not just regular numerals
 c is char to be tested against the base (c < base, since base isn't a numeral in it's own system)
 * this is a basic is_digit function only to tell us if the number is */
-int is_digit(char c, const char base){
+int is_digit(char c, const char maxDigit){
     //reduce capital letters to small, since we're not sure which come first
     if (c >= 'A' && c <= 'Z')
     {
         c = 'a' + (c - 'A');
     }
     //the case we need to deal with the 10+ base
-    if (base >= 'a' && base <= 'z'){
-        return (c >= '0' && c <= '9') || (c >= 'a' && c < base);
+    if (maxDigit >= 'a' && maxDigit <= 'z'){
+        return (c >= '0' && c <= '9') || (c >= 'a' && c <= maxDigit);
     }
-    return c >= '0' && c <= '9';
+    return c >= '0' && c <= maxDigit;
 }
 
 /*A horrible function that returns a truth value BUT also changes the char value that is being evaluated
@@ -183,11 +183,12 @@ int read_num(STR_INT* num, FILE* f)
     //we need to allow only numbers < base
     //IGNORE white spaces or any possibly separating symbols in front
     c = getc(f);
-    while (c == '0' || is_digit(c, num->base) == 0)//ignore leading zeros
+    while (c == '0' || is_digit(c, max_digit(num->base)) == 0)//ignore leading zeros
     {
         if (c == '$') return 1;//$ is escape character
         c = getc(f);
     }
+    printf("found a number and reading...\n");
     //READING THE NUMBER:
     STR_INT_PART* part_it = num->head;
     char* data_it = num->head->data; //iterator
