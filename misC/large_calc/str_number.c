@@ -1,7 +1,7 @@
 #include "str_number.h"
 
 //added iterator
-STR_INT_ITERATOR* make_iterator(STR_INT* mom)
+STR_INT_ITERATOR* make_fw_iterator(STR_INT* mom)
 {
     STR_INT_ITERATOR* it = (STR_INT_ITERATOR*) malloc(sizeof(STR_INT_ITERATOR));
     it->mom = mom;
@@ -10,15 +10,26 @@ STR_INT_ITERATOR* make_iterator(STR_INT* mom)
     return it;
 }
 
+STR_INT_ITERATOR* make_bw_iterator(STR_INT* mom)
+{
+    STR_INT_ITERATOR* it = (STR_INT_ITERATOR*) malloc(sizeof(STR_INT_ITERATOR));
+    it->mom = mom;
+    it->part_it = mom->tail;
+    it->data_it = mom->end;
+    return it;
+}
+
 int iterator_fw(STR_INT_ITERATOR* it)
 {
-    if (it->data_it > it->mom->end) {
-        printf("fw called on end\n");
+    if (it->data_it >= it->mom->end) {
+        printf("ERROR: forward iterator called on end\n");
         return 0;
     }
     
     it->data_it++;
-    if (it->data_it == it->part_it->data + it->mom->partSz)
+    if (it->data_it == it->mom->end)
+        return 1;
+    else if (it->data_it == it->part_it->data + it->mom->partSz)
     {
         it->part_it = it->part_it->next;
         it->data_it = it->part_it->data;
@@ -29,8 +40,12 @@ int iterator_fw(STR_INT_ITERATOR* it)
 
 int iterator_bw(STR_INT_ITERATOR* it)
 {
+    if (it->part_it == it->mom->head && it->data_it == it->mom->head->data)
+    { 
+        printf("ERROR: backward iterator called on begin\n");
+        return 0;
+    }
     it->data_it--;
-
     if (it->data_it < it->part_it->data)
     {
         if (it->part_it == it->mom->head) return 0;
@@ -222,7 +237,7 @@ int read_num(STR_INT* num, FILE* f)
         if (fw_part == bw_part && fw_data >= bw_data) 
             break;
         //SWITCH:
-        printf("switching %c <-> %c\n", *fw_data+'0', *bw_data+'0');
+        //printf("switching %c <-> %c\n", *fw_data+'0', *bw_data+'0');
         tmp = *fw_data;
         *fw_data = *bw_data;
         *bw_data = tmp;

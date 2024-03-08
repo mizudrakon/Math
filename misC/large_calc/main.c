@@ -8,11 +8,10 @@
 
 int main(int argc, char** argv)
 {
-
-#ifdef TEST
+    const char base = 16;
+#ifdef LIST_NUMS
     int b = 16;
     //char base = max_digit(b+1);
-    const char base = 16;
     /*the thing is: we usually need the max_digit which is 15, not the actual base which would be 16
      not sure if I should change the code to enter the actual base...*/
     for (int i = 1; i <= 40; i++)
@@ -23,6 +22,8 @@ int main(int argc, char** argv)
             printf("%c is digit for base %c = %d\n",i,max_digit(base+1),b);
     }
     putchar('\n');
+#endif
+#ifdef TEST
     STR_INT* a = new_str_int('g',5);
     printf("print empty init str_int: ");
     print_str_int(a,stdout);
@@ -33,11 +34,11 @@ int main(int argc, char** argv)
     printf("regular print: ");
     print_str_int(a,stdout);
     printf("testing iterator:\n");
-    STR_INT_ITERATOR* start = make_iterator(a);
-    STR_INT_ITERATOR* end = make_iterator(a);
-    end->part_it = a->tail;
-    end->data_it = a->end;
+    STR_INT_ITERATOR* start = make_fw_iterator(a);
+    STR_INT_ITERATOR* end = make_bw_iterator(a);
+    //printf("last dig: %c\n", *(end->data_it-1) + '0');
     it_test(*start, *end);
+    printf("it_test done\n");
     free((void*)start);
     free((void*)end);
 
