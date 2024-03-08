@@ -8,7 +8,11 @@
 
 int main(int argc, char** argv)
 {
-    const char base = 16;
+    int bs;
+    printf("Insert base:");
+    scanf("%d",&bs);
+    char base = max_digit(bs+1);
+
 #ifdef LIST_NUMS
     int b = 16;
     //char base = max_digit(b+1);
@@ -24,24 +28,38 @@ int main(int argc, char** argv)
     putchar('\n');
 #endif
 #ifdef TEST
-    STR_INT* a = new_str_int('g',5);
+    STR_INT* a = new_str_int(bs,5);
     printf("print empty init str_int: ");
     print_str_int(a,stdout);
     printf("enter number: ");
     read_num(a, stdin);
-    printf("backward print: ");
-    backward_print_str_int(a,stdout,0,0);
-    printf("regular print: ");
+    printf("enter number: ");
+    STR_INT* b = new_str_int(bs,5);
+    read_num(b, stdin);
+    //printf("backward print: ");
+    //backward_print_str_int(a,stdout,0,0);
+    printf("regular print: \n");
+    printf("a:\n");
     print_str_int(a,stdout);
+    printf("b:\n");
+    print_str_int(b,stdout);
+    printf("a + b:\n");
+    STR_INT* c = new_str_int(bs,5);
+    str_int_add(a,b,c);
+    print_str_int(c,stdout);
+    /*
     printf("testing iterator:\n");
-    STR_INT_ITERATOR* start = make_fw_iterator(a);
-    STR_INT_ITERATOR* end = make_bw_iterator(a);
+    STR_INT_ITERATOR* start = make_fw_iterator(c);
+    STR_INT_ITERATOR* end = make_bw_iterator(c);
     //printf("last dig: %c\n", *(end->data_it-1) + '0');
     it_test(*start, *end);
     printf("it_test done\n");
     free((void*)start);
     free((void*)end);
-
+    */
+    deleteSTR_INT(a);
+    deleteSTR_INT(b);
+    deleteSTR_INT(c);
 #endif
 #ifdef TEST2
     //realization: char IS an 8 bit number...

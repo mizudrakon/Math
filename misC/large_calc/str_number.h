@@ -29,23 +29,6 @@ typedef struct str_int
     STR_INT_PART* tail;
 } STR_INT;
 
-//ADDED ITERATOR HERE:
-
-/*we need to iterate over the data every time we do anything with str_int
- * that means A LOT of repeating pointer declarations */
-typedef struct
-{
-    STR_INT* mom;
-    STR_INT_PART* part_it;
-    char* data_it;
-} STR_INT_ITERATOR;
-
-STR_INT_ITERATOR* make_iterator(STR_INT* mom);
-
-int iterator_fw(STR_INT_ITERATOR* it);
-
-int iterator_bw(STR_INT_ITERATOR* it);
-
 int new_si_part(STR_INT* mom);
 /*create new str_int_part = c array that we can read the number into
 returns int as a truth value: 1 = error, 0 = no error
@@ -61,6 +44,31 @@ STR_INT* new_str_int(char base, size_t part_len);
 int deleteSTR_INT(STR_INT* corpse);
 /*cleaning function to free the memory*/
 
+//ITERATOR:
+typedef struct
+{
+    STR_INT* mom;
+    STR_INT_PART* part_it;
+    char* data_it;
+} STR_INT_ITERATOR;
+/*we need to iterate over the data every time we do anything with str_int
+ * that means A LOT of repeating pointer declarations */
+
+STR_INT_ITERATOR* make_fw_iterator(STR_INT* mom);
+//iterator that starts at head->data
+
+STR_INT_ITERATOR* make_bw_iterator(STR_INT* mom);
+//iterator that starts at the tail->data+tailLength = 1 past the end
+
+int iterator_fw(STR_INT_ITERATOR* it);
+//move iterator towards the end
+
+int iterator_bw(STR_INT_ITERATOR* it);
+//move iterator towards the begin
+
+int it_eq(const STR_INT_ITERATOR* a, const STR_INT_ITERATOR* b);
+//do iterators point to the same thing?
+
 
 char max_digit(size_t b);
 //given a base b, get the char representing the maximum single digit
@@ -71,13 +79,19 @@ int is_digit(char c, const char base);
 int is_digit_convert(char* p_c, const char* p_base);
 //also converts the *p_c into form used in str_int (char with required ordinal value)
 
+char to_symbol(const char* cnum);
+//converts small saved in char to it's char symbol
+
 int read_num(STR_INT* num, FILE* f);
 /*read from the specified input into the specified number handler
  * writes the digits one by one into the head part
  * calls new_str_int_part() if necessary
  * returns 1 for success and 0 for failure, which might switch, since the opposite might be handier for counting total errors*/
 
-void formated_print_str_int(STR_INT* num, FILE* f,int brk, size_t line_len);
+int str_int_append(STR_INT* num, char digit);
+/*appends a digit to the end of the number*/
+
+void formated_print_str_int(STR_INT* num, FILE* f,char brk, size_t line_len);
 //print with possibility of adding new_lines, brk is meant as bool, line len is the required lenght
 //but it might be nice to make brk a separator specifier and get the truth value just for line_len x<=0 being false
 
