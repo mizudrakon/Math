@@ -43,14 +43,14 @@ int main(int argc, char** argv)
         printf("b:\n");
         print_str_int(b,stdout);
         printf("a + b:\n");
-        STR_INT* c = new_str_int(bs,5);
-        str_int_add(a,b,c);
-        print_str_int(c,stdout);
-        printf("deleting a,b,c\n");
+        //STR_INT* c = new_str_int(bs,5);
+        str_int_add(a,b,b);
+        print_str_int(b,stdout);
+        printf("deleting a,b\n");
         putchar('\n');
         deleteSTR_INT(a);
         deleteSTR_INT(b);
-        deleteSTR_INT(c);
+        //deleteSTR_INT(c);
     }
 #endif
 #ifdef TEST2

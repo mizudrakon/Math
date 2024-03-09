@@ -104,11 +104,16 @@ int mark(char* num, char base);
 */
 
 //ARITHEMTICS:
-int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target);
-/* target = a + b
- * target can be specified as a or b as well, but we don't rewrite implicitly 
- * target = new_str_int() must be run first and result provided here as a parameter
+/* FOR ALL BINARY OPERATIONS:
+ * target = a operation b
+ * target can be specified as a or b, or it needs to be new_str_int() first
  */
+
+int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target);
+// target = a + b, success return 0, error return 1
+
+int str_int_minus(STR_INT* a, STR_INT* b, STR_INT* target);
+// target = a - b, success return 0, error return 1
 
 #include "str_number.c"
 #endif

@@ -260,6 +260,7 @@ int read_num(STR_INT* num, FILE* f)
     return 0;//zero errors
 }
 
+/*append is special because it pushes num->end further, and that's why it needs to call new_si_part*/
 int str_int_append(STR_INT* num, char digit)
 {
     //we need to enlarge num
@@ -276,6 +277,34 @@ int str_int_append(STR_INT* num, char digit)
     else num->tailLength++;
     //insert digit and move end further
     *num->end++ = digit;
+    return 0;
+}
+
+int str_int_insert(STR_INT_ITERATOR* num_it, char digit)
+{
+    //first two ifs deal with appending where the iterator is moved afterwards
+    //we need to enlarge str_int by another part
+    if (num_it->data_it == num_it->mom->tail->data+num_it->mom->partSz)
+    {
+        if (new_si_part(num_it->mom)){
+            fprintf(stderr, "new part creation failed!\n");
+            return 1;
+        }
+        num_it->data_it = num_it->mom->tail->data;
+        *num_it->data_it++ = digit;
+        num_it->mom->tailLength = 1;//we start from 0, the previous parts are all full
+        num_it->mom->end = num_it->data_it;//mark new end;
+    }
+    //num size is fine but need to push str_int end further
+    else if (num_it->data_it == num_it->mom->end) 
+    { 
+        num_it->mom->end++;
+        num_it->mom->tailLength++;
+        *num_it->data_it++ = digit;
+    }
+    //insert digit. if not appending, this is the only step
+    //no incrementing, since the iterator is actually incremented elswhere
+    *num_it->data_it = digit;
     return 0;
 }
 
@@ -338,47 +367,138 @@ int mark(char* num, char base)
     return 0;
 }
 
-int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target)
-{
+//ARITHMETICS:
+int base_not_eq(STR_INT* a, STR_INT* b){
     if (a->base != b->base){ 
         printf("ERROR: only add numbers of same base! %c != %c", a->base+'0', b->base+'0');
         return 1;
     }
-    target->base = a->base;//target needs to be created first with the base specified, but it can be changed
-    if (target->head->data[0] == 0){
-        target->end--;
-        target->tailLength--;
+    return 0;
+}
+
+int str_int_same(STR_INT* a, STR_INT*b){
+    return a->head == b->head;
+}
+
+STR_INT_ITERATOR* target_setup(STR_INT_ITERATOR* a_it, STR_INT_ITERATOR* b_it, STR_INT* target){
+    if (str_int_same(a_it->mom, target)){
+        return a_it;
     }
-    char overflow = 0;//overflow tmp
+    else if (str_int_same(b_it->mom, target)){
+        return b_it;
+    }
+    //target is a new str_int innitiated to 0
+    target->base = a_it->mom->base;//we need to common base
+    target->end--;//move end from pointing to data[1] to data[0]
+    target->tailLength = 0;//decrease from 1 to 0
+    STR_INT_ITERATOR* t_it = make_fw_iterator(target);
+    return t_it;
+}
+
+int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target)
+{
+    if (base_not_eq(a,b)){ 
+        return 1;
+    }
+    int isTargetNew = 0; 
     STR_INT_ITERATOR* a_it = make_fw_iterator(a);
     STR_INT_ITERATOR* b_it = make_fw_iterator(b);
+    STR_INT_ITERATOR* t_it = target_setup(a_it, b_it, target);
+
+    char overflow = 0;//overflow tmp
     int a_cont = 1;
     int b_cont = 1;
     while (a_cont && b_cont)
     {
-       // printf("%c + %c = ", to_symbol(a_it->data_it), to_symbol(b_it->data_it));
         char sum = *a_it->data_it + *b_it->data_it + overflow;
-       // char result = (char)(sum % a->base); 
-       // printf("%c\n",to_symbol(&result));
-        str_int_append(target, sum % a->base);
+        str_int_insert(t_it, sum % a->base);
         overflow = sum / a->base;
         a_cont = iterator_fw(a_it);
         b_cont = iterator_fw(b_it);
     }
     while (a_cont){
-        str_int_append(target, *a_it->data_it + overflow);
+        if (it_eq(b_it, t_it)) str_int_append(target, *a_it->data_it + overflow);
+        else str_int_insert(t_it, *a_it->data_it + overflow);
         overflow = 0;
         a_cont = iterator_fw(a_it);
     }
     while (b_cont){
-        str_int_append(target, *b_it->data_it + overflow);
+        if (it_eq(a_it, t_it)) str_int_append(target, *b_it->data_it + overflow);
+        else str_int_insert(t_it, *b_it->data_it + overflow);
         overflow = 0;
         b_cont = iterator_fw(b_it);
+    }
+    if (overflow){
+        str_int_append(target, 1);
     }
     free((void*)a_it);
     free((void*)b_it);
     return 0;
 }
 
+int str_int_minus(STR_INT* a, STR_INT* b, STR_INT* target)
+{
+    if (base_not_eq(a,b)){ 
+        return 1;
+    }
+    int isTargetNew = 0; 
+    STR_INT_ITERATOR* a_it = make_fw_iterator(a);
+    STR_INT_ITERATOR* b_it = make_fw_iterator(b);
+    STR_INT_ITERATOR* t_it = target_setup(a_it, b_it, target);
+
+    char overflow = 0;//overflow tmp
+    int a_cont = 1;
+    int b_cont = 1;
+    while (a_cont && b_cont)
+    {
+        char sum; 
+        if (*a_it->data_it >= *b_it->data_it + overflow) //same as add but minus
+        {    
+            sum = *a_it->data_it - *b_it->data_it - overflow;
+            overflow = 0;
+        }
+        else //we need to add base to a
+        {
+            sum = *a_it->data_it + a->base - *b_it->data_it - overflow; 
+            overflow = 1;
+        }
+        str_int_insert(t_it, sum);
+        a_cont = iterator_fw(a_it);
+        b_cont = iterator_fw(b_it);
+    }
+    while (a_cont && overflow){//the main complication is that the a digit can be 0 -> base - overflow
+        if (it_eq(b_it, t_it)){
+            if (*a_it->data_it < overflow) 
+            {
+                str_int_append(target, a->base - overflow);
+                continue;
+            }
+            str_int_append(target, *a_it->data_it - overflow);
+            overflow = 0;
+        }
+        else{
+            if (*a_it->data_it < overflow) 
+            {
+                str_int_insert(t_it, a->base - overflow);
+                continue;
+            }
+            str_int_insert(t_it, *a_it->data_it - overflow);
+            overflow = 0;
+        }
+        a_cont = iterator_fw(a_it);
+    }
+    while (b_cont){//a digit is always 0 and overflow is always 1
+        if (it_eq(a_it, t_it)) str_int_append(target, a->base - *b_it->data_it - overflow);
+        else str_int_insert(t_it, *b_it->data_it - overflow);
+        overflow = 1;
+        b_cont = iterator_fw(b_it);
+    }
+    if (overflow){
+        str_int_append(target, a->base - 1);
+    }
+    free((void*)a_it);
+    free((void*)b_it);
+    return 0;
+}
 
 STR_INT* convert(){}
