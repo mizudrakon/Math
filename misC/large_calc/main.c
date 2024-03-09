@@ -6,6 +6,39 @@
 //test definitions
 #endif
 
+int test_func(int limit, int (f)(STR_INT*,STR_INT*,STR_INT*), char op_sign, STR_INT* a, STR_INT* b, STR_INT* c)
+{
+    for (int i = 0; i < limit; i++){
+        int bs;
+        printf("Insert base:");
+        scanf("\n%d",&bs);
+        char base = max_digit(bs+1);
+        printf("base is: %c\n", base);
+        a = new_str_int(bs,5);
+        print_str_int(a,stdout);
+        printf("enter number: ");
+        read_num(a, stdin);
+        printf("enter number: ");
+        b = new_str_int(bs,5);
+        read_num(b, stdin);
+        printf("regular print: \n");
+        printf("a:\n");
+        print_str_int(a,stdout);
+        printf("b:\n");
+        print_str_int(b,stdout);
+        printf("a %c b:\n", op_sign);
+        //STR_INT* c = new_str_int(bs,5);
+        f(a,b,b);
+        //str_int_add(a,b,b);
+        print_str_int(b,stdout);
+        printf("deleting a,b\n");
+        putchar('\n');
+        deleteSTR_INT(a);
+        deleteSTR_INT(b);
+        //deleteSTR_INT(c);
+    }
+}
+
 int main(int argc, char** argv)
 {
 
@@ -24,34 +57,9 @@ int main(int argc, char** argv)
     putchar('\n');
 #endif
 #ifdef TEST
-    for (int i = 0; i < 3; i++){
-        int bs;
-        printf("Insert base:");
-        scanf("\n%d",&bs);
-        char base = max_digit(bs+1);
-        printf("base is: %c\n", base);
-        STR_INT* a = new_str_int(bs,5);
-        print_str_int(a,stdout);
-        printf("enter number: ");
-        read_num(a, stdin);
-        printf("enter number: ");
-        STR_INT* b = new_str_int(bs,5);
-        read_num(b, stdin);
-        printf("regular print: \n");
-        printf("a:\n");
-        print_str_int(a,stdout);
-        printf("b:\n");
-        print_str_int(b,stdout);
-        printf("a + b:\n");
-        //STR_INT* c = new_str_int(bs,5);
-        str_int_add(a,b,b);
-        print_str_int(b,stdout);
-        printf("deleting a,b\n");
-        putchar('\n');
-        deleteSTR_INT(a);
-        deleteSTR_INT(b);
-        //deleteSTR_INT(c);
-    }
+    STR_INT* a, *b, *c;
+    test_func(3, str_int_add, '+', a, b, b);
+    test_func(2, str_int_minus, '-', a, b, b);
 #endif
 #ifdef TEST2
     //realization: char IS an 8 bit number...

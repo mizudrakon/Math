@@ -294,6 +294,7 @@ int str_int_insert(STR_INT_ITERATOR* num_it, char digit)
         *num_it->data_it++ = digit;
         num_it->mom->tailLength = 1;//we start from 0, the previous parts are all full
         num_it->mom->end = num_it->data_it;//mark new end;
+        return 0;
     }
     //num size is fine but need to push str_int end further
     else if (num_it->data_it == num_it->mom->end) 
@@ -301,6 +302,7 @@ int str_int_insert(STR_INT_ITERATOR* num_it, char digit)
         num_it->mom->end++;
         num_it->mom->tailLength++;
         *num_it->data_it++ = digit;
+        return 0;
     }
     //insert digit. if not appending, this is the only step
     //no incrementing, since the iterator is actually incremented elswhere
@@ -431,6 +433,9 @@ int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target)
     if (overflow){
         str_int_append(target, 1);
     }
+    //deallocation
+    if (!it_eq(a_it, t_it) && !it_eq(b_it, t_it))
+        free((void*)t_it);
     free((void*)a_it);
     free((void*)b_it);
     return 0;
@@ -475,6 +480,7 @@ int str_int_minus(STR_INT* a, STR_INT* b, STR_INT* target)
             }
             str_int_append(target, *a_it->data_it - overflow);
             overflow = 0;
+            iterator_fw(t_it);
         }
         else{
             if (*a_it->data_it < overflow) 
@@ -488,14 +494,26 @@ int str_int_minus(STR_INT* a, STR_INT* b, STR_INT* target)
         a_cont = iterator_fw(a_it);
     }
     while (b_cont){//a digit is always 0 and overflow is always 1
-        if (it_eq(a_it, t_it)) str_int_append(target, a->base - *b_it->data_it - overflow);
-        else str_int_insert(t_it, *b_it->data_it - overflow);
+        if (it_eq(b_it, t_it)) {//t_it is b_it, so we insert at b_it
+            str_int_insert(t_it, a->base - *b_it->data_it - overflow);//t_it doesn't move
+        }
+        else //t_it is a_it or new str_int, so we just append and move the iterator
+        {   
+            str_int_append(target, a->base - *b_it->data_it - overflow);
+            iterator_fw(t_it);//
+        }
+        //if (!it_eq(b_it, t_it))
         overflow = 1;
         b_cont = iterator_fw(b_it);
     }
     if (overflow){
         str_int_append(target, a->base - 1);
+        iterator_fw(t_it);
     }
+    t_it->mom->end = t_it->data_it;//t_it can mark the new end 
+    //deallocation:
+    if (!it_eq(a_it, t_it) && !it_eq(b_it, t_it))
+        free((void*)t_it);
     free((void*)a_it);
     free((void*)b_it);
     return 0;
