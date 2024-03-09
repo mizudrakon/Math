@@ -14,10 +14,15 @@
 ### Done:  
  * Storage and input/output of the numbers pretty much dealt with. 
  * Can read numbers of different base, and write them 
+ * Adding two numbers together, either into a new thrid one or rewriting one of the two str_int_add(a,b,target)   
+ * Subtracting str_int_minu(a,b,target) means a - b = target
+
    
 ### To Do:   
  * shift left and right (which is mostly useful in multiplication)
- * arithmetics: addition, subtraction, multiplication and difision... that might be it
+ * arithmetics: multiplication and difision... that might be it
+ * subtraction might need more debugging, there are two functions: append, insert that are used to enter the resulting digit into the target... it's not vary efficient or readable, probably could be merged into a single function. insert() actually can append already... anyway, it works for now.
 
 ### Additional info   
  * str_num folder contains an Obsidian canvas somewhat illustrating the function
+ * some new functions haven't been added to the h file, since they're not intended for use in any application. I might want to remove some more of them, but I also like the h file to be a sort of docummentation file... it's a pickle
