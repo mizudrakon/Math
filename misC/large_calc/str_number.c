@@ -83,13 +83,13 @@ STR_INT_ITERATOR* make_bw_iterator(STR_INT* mom)
 
 int iterator_fw(STR_INT_ITERATOR* it)
 {
-    if (it->data_it == it->mom->end-1) {
+    if (it->data_it == it->mom->end) {
         //printf("ERROR: forward iterator called on end\n");
         return 0;
     }
     it->data_it++;
     if (it->data_it == it->mom->end)
-        return 1;
+        return 0;
     else if (it->data_it == it->part_it->data + it->mom->partSz)
     {
         it->part_it = it->part_it->next;
@@ -282,30 +282,15 @@ int str_int_append(STR_INT* num, char digit)
 
 int str_int_insert(STR_INT_ITERATOR* num_it, char digit)
 {
-    //first two ifs deal with appending where the iterator is moved afterwards
-    //we need to enlarge str_int by another part
-    if (num_it->data_it == num_it->mom->tail->data+num_it->mom->partSz)
-    {
-        if (new_si_part(num_it->mom)){
-            fprintf(stderr, "new part creation failed!\n");
-            return 1;
-        }
-        num_it->data_it = num_it->mom->tail->data;
-        *num_it->data_it++ = digit;
-        num_it->mom->tailLength = 1;//we start from 0, the previous parts are all full
-        num_it->mom->end = num_it->data_it;//mark new end;
+    //iterator at the end, so append
+    if (num_it->data_it == num_it->mom->end) {
+        str_int_append(num_it->mom, digit);
+        //end was push, possibly into an entirely different area in memory
+        //-> end previous end might be just after the last part data chunk
+        num_it->data_it = num_it->mom->end-1;
         return 0;
     }
-    //num size is fine but need to push str_int end further
-    else if (num_it->data_it == num_it->mom->end) 
-    { 
-        num_it->mom->end++;
-        num_it->mom->tailLength++;
-        *num_it->data_it++ = digit;
-        return 0;
-    }
-    //insert digit. if not appending, this is the only step
-    //no incrementing, since the iterator is actually incremented elswhere
+    //or insert
     *num_it->data_it = digit;
     return 0;
 }
@@ -415,23 +400,24 @@ int str_int_add(STR_INT* a, STR_INT* b, STR_INT* target)
         char sum = *a_it->data_it + *b_it->data_it + overflow;
         str_int_insert(t_it, sum % a->base);
         overflow = sum / a->base;
+        if (!it_eq(a_it,t_it) && !it_eq(b_it,t_it)) iterator_fw(t_it);
         a_cont = iterator_fw(a_it);
         b_cont = iterator_fw(b_it);
     }
     while (a_cont){
-        if (it_eq(b_it, t_it)) str_int_append(target, *a_it->data_it + overflow);
-        else str_int_insert(t_it, *a_it->data_it + overflow);
+        str_int_insert(t_it, *a_it->data_it + overflow);
         overflow = 0;
+        if (!it_eq(a_it, t_it)) iterator_fw(t_it);
         a_cont = iterator_fw(a_it);
     }
     while (b_cont){
-        if (it_eq(a_it, t_it)) str_int_append(target, *b_it->data_it + overflow);
-        else str_int_insert(t_it, *b_it->data_it + overflow);
+        str_int_insert(t_it, *b_it->data_it + overflow);
         overflow = 0;
+        if (!it_eq(b_it, t_it)) iterator_fw(t_it);
         b_cont = iterator_fw(b_it);
     }
     if (overflow){
-        str_int_append(target, 1);
+        str_int_insert(t_it, 1);
     }
     //deallocation
     if (!it_eq(a_it, t_it) && !it_eq(b_it, t_it))
@@ -454,9 +440,9 @@ int str_int_minus(STR_INT* a, STR_INT* b, STR_INT* target)
     char overflow = 0;//overflow tmp
     int a_cont = 1;
     int b_cont = 1;
+    char sum = 0; 
     while (a_cont && b_cont)
     {
-        char sum; 
         if (*a_it->data_it >= *b_it->data_it + overflow) //same as add but minus
         {    
             sum = *a_it->data_it - *b_it->data_it - overflow;
@@ -468,49 +454,41 @@ int str_int_minus(STR_INT* a, STR_INT* b, STR_INT* target)
             overflow = 1;
         }
         str_int_insert(t_it, sum);
+        if (!it_eq(a_it,t_it) && !it_eq(b_it,t_it)) iterator_fw(t_it);
         a_cont = iterator_fw(a_it);
         b_cont = iterator_fw(b_it);
     }
     while (a_cont && overflow){//the main complication is that the a digit can be 0 -> base - overflow
-        if (it_eq(b_it, t_it)){
-            if (*a_it->data_it < overflow) 
-            {
-                str_int_append(target, a->base - overflow);
-                continue;
-            }
-            str_int_append(target, *a_it->data_it - overflow);
-            overflow = 0;
+        if (*a_it->data_it < overflow) 
+        {
+            sum = a->base - overflow;
+        }
+        else sum = *a_it->data_it - overflow;
+        
+        str_int_insert(t_it, sum);
+        overflow = 0;
+        if (!it_eq(a_it, t_it))
             iterator_fw(t_it);
-        }
-        else{
-            if (*a_it->data_it < overflow) 
-            {
-                str_int_insert(t_it, a->base - overflow);
-                continue;
-            }
-            str_int_insert(t_it, *a_it->data_it - overflow);
-            overflow = 0;
-        }
         a_cont = iterator_fw(a_it);
     }
     while (b_cont){//a digit is always 0 and overflow is always 1
-        if (it_eq(b_it, t_it)) {//t_it is b_it, so we insert at b_it
-            str_int_insert(t_it, a->base - *b_it->data_it - overflow);//t_it doesn't move
-        }
-        else //t_it is a_it or new str_int, so we just append and move the iterator
-        {   
-            str_int_append(target, a->base - *b_it->data_it - overflow);
-            iterator_fw(t_it);//
-        }
-        //if (!it_eq(b_it, t_it))
+        str_int_insert(t_it, a->base - *b_it->data_it - overflow);//t_it doesn't move
+        if (!it_eq(b_it, t_it))
+            iterator_fw(t_it);
         overflow = 1;
         b_cont = iterator_fw(b_it);
     }
     if (overflow){
-        str_int_append(target, a->base - 1);
+        str_int_insert(t_it, a->base - 1);
         iterator_fw(t_it);
     }
-    t_it->mom->end = t_it->data_it;//t_it can mark the new end 
+    //we need to mark the end correctly by backtracking to last non-0 
+    if (t_it->data_it == t_it->mom->end)
+        iterator_bw(t_it);
+    while (*t_it->data_it == 0) iterator_bw(t_it);
+    iterator_fw(t_it);
+    t_it->mom->end = t_it->data_it;
+
     //deallocation:
     if (!it_eq(a_it, t_it) && !it_eq(b_it, t_it))
         free((void*)t_it);
