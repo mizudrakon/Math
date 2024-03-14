@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RATIO_H
+#define RATIO_H
 
 #include<format>
 #include<string>
@@ -18,31 +19,13 @@ constexpr void print(const std::string_view text, auto&&... args){
 
 template <Arithmetic T>
 //greatest common divisor... classic Eukleides
-inline T gcd(T a, T b){ 
-    while(true)
-    {
-        if (a < b) std::swap(a,b);
-        if (b == 0) return a;
-        a %= b;
-    }
-    return 1;
-}
+inline T gcd(T a, T b); 
+
+enum class lcm_return { multiple, a_multiplier, b_multiplier};
 
 template <Arithmetic T>
 //lowest common multiple returing a tuple with the required multiplier to a and b
-inline std::tuple<T,T,T> lcm(T a, T b){ 
-    T x = a,
-        y = b,
-        am = 1,
-        bm = 1;
-    while (a != b)
-    {
-        if (a < b) {a += x; ++am;}
-        else {b += y; ++bm;}
-    }
-    
-    return std::make_tuple(a,am,bm);
-}
+inline std::tuple<T,T,T> lcm(T a, T b); 
 
 //RATIONAL CLASS DEFINITIONS:
 /*
@@ -227,84 +210,4 @@ struct std::formatter<rational<T>> : std::formatter<std::string> {
     }
 };
 
-
-//EXP_NUM CALSS DEFINITIONS:
-/*
-    -exp_num is meant to keep numbers as possibly primes with exponent for use in fractions
-    I mostly want them to keep irrational numbers like sqr(2) 
-    -like rational they keep two numbers, but the exponent is kept as rational, since it's 
-    mostly intended to use for 0 < exp <= 1
-*/
-//I need to figure out if I need to force rational into the exponent here...
-template <Arithmetic T>
-class exp_num
-{
-    int base {0};
-    rational<T> exponent {1};
-public:
-    exp_num(int b = 0, rational<T> exp = 1) : base(b),exponent(exp){}
-    exp_num(const exp_num& en) : base(en.base),exponent(en.exponent){}
-    exp_num(exp_num&& en) noexcept : base(std::move(en.base)),exponent(std::move(en.exponent)){}
-
-    int Base() const { return base; }
-    void SetBase(int x) { base = x; } 
-    rational<T> Exp() const { return exponent; }
-    void SetExp(rational<T> r) { exponent = r; }
-    
-    /*
-        * numbers with positive nonfractional exponen get pow-ed
-        * otherwise the exponent is a fraction itself and should get reduced
-    */
-    void Reduce() {
-        exponent.reduce();
-        if (exponent.denomin() == 1){
-            base = int(pow(base, exponent.nomin()));
-            exponent = 1;
-        }
-    }
-
-    std::string str() const {
-        if (exponent == 0) return "1"; //reduce to 1
-        std::string text = std::to_string(base); 
-        if (exponent == 1) return text;//no need to print exponent
-        return text + "^{" + exponent.str() + '}';//also print exponent, if it's nontrivial
-    }
-};
-
-template <Arithmetic T>
-//multiplies only if a nad b are of the same base or their exps are 1
-exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
-    if (a.exponent > )
-    exp_num answ{0};
-    //exponents = 1 just makes them regular integers
-    if (a.Exp() == b.Exp() && a.Exp() == 1){
-        answ.SetBase(a.Base()*b.Base());
-    }
-    //same base allows us to add exponents
-    else if (a.Base() == b.Base()){
-        answ.SetBase(a.Base());
-        answ.SetExp(a.Exp() + b.Exp());
-    }
-    else {
-        
-    }
-    answ.Reduce(); 
-    return answ;
-}
-//assuming this goes the same as with rational...
-
-//op /
-
-//op +
-
-//op -
-
-
-//formater for rational class to print it directly with print()
-template<typename T>
-struct std::formatter<exp_num<T>> : std::formatter<std::string> {
-    template<typename Context>
-    auto format(const exp_num& num, Context& ctx) const {
-        return std::format_to(ctx.out(), "{}", num.str());
-    }
-};
+#endif
