@@ -41,6 +41,7 @@ class rational
     T nom {0};
     T den {1};
 public:
+    //constructors:
     rational() = delete;
     //default c_tor, implicit 0/1, one argument n gives us n/1
     rational(T n = 0, T d = 1):nom(n),den(d){}
@@ -49,61 +50,33 @@ public:
     //move c_tor
     rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)){}
     //copy_swap operator, pass by value makes a copy which is returned as the desired new object
-    rational& operator=(rational rn)noexcept {
-        std::swap(nom, rn.nom);
-        std::swap(den, rn.den);
-        return *this;
-    }
-    //we need member operators to allow *=, /=, %=
-    rational& operator*=(const rational& frac){
-        nom *= frac.nom;
-        den *= frac.den;
-        if (den != 1) reduce();
-        return *this;
-    }
-    rational& operator/=(const rational& frac){
-        nom /= frac.nom;
-        den /= frac.den;
-        if (den != 1) reduce();
-        return *this;
-    }
-    rational& operator%=(rational frac){
-    //I want to allow remainder from fraction division too
-        reduce(); //our initial fraction will be switched for the result, so we can just reduce it
-        frac.reduce(); //frac is a copy of some rational argument which itself doesn't get reduced
-        auto [com_den, m, rm] = lcm(den,frac.den); //get lcm and multipliers for the denominators
-        //result should be: (nom*m % frac.nom*rm)/lcm
-        //we can switch them with the original fraction data with modified parameter data
-        frac.set_den(com_den);
-        frac.set_nom((nom*m)%(frac.nom*rm));
-        std::swap(*this,frac);
-        return *this;
-    }
-
-    //d_tor doesn't really have anything special to do
+    
     ~rational(){}
 
     //GETTERS and SETTERS for the two int numbers
     T nomin() const { return nom;}
+    
     void set_nom(T n) { nom = n; }
+    
     T denomin() const { return den; }
+    
     void set_den(T d) { den = d; }
+    
     //functions to get the number as a floating point rather than a fraction
     double dbl() const { return static_cast<double>(nom) / static_cast<double>(den);}
     float flt() const { return static_cast<float>(nom) / static_cast<float>(den);}
     
+    rational& operator=(rational rn)noexcept; 
+    //we need member operators to allow *=, /=, %=
+    rational& operator*=(const rational& frac);
+    
+    rational& operator/=(const rational& frac);
+    
+    rational& operator%=(rational frac);
+
     //function for reducing the fraction
     //just divide everything with greatest common denominator, which could be one therefore no change
-    void reduce(){
-        T c = gcd(nom,den);
-        nom /= c;
-        den /= c;
-        //we wnat to move a (-) sign to nom (or make two - into +)
-        if (den < 0){
-            nom *= -1;
-            den *= -1;
-        }
-    }
+    void reduce();
 
     //getting it as string for printing
     /*
@@ -112,94 +85,36 @@ public:
        * 0/anything should just be 0
        * any farc < 0 should be written as (-p/q)
     */
-    std::string str() const{
-        if (nom == den) return "1";
-        if (nom == 0) return "0";
-        std::string answ {};
-        if (nom < 0) answ += "(-";
-        answ += std::to_string(nom);
-        if (den != 1) answ += "/" + std::to_string(den);
-        if (nom < 0) answ += ")";
-        return answ;
-    }
+    std::string str() const;
 };
 
-//RATIONAL NONMEMBER OPERATORS
+//NONMEMBER OPERATOR OVERLOADS:
 template <Arithmetic T>
 //spaceship operator for comparison
-inline auto operator<=>(const rational<T>& lhs, const rational<T>& rhs){
-    if (lhs.denomin() == rhs.denomin()) return lhs.nomin() <=> rhs.nomin();
-    auto a = lhs, b = rhs;
-    a.reduce();
-    b.reduce();
-    auto [com_den, am, bm] = lcm(a.denomin(),b.denomin());
-    
-    return (a.nomin()*am) <=> (b.nomin()*bm);
-};
+inline auto operator<=>(const rational<T>& lhs, const rational<T>& rhs);
 
 template <Arithmetic T>
-inline auto operator==(const rational<T>& lhs, const rational<T>& rhs){
-    if (lhs.nomin() == rhs.nomin() && lhs.denomin() == rhs.denomin())
-        return true;
-    auto a = lhs, b = rhs;
-    a.reduce();
-    b.reduce();
-    return a.nomin() == b.nomin() && a.denomin() == b.denomin();
-};
+inline auto operator==(const rational<T>& lhs, const rational<T>& rhs);
 
 template <Arithmetic T>
-inline auto operator* (const rational<T>& lhs, const rational<T>& rhs){
-    rational new_r(lhs.nomin()*rhs.nomin(),lhs.denomin()*rhs.denomin());
-    return new_r;
-};
-
+inline auto operator* (const rational<T>& lhs, const rational<T>& rhs);
 
 template <Arithmetic T>
-inline auto operator/ (const rational<T>& lhs, const rational<T>& rhs){
-    rational new_r(lhs.nomin()*rhs.denomin(),lhs.denomin()+rhs.nomin());
-    return new_r;
-};
+inline auto operator/ (const rational<T>& lhs, const rational<T>& rhs);
 
 template <Arithmetic T>
-inline auto operator%(rational<T> lhs, rational<T> rhs){
-    if (lhs < rhs) return lhs;
-    rational result(0);
-    if (lhs == rhs) return result;
-    lhs.reduce();
-    rhs.reduce();
-    auto [com_den, lhsm, rhsm] = lcm(lhs.denomin(),rhs.denomin());
-    result.set_nom((lhs.nomin()*lhsm) % (rhs.nomin()*rhsm));
-    result.set_den(com_den);
-    return result;
-}
+inline auto operator%(rational<T> lhs, rational<T> rhs);
 
 template <Arithmetic T>
-inline auto operator+ (const rational<T>& lhs, const rational<T>& rhs){
-    if (lhs.denomin() != rhs.denomin()){
-        lhs.reduce();
-        rhs.reduce();
-    }
-    auto [com_denom,lhsm,rhsm] = lcm(lhs.denomin(),rhs.denomin());
-    rational result(lhs.nomin()*lhsm+rhs.nomin()*rhsm,com_denom);
-    return result;
-};
+inline auto operator+ (const rational<T>& lhs, const rational<T>& rhs);
 
 template <Arithmetic T>
-inline auto operator- (const rational<T>& lhs, const rational<T>& rhs){
-    if (lhs.denomin() != rhs.denomin()){
-        lhs.reduce();
-        rhs.reduce();
-    }
-    auto [com_denom, lhsm, rhsm] = lcm(lhs.denomin(),rhs.denomin());
-    rational result(lhs.nomin()*lhsm - rhs.nomin()*rhsm, com_denom);
-    return result;
-};
-
+inline auto operator- (const rational<T>& lhs, const rational<T>& rhs);
+ 
 template <Arithmetic T>
 //for negation with -
-inline auto operator-(const rational<T>& frac){
-    return 0-frac;
-}
+inline auto operator-(const rational<T>& frac);
+
 
 //formater for rational class to print it directly with print()
 template<typename T>

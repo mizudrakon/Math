@@ -26,6 +26,7 @@ public:
     exp_num(int b = 0, rational<T> exp = 1) : base(b),exponent(exp){}
     exp_num(const exp_num& en) : base(en.base),exponent(en.exponent){}
     exp_num(exp_num&& en) noexcept : base(std::move(en.base)),exponent(std::move(en.exponent)){}
+    ~exp_num(){}
 
     //getters, setters:
     int GetBase() const { return base; }
