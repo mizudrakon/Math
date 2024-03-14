@@ -30,6 +30,7 @@ inline T gcd(T a, T b){
 
 template <Arithmetic T>
 //lowest common multiple returing a tuple with the required multiplier to a and b
+//< lcm, lcm/a, lcm/b >
 inline std::tuple<T,T,T> lcm(T a, T b){ 
     T x = a,
         y = b,
@@ -164,16 +165,21 @@ inline auto operator==(const rational<T>& lhs, const rational<T>& rhs){
     return a.nomin() == b.nomin() && a.denomin() == b.denomin();
 };
 
+//lhs.nom*rhs.nom,
+//lhs.den*rhs.den
 template <Arithmetic T>
 inline auto operator* (const rational<T>& lhs, const rational<T>& rhs){
     rational new_r(lhs.nomin()*rhs.nomin(),lhs.denomin()*rhs.denomin());
+    new_r.reduce();
     return new_r;
 };
 
-
+//lhs.nom*rhs.den,
+//lhs.den*rhs.nom
 template <Arithmetic T>
 inline auto operator/ (const rational<T>& lhs, const rational<T>& rhs){
     rational new_r(lhs.nomin()*rhs.denomin(),lhs.denomin()+rhs.nomin());
+    new_r.reduce();
     return new_r;
 };
 
@@ -190,6 +196,8 @@ inline auto operator%(rational<T> lhs, rational<T> rhs){
     return result;
 }
 
+//get common denom,
+//add fixed nominators
 template <Arithmetic T>
 inline auto operator+ (const rational<T>& lhs, const rational<T>& rhs){
     if (lhs.denomin() != rhs.denomin()){
@@ -198,6 +206,7 @@ inline auto operator+ (const rational<T>& lhs, const rational<T>& rhs){
     }
     auto [com_denom,lhsm,rhsm] = lcm(lhs.denomin(),rhs.denomin());
     rational result(lhs.nomin()*lhsm+rhs.nomin()*rhsm,com_denom);
+    result.reduce();
     return result;
 };
 
@@ -209,6 +218,7 @@ inline auto operator- (const rational<T>& lhs, const rational<T>& rhs){
     }
     auto [com_denom, lhsm, rhsm] = lcm(lhs.denomin(),rhs.denomin());
     rational result(lhs.nomin()*lhsm - rhs.nomin()*rhsm, com_denom);
+    result.reduce();
     return result;
 };
 
@@ -274,7 +284,6 @@ public:
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
 exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
-    if (a.exponent > )
     exp_num answ{0};
     //exponents = 1 just makes them regular integers
     if (a.Exp() == b.Exp() && a.Exp() == 1){
@@ -285,7 +294,7 @@ exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
         answ.SetBase(a.Base());
         answ.SetExp(a.Exp() + b.Exp());
     }
-    else {
+    else if (a.Exp() > 1 && b.Exp > 1) {
         
     }
     answ.Reduce(); 
