@@ -9,10 +9,9 @@
 int main(int argc, char** argv)
 {
 
-#ifdef TEST
+#ifdef LIST_NUMS
     int b = 16;
     //char base = max_digit(b+1);
-    const char base = 16;
     /*the thing is: we usually need the max_digit which is 15, not the actual base which would be 16
      not sure if I should change the code to enter the actual base...*/
     for (int i = 1; i <= 40; i++)
@@ -23,24 +22,36 @@ int main(int argc, char** argv)
             printf("%c is digit for base %c = %d\n",i,max_digit(base+1),b);
     }
     putchar('\n');
-    STR_INT* a = new_str_int('g',5);
-    printf("print empty init str_int: ");
-    print_str_int(a,stdout);
-    printf("enter number: ");
-    read_num(a, stdin);
-    printf("backward print: ");
-    backward_print_str_int(a,stdout,0,0);
-    printf("regular print: ");
-    print_str_int(a,stdout);
-    printf("testing iterator:\n");
-    STR_INT_ITERATOR* start = make_iterator(a);
-    STR_INT_ITERATOR* end = make_iterator(a);
-    end->part_it = a->tail;
-    end->data_it = a->end;
-    it_test(*start, *end);
-    free((void*)start);
-    free((void*)end);
-
+#endif
+#ifdef TEST
+    for (int i = 0; i < 3; i++){
+        int bs;
+        printf("Insert base:");
+        scanf("\n%d",&bs);
+        char base = max_digit(bs+1);
+        printf("base is: %c\n", base);
+        STR_INT* a = new_str_int(bs,5);
+        print_str_int(a,stdout);
+        printf("enter number: ");
+        read_num(a, stdin);
+        printf("enter number: ");
+        STR_INT* b = new_str_int(bs,5);
+        read_num(b, stdin);
+        printf("regular print: \n");
+        printf("a:\n");
+        print_str_int(a,stdout);
+        printf("b:\n");
+        print_str_int(b,stdout);
+        printf("a + b:\n");
+        STR_INT* c = new_str_int(bs,5);
+        str_int_add(a,b,c);
+        print_str_int(c,stdout);
+        printf("deleting a,b,c\n");
+        putchar('\n');
+        deleteSTR_INT(a);
+        deleteSTR_INT(b);
+        deleteSTR_INT(c);
+    }
 #endif
 #ifdef TEST2
     //realization: char IS an 8 bit number...
