@@ -9,15 +9,19 @@
  * some operations can be functions
 */
 
-template <Arithmetic T>
 struct value_node 
 {
-    T value;
+    //value: rational<exp_num<int>>
+    //parent: op_node*
 };
 
+enum class op_id { plus, minus, mult, div, mod };
 struct op_node 
 {
-
+    //op_id
+    //parent: can only be op_node
+    //daughter_left: op_node or value_node
+    //daughter_right: op_node or value_node
 };
 
 class expression
