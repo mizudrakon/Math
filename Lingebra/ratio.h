@@ -117,7 +117,7 @@ inline auto operator-(const rational<T>& frac);
 
 
 //formater for rational class to print it directly with print()
-template<typename T>
+template<Arithmetic T>
 struct std::formatter<rational<T>> : std::formatter<std::string> {
     template<typename Context>
     auto format(const rational<T>& frac, Context& ctx) const {

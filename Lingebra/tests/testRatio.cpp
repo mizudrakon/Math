@@ -7,6 +7,6 @@ int main(int argc, char* argv[])
     rational<int> zero;
     rational<int> one{1};
 
-    print("{}\n", zero);
-    print("{}\n", one);
+    print("{}\n", zero.str());
+    print("{}\n", one.str());
 }

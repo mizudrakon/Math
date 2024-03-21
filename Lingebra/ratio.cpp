@@ -92,6 +92,7 @@ template <Arithmetic T>
 std::string rational<T>::str() const{
     if (nom == den) return "1";
     if (nom == 0) return "0";
+    if (den == 1) return std::to_string(nom);
     std::string answ {};
     if (nom < 0) answ += "(-";
     answ += std::to_string(nom);
