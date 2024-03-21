@@ -42,13 +42,13 @@ class rational
     T den {1};
 public:
     //constructors:
-    rational() = delete;
+    rational() : nom(0),den(1){} 
     //default c_tor, implicit 0/1, one argument n gives us n/1
-    rational(T n = 0, T d = 1):nom(n),den(d){}
+    rational(T n, T d = 1) : nom(n),den(d) {} 
     //copy c_tor
-    rational(const rational& rn):nom(rn.nom),den(rn.den){}
+    rational(const rational& rn) : nom(rn.nom),den(rn.den) {}
     //move c_tor
-    rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)){}
+    rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)) {}
     //copy_swap operator, pass by value makes a copy which is returned as the desired new object
     
     ~rational(){}
@@ -120,7 +120,7 @@ inline auto operator-(const rational<T>& frac);
 template<typename T>
 struct std::formatter<rational<T>> : std::formatter<std::string> {
     template<typename Context>
-    auto format(const rational& frac, Context& ctx) const {
+    auto format(const rational<T>& frac, Context& ctx) const {
         return std::format_to(ctx.out(), "{}", frac.str());
     }
 };

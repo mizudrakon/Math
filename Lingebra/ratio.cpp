@@ -35,7 +35,7 @@ using racio =  rational<T>;
     
 //MEMBER OPERATION OVERLOADS
 template <Arithmetic T>
-rational<T>& rational<T>::operator=(rational rn)noexcept {
+rational<T>& rational<T>::operator=(rational<T> rn)noexcept {
     std::swap(nom, rn.nom);
     std::swap(den, rn.den);
     return *this;
