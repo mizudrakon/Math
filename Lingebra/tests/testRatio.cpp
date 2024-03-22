@@ -10,11 +10,13 @@ int main(int argc, char* argv[])
     //rational<int> two_thirds{2,3};
     ifrac num(2,3);
 
+
     print("-5 % 2 = {}\n", -5%2);
 
     print("default const number (0) : {}\n", zero);
     print("one argument (1) :{}\n", one);
     print("num (2/3) :{}\n", num);
+    std::cout << "ostream: " << num << '\n';
     num += 2;
     print("num += 2 (8/3):{}\n", num);
     num -= 4;

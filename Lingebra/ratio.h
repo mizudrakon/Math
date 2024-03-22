@@ -5,6 +5,7 @@
 #include<string>
 #include<tuple>
 #include<cmath>
+#include<iostream>
 
 #include "my_concepts.hpp"
 
@@ -132,7 +133,11 @@ template <Arithmetic T>
 //for negation with -
 inline auto operator-(const rational<T>& frac);
 
-
+template <Arithmetic T>
+inline std::ostream& operator<<(std::ostream& os, const rational<T> frac){
+    os << frac.str();
+    return os;
+}
 
 //formater for rational class to print it directly with print()
 template<Arithmetic T>
