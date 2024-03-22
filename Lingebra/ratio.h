@@ -21,7 +21,7 @@ template <Arithmetic T>
 //greatest common divisor... classic Eukleides
 inline T gcd(T a, T b); 
 
-enum class lcm_return { multiple, a_multiplier, b_multiplier};
+//enum class lcm_return { multiple, a_multiplier, b_multiplier};
 
 template <Arithmetic T>
 //lowest common multiple returing a tuple with the required multiplier to a and b
@@ -44,7 +44,7 @@ public:
     //constructors:
     rational() : nom(0),den(1){} 
     //default c_tor, implicit 0/1, one argument n gives us n/1
-    rational(T n, T d = 1) : nom(n),den(d) {} 
+    rational(T n, T d = 1) : nom(n),den(d) { reduce(); } 
     //copy c_tor
     rational(const rational& rn) : nom(rn.nom),den(rn.den) {}
     //move c_tor
@@ -66,13 +66,27 @@ public:
     double dbl() const { return static_cast<double>(nom) / static_cast<double>(den);}
     float flt() const { return static_cast<float>(nom) / static_cast<float>(den);}
     
+    //MEMBER OPERATORS
     rational& operator=(rational rn)noexcept; 
-    //we need member operators to allow *=, /=, %=
+
+    rational& operator+=(const rational& frac);
+
+    rational& operator-=(const rational& frac);
+
     rational& operator*=(const rational& frac);
     
     rational& operator/=(const rational& frac);
     
     rational& operator%=(rational frac);
+
+    //INCREMENTS
+    rational& operator++();
+    
+    rational operator++(int);
+
+    rational& operator--();
+    
+    rational operator--(int);
 
     //function for reducing the fraction
     //just divide everything with greatest common denominator, which could be one therefore no change
@@ -87,6 +101,9 @@ public:
     */
     std::string str() const;
 };
+
+template <Arithmetic T>
+inline rational<T> make_rational(T n, T d);
 
 //NONMEMBER OPERATOR OVERLOADS:
 template <Arithmetic T>
@@ -116,6 +133,7 @@ template <Arithmetic T>
 inline auto operator-(const rational<T>& frac);
 
 
+
 //formater for rational class to print it directly with print()
 template<Arithmetic T>
 struct std::formatter<rational<T>> : std::formatter<std::string> {
@@ -125,4 +143,6 @@ struct std::formatter<rational<T>> : std::formatter<std::string> {
     }
 };
 
+
+#include "ratio.cpp"
 #endif

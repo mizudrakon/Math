@@ -4,6 +4,8 @@
 template <Arithmetic T>
 //greatest common divisor... classic Eukleides
 inline T gcd(T a, T b){ 
+    if (a < 0) a = -a;
+    if (b < 0) b = -b;
     while(true)
     {
         if (a < b) std::swap(a,b);
@@ -30,9 +32,14 @@ inline std::tuple<T,T,T> lcm(T a, T b){
     
     return std::make_tuple(a,am,bm);
 }
+
 template <Arithmetic T>
-using racio =  rational<T>;
-    
+rational<T> make_rational(T n, T d)    
+{
+    rational<T> num{n,d};
+    return num;
+}
+
 //MEMBER OPERATION OVERLOADS
 template <Arithmetic T>
 rational<T>& rational<T>::operator=(rational<T> rn)noexcept {
@@ -40,7 +47,29 @@ rational<T>& rational<T>::operator=(rational<T> rn)noexcept {
     std::swap(den, rn.den);
     return *this;
 }
-//we need member operators to allow *=, /=, %=
+
+template <Arithmetic T>
+rational<T>& rational<T>::operator+=(const rational& frac){
+    if (den != frac.den){
+        reduce();
+        //frac.reduce();
+    }
+    auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
+    nom = nom*lhsm+frac.nom*rhsm;
+    den = com_denom;
+    reduce();
+    return *this;
+}
+
+template <Arithmetic T>
+rational<T>& rational<T>::operator-=(const rational& frac){
+    auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
+    nom = nom*lhsm-frac.nom*rhsm;
+    den = com_denom;
+    reduce();
+    return *this;
+}
+
 template <Arithmetic T>
 rational<T>& rational<T>::operator*=(const rational& frac){
     nom *= frac.nom;
@@ -69,16 +98,49 @@ rational<T>& rational<T>::operator%=(rational frac){
     return *this;
 }
 
+//INCREMENTS
+template <Arithmetic T>
+rational<T>& rational<T>::operator++(){
+    nom += den;
+    reduce();
+    return *this;
+}
+
+
+template <Arithmetic T>
+rational<T> rational<T>::operator++(int){
+    auto old = *this;
+    operator++();
+    return old;
+}
+
+template <Arithmetic T>
+rational<T>& rational<T>::operator--(){
+    nom -= den;
+    reduce();
+    return *this;
+}
+
+template <Arithmetic T>
+rational<T> rational<T>::operator--(int){
+    auto old = *this;
+    operator--();
+    return old;
+}
+
 template <Arithmetic T>
 void rational<T>::reduce(){
-    T c = gcd(nom,den);
-    nom /= c;
-    den /= c;
     //we wnat to move a (-) sign to nom (or make two - into +)
     if (den < 0){
         nom *= -1;
         den *= -1;
     }
+    bool ng = (nom < 0) ? true : false;
+    if (ng) nom *= -1;
+    T c = gcd(nom,den);
+    nom /= c;
+    den /= c;
+    if (ng) nom *= -1;
 }
 
 //getting it as string for printing
@@ -94,7 +156,7 @@ std::string rational<T>::str() const{
     if (nom == 0) return "0";
     if (den == 1) return std::to_string(nom);
     std::string answ {};
-    if (nom < 0) answ += "(-";
+    if (nom < 0) answ += "(";
     answ += std::to_string(nom);
     if (den != 1) answ += "/" + std::to_string(den);
     if (nom < 0) answ += ")";
@@ -110,8 +172,8 @@ template <Arithmetic T>
 auto operator<=>(const rational<T>& lhs, const rational<T>& rhs){
     if (lhs.denomin() == rhs.denomin()) return lhs.nomin() <=> rhs.nomin();
     auto a = lhs, b = rhs;
-    a.reduce();
-    b.reduce();
+    //a.reduce();
+    //b.reduce();
     auto [com_den, am, bm] = lcm(a.denomin(),b.denomin());
     
     return (a.nomin()*am) <=> (b.nomin()*bm);
@@ -155,23 +217,17 @@ auto operator%(rational<T> lhs, rational<T> rhs){
 
 template <Arithmetic T>
 auto operator+ (const rational<T>& lhs, const rational<T>& rhs){
-    if (lhs.denomin() != rhs.denomin()){
-        lhs.reduce();
-        rhs.reduce();
-    }
     auto [com_denom,lhsm,rhsm] = lcm(lhs.denomin(),rhs.denomin());
     rational result(lhs.nomin()*lhsm+rhs.nomin()*rhsm,com_denom);
+    result.reduce();
     return result;
 };
 
 template <Arithmetic T>
 auto operator- (const rational<T>& lhs, const rational<T>& rhs){
-    if (lhs.denomin() != rhs.denomin()){
-        lhs.reduce();
-        rhs.reduce();
-    }
     auto [com_denom, lhsm, rhsm] = lcm(lhs.denomin(),rhs.denomin());
     rational result(lhs.nomin()*lhsm - rhs.nomin()*rhsm, com_denom);
+    result.reduce();
     return result;
 };
 
