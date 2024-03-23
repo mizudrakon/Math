@@ -47,12 +47,12 @@ public:
     //default c_tor, implicit 0/1, one argument n gives us n/1
     rational(T n, T d = 1) : nom(n),den(d) { reduce(); } 
     //copy c_tor
-    rational(const rational& rn) : nom(rn.nom),den(rn.den) {}
+    rational(const rational& rn) : nom(rn.nom),den(rn.den) { print("copy ctor\n"); }
     //move c_tor
     rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)) {}
     //copy_swap operator, pass by value makes a copy which is returned as the desired new object
     
-    ~rational(){}
+    ~rational(){ print("rational {}/{} destructor\n",nom, den);}
 
     //GETTERS and SETTERS for the two int numbers
     T nomin() const { return nom;}
@@ -104,7 +104,7 @@ public:
 };
 
 template <Arithmetic T>
-inline rational<T> make_rational(T n, T d);
+inline constexpr rational<T> make_rational(T n, T d);
 
 //NONMEMBER OPERATOR OVERLOADS:
 template <Arithmetic T>
@@ -134,7 +134,7 @@ template <Arithmetic T>
 inline auto operator-(const rational<T>& frac);
 
 template <Arithmetic T>
-inline std::ostream& operator<<(std::ostream& os, const rational<T> frac){
+inline std::ostream& operator<<(std::ostream& os, const rational<T>& frac){
     os << frac.str();
     return os;
 }

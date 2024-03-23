@@ -34,8 +34,9 @@ inline std::tuple<T,T,T> lcm(T a, T b){
 }
 
 template <Arithmetic T>
-rational<T> make_rational(T n, T d)    
+constexpr rational<T> make_rational(T n, T d)    
 {
+    print("making a {}/{} rational\n", n, d);
     rational<T> num{n,d};
     return num;
 }
@@ -50,10 +51,10 @@ rational<T>& rational<T>::operator=(rational<T> rn)noexcept {
 
 template <Arithmetic T>
 rational<T>& rational<T>::operator+=(const rational& frac){
-    if (den != frac.den){
-        reduce();
+    //if (den != frac.den){
+    //    reduce();
         //frac.reduce();
-    }
+    //}
     auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
     nom = nom*lhsm+frac.nom*rhsm;
     den = com_denom;
