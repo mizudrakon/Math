@@ -51,9 +51,11 @@ int main(int argc, char* argv[])
     plus_t += make_rational<int>(1,3);
     print("{}\n\n", plus_t);
 
+    if (plus_t > three) print("{} > {}\n\n",plus_t,three);
+    else print("{} <= {}\n\n",plus_t,three);
     //1/3 gets destroyed, but it is at the end of use
 
-    auto ir = make_rational<int>(1,7);
+    auto ir = make_rational<int>(2,7);
     print("pause\n");
     auto limit = make_rational<int>(6,1);
     print("pause\n");
@@ -80,8 +82,8 @@ int main(int argc, char* argv[])
 
 
     print("trying a while loop:\n");
-    while ( ir < limit ){
-        print("value:{}, ",ir);
+    while (step > ir || ir < limit){
+        print("value:{}, \n",ir);
         ir += step;
     }
     /*

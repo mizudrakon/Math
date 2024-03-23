@@ -224,6 +224,7 @@ auto operator+ (const rational<T>& lhs, const rational<T>& rhs){
     return result;
 };
 
+
 template <Arithmetic T>
 auto operator- (const rational<T>& lhs, const rational<T>& rhs){
     auto [com_denom, lhsm, rhsm] = lcm(lhs.denomin(),rhs.denomin());

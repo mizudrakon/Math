@@ -47,7 +47,7 @@ public:
     //default c_tor, implicit 0/1, one argument n gives us n/1
     rational(T n, T d = 1) : nom(n),den(d) { reduce(); } 
     //copy c_tor
-    rational(const rational& rn) : nom(rn.nom),den(rn.den) { print("copy ctor\n"); }
+    rational(const rational& rn) : nom(rn.nom),den(rn.den) { print("copy ctor {}/{}\n",nom,den); }
     //move c_tor
     rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)) {}
     //copy_swap operator, pass by value makes a copy which is returned as the desired new object
