@@ -55,19 +55,23 @@ rational<T>& rational<T>::operator+=(const rational& frac){
     //    reduce();
         //frac.reduce();
     //}
+    print("+= assignment {}/{} ->",nom,den);
     auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
     nom = nom*lhsm+frac.nom*rhsm;
     den = com_denom;
     reduce();
+    print("{}/{}\n", nom, den);
     return *this;
 }
 
 template <Arithmetic T>
 rational<T>& rational<T>::operator-=(const rational& frac){
+    print("-= assignment {}/{} ->",nom,den);
     auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
     nom = nom*lhsm-frac.nom*rhsm;
     den = com_denom;
     reduce();
+    print("{}/{}\n", nom, den);
     return *this;
 }
 
@@ -171,13 +175,15 @@ std::string rational<T>::str() const{
 template <Arithmetic T>
 //spaceship operator for comparison
 auto operator<=>(const rational<T>& lhs, const rational<T>& rhs){
+    print("compare <=>\n");
     if (lhs.denomin() == rhs.denomin()) return lhs.nomin() <=> rhs.nomin();
-    auto a = lhs, b = rhs;
+    //copy ctor used here:
+    //auto a = lhs, b = rhs;
     //a.reduce();
     //b.reduce();
-    auto [com_den, am, bm] = lcm(a.denomin(),b.denomin());
+    auto [com_den, am, bm] = lcm(lhs.denomin(),rhs.denomin());
     
-    return (a.nomin()*am) <=> (b.nomin()*bm);
+    return (lhs.nomin()*am) <=> (rhs.nomin()*bm);
 };
 
 template <Arithmetic T>

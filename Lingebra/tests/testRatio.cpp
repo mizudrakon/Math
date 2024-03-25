@@ -1,9 +1,14 @@
 #include "../ratio.h"
 
 
+const auto make_frac = make_rational<int>; 
+
 int main(int argc, char* argv[])
 {
     using ifrac = rational<int>;
+//    using make_frac = make_rational<int>;
+    
+#ifdef BASETEST
     //declare rational 0;
     ifrac zero;
     ifrac one{1};
@@ -55,17 +60,28 @@ int main(int argc, char* argv[])
     else print("{} <= {}\n\n",plus_t,three);
     //1/3 gets destroyed, but it is at the end of use
 
-    auto ir = make_rational<int>(2,7);
-    print("pause\n");
-    auto limit = make_rational<int>(6,1);
-    print("pause\n");
-    auto step = make_rational<int>(1,7);
-    print("pause\n");
     //ok, this avoids remaking it every time    
     //but:
     //dest 6/1?
     //dest 1/7?
-
+#endif
+    
+    auto a = make_frac(1,2);
+    auto b = make_frac(1,7);
+    print("a < b: {}:\n", a < b);
+    print("a > b: {}:\n", a > b);
+    print("a == b: {}:\n", a == b);
+    print("a != b: {}:\n", a != b);
+     
+    
+    
+    
+    print("\n\nmake ir,limit,step:\n");
+    auto ir = make_rational<int>(2,7);
+    auto limit = make_rational<int>(10,7);
+    auto step = make_rational<int>(1,7);
+    /*
+    print("pause\n");
     print("STARTING += 1/7:\n");
     print("value:{}, \n",ir);
     ir += step;
@@ -79,30 +95,38 @@ int main(int argc, char* argv[])
     print("value:{}, \n",ir);
     ir -= static_cast<rational<int>>(4)*step; //this is a problem, 4 needs to be cast...
     print("value:{}, \n",ir);
+    */
 
-
-    print("trying a while loop:\n");
-    while (step > ir || ir < limit){
-        print("value:{}, \n",ir);
+    printf("STARTING += 1/7 in while loop:\n");
+    while (ir < limit){
+        //print("value:{}, \n",ir);
         ir += step;
     }
+    print("as double: {}\n\n", ir.dbl());
+
     /*
     for (; ir < limit; ir += step){//these two get destroyed
         print("value:{}, ",ir);
     }
     */
-    print("final: {}\n\n", ir.dbl());
     ir = make_rational<int>(1,7);
-    limit = make_rational<int>(-6,1);
-    step = make_rational<int>(1,7);
-    printf("STARTING -= 1/7:\n");
-    for (; ir > limit; ir -= step ){
-        print("value:{}, ",ir);
+    limit = make_rational<int>(-10,1);
+    //step = make_rational<int>(1,7);
+    printf("STARTING -= 1/7 in for loop:\n");
+    for (; ir > limit; --ir ){
+        print("-- {}\n",ir);
     }
-    print("final: {}\n", ir.dbl());
-    
+    print("as double: {}\n", ir.dbl());
     // *=
+    print("STARTING *=2:");
+    for (auto i = make_frac(1,4); i < 5; i *= 2){
+        print("*2 {}\n",i);
+    }
     // /=
+    print("STARTING /=2:");
+    for (auto i = make_frac(8,1); i > step; i /= 2){
+        print("/2 {}\n",i);
+    }
     //nonmember
 
     //destroying -6, 2, 3, -4/3

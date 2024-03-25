@@ -43,13 +43,13 @@ class rational
     T den {1};
 public:
     //constructors:
-    rational() : nom(0),den(1){} 
+    rational() : nom(0),den(1){ print("default ctor -> 0"); } 
     //default c_tor, implicit 0/1, one argument n gives us n/1
-    rational(T n, T d = 1) : nom(n),den(d) { reduce(); } 
+    rational(T n, T d = 1) : nom(n),den(d) { reduce(); print("arg ctor -> {}/{}\n",nom,den); } 
     //copy c_tor
     rational(const rational& rn) : nom(rn.nom),den(rn.den) { print("copy ctor {}/{}\n",nom,den); }
     //move c_tor
-    rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)) {}
+    rational(rational&& rn) noexcept : nom(std::move(rn.nom)),den(std::move(rn.den)) { print("move ctor {}/{}\n", nom,den);}
     //copy_swap operator, pass by value makes a copy which is returned as the desired new object
     
     ~rational(){ print("rational {}/{} destructor\n",nom, den);}
@@ -110,6 +110,12 @@ inline constexpr rational<T> make_rational(T n, T d);
 template <Arithmetic T>
 //spaceship operator for comparison
 inline auto operator<=>(const rational<T>& lhs, const rational<T>& rhs);
+
+template <Arithmetic T>
+inline auto operator<=>(const rational<T>& frac, const T& t){
+    return frac.nomin() <=> frac.denomin()*t;
+}
+
 
 template <Arithmetic T>
 inline auto operator==(const rational<T>& lhs, const rational<T>& rhs);
