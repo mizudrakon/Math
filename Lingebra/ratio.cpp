@@ -36,7 +36,7 @@ inline std::tuple<T,T,T> lcm(T a, T b){
 template <Arithmetic T>
 constexpr rational<T> make_rational(T n, T d)    
 {
-    print("making a {}/{} rational\n", n, d);
+    //print("making a {}/{} rational\n", n, d);
     rational<T> num{n,d};
     return num;
 }
@@ -51,27 +51,23 @@ rational<T>& rational<T>::operator=(rational<T> rn)noexcept {
 
 template <Arithmetic T>
 rational<T>& rational<T>::operator+=(const rational& frac){
-    //if (den != frac.den){
-    //    reduce();
-        //frac.reduce();
-    //}
-    print("+= assignment {}/{} ->",nom,den);
+    //print("+= assignment {}/{} ->",nom,den);
     auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
     nom = nom*lhsm+frac.nom*rhsm;
     den = com_denom;
     reduce();
-    print("{}/{}\n", nom, den);
+    //print("{}/{}\n", nom, den);
     return *this;
 }
 
 template <Arithmetic T>
 rational<T>& rational<T>::operator-=(const rational& frac){
-    print("-= assignment {}/{} ->",nom,den);
+    //print("-= assignment {}/{} ->",nom,den);
     auto [com_denom,lhsm,rhsm] = lcm(den,frac.den);
     nom = nom*lhsm-frac.nom*rhsm;
     den = com_denom;
     reduce();
-    print("{}/{}\n", nom, den);
+    //print("{}/{}\n", nom, den);
     return *this;
 }
 
@@ -175,12 +171,8 @@ std::string rational<T>::str() const{
 template <Arithmetic T>
 //spaceship operator for comparison
 auto operator<=>(const rational<T>& lhs, const rational<T>& rhs){
-    print("compare <=>\n");
+    //print("compare <=>\n");
     if (lhs.denomin() == rhs.denomin()) return lhs.nomin() <=> rhs.nomin();
-    //copy ctor used here:
-    //auto a = lhs, b = rhs;
-    //a.reduce();
-    //b.reduce();
     auto [com_den, am, bm] = lcm(lhs.denomin(),rhs.denomin());
     
     return (lhs.nomin()*am) <=> (rhs.nomin()*bm);
@@ -210,12 +202,12 @@ auto operator/ (const rational<T>& lhs, const rational<T>& rhs){
 };
 
 template <Arithmetic T>
-auto operator%(rational<T> lhs, rational<T> rhs){
+auto operator% (const rational<T>& lhs, const rational<T>& rhs){
     if (lhs < rhs) return lhs;
     rational result(0);
     if (lhs == rhs) return result;
-    lhs.reduce();
-    rhs.reduce();
+    //lhs.reduce();
+    //rhs.reduce();
     auto [com_den, lhsm, rhsm] = lcm(lhs.denomin(),rhs.denomin());
     result.set_nom((lhs.nomin()*lhsm) % (rhs.nomin()*rhsm));
     result.set_den(com_den);
