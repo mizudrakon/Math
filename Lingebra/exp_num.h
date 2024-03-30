@@ -40,7 +40,19 @@ public:
     //getting a string representation
     std::string str() const;
 
+    //NORMAL operators - work only in limited set of cases
+    
+
+    //we need boolean operations for the expression class
+    bool add(const exp_num& rhs);
+    bool sub(const exp_num& rhs);
+    bool mult_by(const exp_num& rhs);
+    bool div_by(const exp_num& rhs);
+
 };
+
+template <Arithmetic T>
+bool operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs);
 
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1

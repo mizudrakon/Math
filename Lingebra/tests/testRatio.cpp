@@ -127,8 +127,8 @@ int main(int argc, char* argv[])
     for (auto i = make_frac(8,1); i > step; i /= 2){
         print("/2 {}\n",i);
     }
-    //nonmember
 
-    //destroying -6, 2, 3, -4/3
-    //destroying one, zero
+    //MORE TESTS: %
+    
+
 }
