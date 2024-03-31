@@ -33,7 +33,8 @@ public:
     void SetBase(int x) { base = x; } 
     rational<T> GetExp() const { return exponent; }
     void SetExp(rational<T> r) { exponent = r; }
-    
+    double to_dbl();
+
     //simplifiying fractions
     void Reduce();
 
@@ -57,14 +58,6 @@ bool operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs);
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
 exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b);
-
-//assuming this goes the same as with rational...
-
-//op /
-
-//op +
-
-//op -
 
 //formater for rational class to print it directly with print()
 template<typename T>

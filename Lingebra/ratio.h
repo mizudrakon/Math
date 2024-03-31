@@ -75,7 +75,7 @@ public:
     void set_den(T d) { den = d; }
     
     //functions to get the number as a floating point rather than a fraction
-    double dbl() const { return static_cast<double>(nom) / static_cast<double>(den);}
+    double to_dbl() const { return static_cast<double>(nom) / static_cast<double>(den);}
     float flt() const { return static_cast<float>(nom) / static_cast<float>(den);}
     
     //MEMBER OPERATORS
