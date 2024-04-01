@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         //print("value:{}, \n",ir);
         ir += step;
     }
-    print("as double: {}\n\n", ir.dbl());
+    print("as double: {}\n\n", ir.to_dbl());
 
     /*
     for (; ir < limit; ir += step){//these two get destroyed
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     for (; ir > limit; --ir ){
         print("-- {}\n",ir);
     }
-    print("as double: {}\n", ir.dbl());
+    print("as double: {}\n", ir.to_dbl());
     // *=
     print("STARTING *=2:");
     for (auto i = make_frac(1,4); i < 5; i *= 2){

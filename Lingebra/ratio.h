@@ -10,8 +10,8 @@
 #include "my_concepts.hpp"
 
 //class declarations
-template <Arithmetic T> class rational;
-template <Arithmetic T> class exp_num;
+//template <Arithmetic T> class rational;
+//template <Arithmetic T> class exp_num;
 
 //print function
 constexpr void print(const std::string_view text, auto&&... args){
@@ -127,9 +127,24 @@ inline auto operator<=>(const rational<T>& frac, const T& t){
     return frac.nomin() <=> frac.denomin()*t;
 }
 
-
 template <Arithmetic T>
 inline auto operator==(const rational<T>& lhs, const rational<T>& rhs);
+
+template <Arithmetic T>
+inline auto operator!=(const rational<T>& lhs, const rational<T>& rhs){
+    return !(lhs == rhs);
+}
+
+template <Arithmetic T>
+inline auto operator==(const rational<T>& lhs, const T& rhs){ 
+    if (lhs.denomin() == 1) return lhs.nomin() == rhs;
+    return lhs.nomin()*lhs.denomin() == rhs*lhs.denomin(); 
+}
+
+template <Arithmetic T>
+inline auto operator!=(const rational<T>& lhs, const T& rhs){
+    return !(lhs == rhs);
+} 
 
 template <Arithmetic T>
 inline auto operator* (const rational<T>& lhs, const rational<T>& rhs);
