@@ -22,21 +22,80 @@ std::string exp_num<T>::str() const {
     return text + "^{" + exponent.str() + '}';//also print exponent, if it's nontrivial
 }
 
+template <Arithmetic T>
+auto exp_num<T>::operator+=(const exp_num<T>& rhs){
+    base += rhs.base;
+    return *this;
+} 
 
+template <Arithmetic T>
+auto exp_num<T>::operator-=(const exp_num<T>& rhs){
+    base -= rhs.base;
+    return *this;
+} 
+
+template <Arithmetic T>
+auto exp_num<T>::operator*=(const exp_num<T>& rhs){
+    if (exponent = 1 && rhs.exponent == 1){
+        base *= rhs.base;
+    }
+    //same base allows us to add exponents
+    else if (base == rhs.base){
+        exponent += rhs.exponent;
+    }
+    Reduce();
+    return *this;
+} 
+
+template <Arithmetic T>
+auto exp_num<T>::operator/=(const exp_num<T>& rhs){
+    if (base == rhs.base){
+        exponent -= rhs.exponent;
+    }
+    //exponents = 1 just makes them regular integers
+    else if (exponent == 1 && rhs.exponent == 1){
+        base /= rhs.base;
+    }
+    Reduce(); 
+    return *this;
+} 
 
 template <Arithmetic T>
 bool exp_num<T>::add(const exp_num<T>& rhs){
-    //if (exponent == 1 &&)
+    if (exponent == 1 && rhs.exponent == 1){
+        *this += rhs;
+        return true;
+    }
+    return false;
 }
 
 template <Arithmetic T>
-bool exp_num<T>::sub(const exp_num<T>& rhs){}
+bool exp_num<T>::sub(const exp_num<T>& rhs){
+    if (exponent == 1 && rhs.exponent == 1){
+        *this -= rhs;
+        return true;
+    }
+    return false;
+}
 
 template <Arithmetic T>
-bool exp_num<T>::mult_by(const exp_num<T>& rhs){}
+bool exp_num<T>::mult_by(const exp_num<T>& rhs){
+    if (base == rhs.GetBase() || exponent == 1 && rhs.GetExp() == 1){
+        *this *= rhs;
+        return true;
+    }
+    return false;
+}
 
 template <Arithmetic T>
-bool exp_num<T>::div_by(const exp_num<T>& rhs){}
+bool exp_num<T>::div_by(const exp_num<T>& rhs){
+    
+    if ((base == rhs.GetBase()) || (exponent = 1 && rhs.GetExp() == 1 && base % rhs.GetBase() == 0)){
+        *this /= rhs;
+        return true;
+    }
+    return false;
+}
 
 
 
@@ -92,32 +151,32 @@ exp_num<T>& operator-(const exp_num<T>& lhs, const exp_num<T>& rhs){
 
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
-exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b){
+exp_num<T>& operator*(const exp_num<T>& lhs, const exp_num<T>& rhs){
     exp_num<T> answ{0};
     //exponents = 1 just makes them regular integers
-    if (a.GetExp() = 1 && b.GetExp() == 1){
-        answ.SetBase(a.GetBase()*b.GetBase());
+    if (lhs.GetExp() == 1 && rhs.GetExp() == 1){
+        answ.SetBase(lhs.GetBase()*rhs.GetBase());
     }
     //same base allows us to add exponents
-    else if (a.GetBase() == b.GetBase()){
-        answ.SetBase(a.GetBase());
-        answ.SetExp(a.GetExp() + b.GetExp());
+    else if (lhs.GetBase() == rhs.GetBase()){
+        answ.SetBase(lhs.GetBase());
+        answ.SetExp(lhs.GetExp() + rhs.GetExp());
     }
     answ.Reduce(); 
     return answ;
 }
 
 template <Arithmetic T>
-exp_num<T>& operator/(const exp_num<T>& a, const exp_num<T>& b){
+exp_num<T>& operator/(const exp_num<T>& lhs, const exp_num<T>& rhs){
     exp_num<T> answ{0};
     //same base allows us to add exponents
-    if (a.GetBase() == b.GetBase()){
-        answ.SetBase(a.GetBase());
-        answ.SetExp(a.GetExp() - b.GetExp());
+    if (lhs.GetBase() == rhs.GetBase()){
+        answ.SetBase(lhs.GetBase());
+        answ.SetExp(lhs.GetExp() - rhs.GetExp());
     }
     //exponents = 1 just makes them regular integers
-    else if (a.GetExp() = 1 && b.GetExp() == 1){
-        answ.SetBase(a.GetBase()/b.GetBase());
+    else if (lhs.GetExp() == 1 && rhs.GetExp() == 1){
+        answ.SetBase(lhs.GetBase()/rhs.GetBase());
     }
     answ.Reduce(); 
     return answ;
@@ -125,7 +184,7 @@ exp_num<T>& operator/(const exp_num<T>& a, const exp_num<T>& b){
 }
 
 template <Arithmetic T>
-exp_num<T>& operator%(const exp_num<T>& a, const exp_num<T>& b){
+exp_num<T>& operator%(const exp_num<T>& lhs, const exp_num<T>& rhs){
     exp_num<T> answ;
     return answ;
 }
