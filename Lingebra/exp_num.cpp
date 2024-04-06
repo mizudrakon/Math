@@ -36,7 +36,7 @@ auto exp_num<T>::operator-=(const exp_num<T>& rhs){
 
 template <Arithmetic T>
 auto exp_num<T>::operator*=(const exp_num<T>& rhs){
-    if (exponent = 1 && rhs.exponent == 1){
+    if (exponent == 1 && rhs.exponent == 1){
         base *= rhs.base;
     }
     //same base allows us to add exponents
@@ -80,7 +80,12 @@ bool exp_num<T>::sub(const exp_num<T>& rhs){
 
 template <Arithmetic T>
 bool exp_num<T>::mult_by(const exp_num<T>& rhs){
-    if (base == rhs.GetBase() || exponent == 1 && rhs.GetExp() == 1){
+    
+    //print("this exponent: {}, rhs exponent: {}\n", exponent, rhs.exponent);
+    //if (exponent == 1) print("this exp == 1\n");
+    //if (rhs.exponent == 1) print("rhs exp == 1\n");
+
+    if (base == rhs.base || exponent == 1 && rhs.exponent == 1){
         *this *= rhs;
         return true;
     }
@@ -90,7 +95,7 @@ bool exp_num<T>::mult_by(const exp_num<T>& rhs){
 template <Arithmetic T>
 bool exp_num<T>::div_by(const exp_num<T>& rhs){
     
-    if ((base == rhs.GetBase()) || (exponent = 1 && rhs.GetExp() == 1 && base % rhs.GetBase() == 0)){
+    if ((base == rhs.GetBase()) || (exponent == 1 && rhs.GetExp() == 1 && base % rhs.GetBase() == 0)){
         *this /= rhs;
         return true;
     }
