@@ -1,0 +1,7 @@
+{
+	"nodes":[
+		{"id":"ffc761e1f9d161ee","x":-49,"y":-126,"width":249,"height":206,"type":"text","text":"### class exp_num\nint base;\nint exp;"},
+		{"id":"2930339881f106c0","x":475,"y":-92,"width":265,"height":92,"type":"text","text":"### class expression\nnode* head;"}
+	],
+	"edges":[]
+}
