@@ -116,6 +116,7 @@ public:
 
 template <Arithmetic T>
 inline constexpr rational<T> make_rational(T n, T d);
+//type has to be specified because of the constexpr
 
 //NONMEMBER OPERATOR OVERLOADS:
 template <Arithmetic T>

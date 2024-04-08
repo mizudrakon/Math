@@ -3,6 +3,7 @@
 
 #include "ratio.h"
 #include "exp_num.h"
+#include <memory>
 
 /* Expression is a binary tree
  * nodes are either values or operations
@@ -12,27 +13,38 @@
 */
 
 enum class op_id { non, plus, minus, mult, div, mod };
+template <Arithmetic T>
 struct node //can be operation or value node
 {
     //op_id - if non it's a value node
     op_id op;
-    //parent: can only be op_node
-    node* mom;
+    std::unique_ptr<exp_num<T>> pvalue;
     //daughter_left: op_node or value_node
-    node* left;
+    std::unique_ptr<node> pleft;
     //daughter_right: op_node or value_node
-    node* right;
+    std::unique_ptr<node> pright;
 };
 
+template <Arithmetic T>
 class expression
 {
-    node* head;
+    std::unique_ptr<node<T>> head;
 
 public:
+    expression():head(std::make_unique<node>(make_node(0,nullptr))){}
     expression();
+    //create a node 
+    auto make_node(op_id op,std::unique_ptr<exp_num<T>> pval);
 
+    auto operator=(const expression& rhse);
+    auto operator=(expression&& rhse) noexcept;
+    auto operator+=(const expression& rhse);
+    auto operator-=(const expression& rhse);
+    auto operator*=(const expression& rhse);
+    auto operator/=(const expression& rhse);
+    
 };
 
 
-
+#include "expression.cpp"
 #endif
