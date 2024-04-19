@@ -23,6 +23,7 @@ struct node //can be operation or value node
     std::unique_ptr<node> pleft;
     //daughter_right: op_node or value_node
     std::unique_ptr<node> pright;
+
 };
 
 template <Arithmetic T>
@@ -31,8 +32,19 @@ class expression
     std::unique_ptr<node<T>> head;
 
 public:
-    expression():head(std::make_unique<node>(make_node(0,nullptr))){}
-    expression();
+    expression():head(std::make_unique<node<T>>(make_node(op_id::non,nullptr))){
+        print("expr default ctor\n");
+    }
+    expression(const expression& orig){
+        head = std::make_unique<node<T>>(make_node(orig->head.op,orig->head))
+        auto p_node = head.get();
+        if (p_node.pleft != nullptr){
+
+        }
+    }
+    expression(expression&& orig):head(std::move(orig.head)){
+        print("expr move ctor\n");
+    }
     //create a node 
     auto make_node(op_id op,std::unique_ptr<exp_num<T>> pval);
 
