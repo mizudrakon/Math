@@ -33,7 +33,7 @@ public:
     void SetBase(int x) { base = x; } 
     rational<T> GetExp() const { return exponent; }
     void SetExp(rational<T> r) { exponent = r; }
-    double to_dbl();
+    double to_dbl() const;
 
     //simplifiying fractions
     void Reduce();

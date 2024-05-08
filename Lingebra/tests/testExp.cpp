@@ -5,6 +5,19 @@ int main(int args, char* argv[])
 {
     using expn = exp_num<int>;
     using frac = rational<int>;
+
+    //test constraints for Arithmetic T:
+    expn a{3,5};
+    expn b{2,8};
+    print("a + b = {}\n",a + b);
+    print("a - b = {}\n", a - b);
+    print("a / b = {}\n", a / b);
+    print("a % b = {}\n", a / b);
+    print("a / b = {}\n", a / b);
+    print("a == b is {}\n", a == b);
+    print("a < b is {}\n",a < b);
+
+#ifdef OPEN_TEST    
     expn df;
     expn num{2,3};
     print("default constructor: {}, 2^3: {}\n", df, num);
@@ -54,5 +67,8 @@ int main(int args, char* argv[])
         print("successful div: {}\n", b);
     else
         print("cannot divide {} with {}\n", b, c);
+#endif
+
+
 
 }

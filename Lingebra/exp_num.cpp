@@ -10,7 +10,7 @@ void exp_num<T>::Reduce() {
 }
 
 template <Arithmetic T>
-double exp_num<T>::to_dbl() {
+double exp_num<T>::to_dbl() const {
     return pow(static_cast<double>(base),exponent.to_dbl());
 }
 
@@ -105,7 +105,7 @@ bool exp_num<T>::div_by(const exp_num<T>& rhs){
 
 
 template <Arithmetic T>
-bool operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs){
+auto operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs){
     //simple cases:
     if (lhs.GetBase() == rhs.GetBase()) 
         return lhs.GetExp() <=> rhs.GetExp();
@@ -113,17 +113,17 @@ bool operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs){
     ((lhs.GetBase() <=> rhs.GetBase()) == (lhs.GetExp() <=> rhs.GetExp())))
         return lhs.GetBase() <=> rhs.GetBase();
     //cases like lhs.base < rhs.base && lhs.exp > rhs.exp:
-    return lhs.to_dbl() <=> rhs.to_dbl();
+    return (lhs.to_dbl() <=> rhs.to_dbl());
 }
 
 template <Arithmetic T>
-bool operator<=>(const exp_num<T>& lhs, const T& rhs){
+auto operator<=>(const exp_num<T>& lhs, const T& rhs){
     if (lhs.GetExp() == 1) return lhs.GetBase() <=> rhs;
     return lhs.to_dbl() <=> static_cast<double>(rhs);
 }
 
 template <Arithmetic T>
-bool operator==(const exp_num<T>& lhs, const exp_num<T>& rhs){
+auto operator==(const exp_num<T>& lhs, const exp_num<T>& rhs){
     //some cases that might save time since to_dbl calls pow()
     if (lhs.GetBase() == rhs.GetBase()) return lhs.GetExp() == rhs.GetExp();
     if (lhs.GetExp() == rhs.GetExp()) return lhs.GetBase() == rhs.GetBase();
@@ -134,7 +134,7 @@ bool operator==(const exp_num<T>& lhs, const exp_num<T>& rhs){
 }
 
 template <Arithmetic T>
-bool operator==(const exp_num<T>& lhs, const T& rhs){
+auto operator==(const exp_num<T>& lhs, const T& rhs){
     if (lhs.GetExp() == 1) return lhs.GetBase() == rhs;
     if (lhs.GetExp() >= 1 && lhs.GetBase() > rhs) return false;
     return lhs.to_dbl() == static_cast<double>(rhs);

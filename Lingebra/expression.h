@@ -13,6 +13,7 @@
 */
 
 enum class op_id { non, plus, minus, mult, div, mod };
+
 template <Arithmetic T>
 struct node //can be operation or value node
 {
