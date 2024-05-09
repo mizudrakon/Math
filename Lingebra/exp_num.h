@@ -3,6 +3,7 @@
 
 #include "ratio.h"
 #include "my_concepts.hpp"
+#include <memory>
 
 //EXP_NUM falls into EXPRESSION pit whenever we have different bases and irreducible expenents
 //THIS IS A BIT MORE COMPLICATED...
@@ -68,20 +69,20 @@ template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const T& rhs);
 
 template <Arithmetic T>
-inline exp_num<T>& operator+(const exp_num<T>& lhs, const exp_num<T>& rhs);
+inline exp_num<T> operator+(const exp_num<T>& lhs, const exp_num<T>& rhs);
 
 template <Arithmetic T>
-inline exp_num<T>& operator-(const exp_num<T>& a, const exp_num<T>& b);
+inline exp_num<T> operator-(const exp_num<T>& a, const exp_num<T>& b);
 
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
-inline exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b);
+inline exp_num<T> operator*(const exp_num<T>& a, const exp_num<T>& b);
 
 template <Arithmetic T>
-inline exp_num<T>& operator/(const exp_num<T>& a, const exp_num<T>& b);
+inline exp_num<T> operator/(const exp_num<T>& a, const exp_num<T>& b);
 
 template <Arithmetic T>
-inline exp_num<T>& operator%(const exp_num<T>& a, const exp_num<T>& b);
+inline exp_num<T> operator%(const exp_num<T>& a, const exp_num<T>& b);
 
 //formater for rational class to print it directly with print()
 template<typename T>

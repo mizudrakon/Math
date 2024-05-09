@@ -7,13 +7,14 @@ int main(int args, char* argv[])
     using frac = rational<int>;
 
     //test constraints for Arithmetic T:
-    expn a{3,5};
-    expn b{2,8};
+    expn a{4};
+    expn b{2};
+    print("a = {}, b = {}\n", a, b);
     print("a + b = {}\n",a + b);
     print("a - b = {}\n", a - b);
+    print("a * b = {}\n", a * b);
     print("a / b = {}\n", a / b);
-    print("a % b = {}\n", a / b);
-    print("a / b = {}\n", a / b);
+    print("a % b = {}\n", a % b);
     print("a == b is {}\n", a == b);
     print("a < b is {}\n",a < b);
 
