@@ -13,7 +13,11 @@ int main(int args, char* argv[])
     print("a + b = {}\n",a + b);
     print("a - b = {}\n", a - b);
     print("a * b = {}\n", a * b);
+    expn r = a * b;
+    print("{} * {} = {}\n", a, b, r);
     print("a / b = {}\n", a / b);
+    expn rd = a / b;
+    print("{} / {} = {}\n", a, b, rd);
     print("a % b = {}\n", a % b);
     print("a == b is {}\n", a == b);
     print("a < b is {}\n",a < b);
