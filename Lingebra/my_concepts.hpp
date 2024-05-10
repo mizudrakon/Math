@@ -14,6 +14,14 @@ concept Arithmetic = requires(T a, T b){
 };
 
 template <typename T>
+concept ExpressionValue = Arithmetic<T> && requires(T a, T b){
+    a.add(b);
+    a.sub(b);
+    a.mut_by(b);
+    a.div_by(b);
+};
+
+template <typename T>
 concept Iterator = requires(T a, T b){
     //need to be comparable and point to comparable values
     a + 1;

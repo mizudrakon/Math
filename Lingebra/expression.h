@@ -5,6 +5,8 @@
 #include "exp_num.h"
 #include <memory>
 
+using std::unique_ptr, std::make_unique;
+
 /* Expression is a binary tree
  * nodes are either values or operations
  * some operations can be functions
@@ -14,30 +16,32 @@
 
 enum class op_id { non, plus, minus, mult, div, mod };
 
-template <Arithmetic T>
+//template <Arithmetic T>
 struct node //can be operation or value node
 {
     //op_id - if non it's a value node
     op_id op;
-    std::unique_ptr<exp_num<T>> pvalue;
+    unique_ptr<rational<exp_num<int>>> p_value;
     //daughter_left: op_node or value_node
-    std::unique_ptr<node> pleft;
+    unique_ptr<node> p_left;
     //daughter_right: op_node or value_node
-    std::unique_ptr<node> pright;
+    unique_ptr<node> p_right;
 
 };
 
-template <Arithmetic T>
+template <ExpressionValue T>
 class expression
 {
-    std::unique_ptr<node<T>> head;
+    unique_ptr<node<T>> head;
 
 public:
-    expression():head(std::make_unique<node<T>>(make_node(op_id::non,nullptr))){
+    expression():head(make_unique<node<T>>(make_node(op_id::non,nullptr))){
+        head->p_value = make_unique<T>
         print("expr default ctor\n");
     }
+
     expression(const expression& orig){
-        head = std::make_unique<node<T>>(make_node(orig->head.op,orig->head))
+        head = make_unique<node<T>>(make_node(orig->head.op,orig->head))
         auto p_node = head.get();
         if (p_node.pleft != nullptr){
 

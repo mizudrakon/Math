@@ -142,29 +142,30 @@ auto operator==(const exp_num<T>& lhs, const T& rhs){
 
 template <Arithmetic T>
 exp_num<T> operator+(const exp_num<T>& lhs, const exp_num<T>& rhs){
-    return exp_num<T>(lhs.GetBase()+rhs.GetBase(),1);
+    if (lhs.GetExp() == 1 && rhs.GetExp() == 1)
+        return exp_num<T>(lhs.GetBase()+rhs.GetBase(),1);
+    return exp_num<T>{0,-1};//failure
 }
 
 template <Arithmetic T>
 exp_num<T> operator-(const exp_num<T>& lhs, const exp_num<T>& rhs){
-    return exp_num<T>{lhs.GetBase()-rhs.GetBase(),1};
+    if (lhs.GetExp() == 1 && rhs.GetExp() == 1)
+        return exp_num<T>{lhs.GetBase()-rhs.GetBase(),1};
+    return exp_num<T>{0,-1};//failure
 }
 
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
 exp_num<T> operator*(const exp_num<T>& lhs, const exp_num<T>& rhs){
-    auto answ = std::make_unique<exp_num<T>>(0);
     //exponents = 1 just makes them regular integers
     if (lhs.GetExp() == 1 && rhs.GetExp() == 1){
-        answ->SetBase(lhs.GetBase()*rhs.GetBase());
+        return exp_num<T>{lhs.GetBase()*rhs.GetBase(),1};
     }
     //same base allows us to add exponents
     else if (lhs.GetBase() == rhs.GetBase()){
-        answ->SetBase(lhs.GetBase());
-        answ->SetExp(lhs.GetExp() + rhs.GetExp());
+        return exp_num<T>{lhs.GetBase(),lhs.GetExp() + rhs.GetExp()};
     }
-    answ->Reduce(); 
-    return *answ;
+    return exp_num<T>{0,-1};//failure
 }
 
 template <Arithmetic T>
@@ -172,20 +173,17 @@ exp_num<T> operator/(const exp_num<T>& lhs, const exp_num<T>& rhs){
     exp_num<T> answ{0};
     //same base allows us to add exponents
     if (lhs.GetBase() == rhs.GetBase()){
-        answ.SetBase(lhs.GetBase());
-        answ.SetExp(lhs.GetExp() - rhs.GetExp());
+        return exp_num<T>{lhs.GetBase(),lhs.GetExp() - rhs.GetExp()};
     }
     //exponents = 1 just makes them regular integers
     else if (lhs.GetExp() == 1 && rhs.GetExp() == 1){
-        answ.SetBase(lhs.GetBase()/rhs.GetBase());
+        return exp_num<T>{lhs.GetBase()/rhs.GetBase(),1};
     }
-    answ.Reduce(); 
-    return answ;
+    return exp_num<T>{0,-1};//failure
 
 }
 
 template <Arithmetic T>
 exp_num<T> operator%(const exp_num<T>& lhs, const exp_num<T>& rhs){
-    exp_num<T> answ;
-    return answ;
+    return exp_num<T>{0,-1};//failure
 }
