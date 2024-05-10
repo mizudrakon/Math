@@ -49,8 +49,8 @@ public:
     auto operator/=(const exp_num& rhs); 
 
     //we need boolean operations for the expression class
-    bool add(const exp_num& rhs);
-    bool sub(const exp_num& rhs);
+    bool add_with(const exp_num& rhs);
+    bool sub_with(const exp_num& rhs);
     bool mult_by(const exp_num& rhs);
     bool div_by(const exp_num& rhs);
 
@@ -58,29 +58,21 @@ public:
 
 template <Arithmetic T>
 inline auto operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs);
-
 template <Arithmetic T>
 inline auto operator<=>(const exp_num<T>& lhs, const T& rhs);
-
 template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const exp_num<T>& rhs);
-
 template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const T& rhs);
-
 template <Arithmetic T>
 inline exp_num<T> operator+(const exp_num<T>& lhs, const exp_num<T>& rhs);
-
 template <Arithmetic T>
 inline exp_num<T> operator-(const exp_num<T>& a, const exp_num<T>& b);
-
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
 inline exp_num<T> operator*(const exp_num<T>& a, const exp_num<T>& b);
-
 template <Arithmetic T>
 inline exp_num<T> operator/(const exp_num<T>& a, const exp_num<T>& b);
-
 template <Arithmetic T>
 inline exp_num<T> operator%(const exp_num<T>& a, const exp_num<T>& b);
 

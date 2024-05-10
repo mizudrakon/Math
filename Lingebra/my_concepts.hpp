@@ -15,8 +15,8 @@ concept Arithmetic = requires(T a, T b){
 
 template <typename T>
 concept ExpressionValue = Arithmetic<T> && requires(T a, T b){
-    a.add(b);
-    a.sub(b);
+    a.add_with(b);
+    a.sub_with(b);
     a.mut_by(b);
     a.div_by(b);
 };

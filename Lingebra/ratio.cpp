@@ -129,6 +129,29 @@ rational<T> rational<T>::operator--(int){
     return old;
 }
 
+
+    //INCREMENTS
+template <Arithmetic T>
+bool rational<T>::add_with(const rational& rhs){
+
+}
+
+template <Arithmetic T>
+bool rational<T>::sub_with(const rational& rhs){
+
+}
+
+template <Arithmetic T>
+bool rational<T>::mult_by(const rational& rhs){
+
+}
+
+template <Arithmetic T>
+bool rational<T>::div_by(const rational& rhs){
+
+}
+
+
 template <Arithmetic T>
 void rational<T>::reduce(){
     //we wnat to move a (-) sign to nom (or make two - into +)

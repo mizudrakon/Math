@@ -24,13 +24,15 @@ std::string exp_num<T>::str() const {
 
 template <Arithmetic T>
 auto exp_num<T>::operator+=(const exp_num<T>& rhs){
-    base += rhs.base;
+    if (exponent == 1 && rhs.exponent == 1)
+        base += rhs.base;
     return *this;
 } 
 
 template <Arithmetic T>
 auto exp_num<T>::operator-=(const exp_num<T>& rhs){
-    base -= rhs.base;
+    if (exponent == 1 && rhs.exponent == 1)
+        base -= rhs.base;
     return *this;
 } 
 
@@ -49,19 +51,19 @@ auto exp_num<T>::operator*=(const exp_num<T>& rhs){
 
 template <Arithmetic T>
 auto exp_num<T>::operator/=(const exp_num<T>& rhs){
-    if (base == rhs.base){
-        exponent -= rhs.exponent;
-    }
     //exponents = 1 just makes them regular integers
-    else if (exponent == 1 && rhs.exponent == 1){
+    if (exponent == 1 && rhs.exponent == 1){
         base /= rhs.base;
+    }
+    else if (base == rhs.base){
+        exponent -= rhs.exponent;
     }
     Reduce(); 
     return *this;
 } 
 
 template <Arithmetic T>
-bool exp_num<T>::add(const exp_num<T>& rhs){
+bool exp_num<T>::add_with(const exp_num<T>& rhs){
     if (exponent == 1 && rhs.exponent == 1){
         *this += rhs;
         return true;
@@ -70,7 +72,7 @@ bool exp_num<T>::add(const exp_num<T>& rhs){
 }
 
 template <Arithmetic T>
-bool exp_num<T>::sub(const exp_num<T>& rhs){
+bool exp_num<T>::sub_with(const exp_num<T>& rhs){
     if (exponent == 1 && rhs.exponent == 1){
         *this -= rhs;
         return true;
@@ -80,11 +82,6 @@ bool exp_num<T>::sub(const exp_num<T>& rhs){
 
 template <Arithmetic T>
 bool exp_num<T>::mult_by(const exp_num<T>& rhs){
-    
-    //print("this exponent: {}, rhs exponent: {}\n", exponent, rhs.exponent);
-    //if (exponent == 1) print("this exp == 1\n");
-    //if (rhs.exponent == 1) print("rhs exp == 1\n");
-
     if (base == rhs.base || exponent == 1 && rhs.exponent == 1){
         *this *= rhs;
         return true;
@@ -101,8 +98,6 @@ bool exp_num<T>::div_by(const exp_num<T>& rhs){
     }
     return false;
 }
-
-
 
 template <Arithmetic T>
 auto operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs){
