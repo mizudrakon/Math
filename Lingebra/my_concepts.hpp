@@ -19,6 +19,8 @@ concept ExpressionValue = Arithmetic<T> && requires(T a, T b){
     a.sub_with(b);
     a.mut_by(b);
     a.div_by(b);
+    can_add(a,b);
+    can_mult(a,b);
 };
 
 template <typename T>
