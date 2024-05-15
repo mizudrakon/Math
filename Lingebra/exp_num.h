@@ -42,13 +42,13 @@ public:
     //getting a string representation
     std::string str() const;
 
-    //NORMAL operators - work only in limited set of cases
+    //NORMAL operators - work right only in limited set of cases
     auto operator+=(const exp_num& rhs); 
     auto operator-=(const exp_num& rhs); 
     auto operator*=(const exp_num& rhs); 
     auto operator/=(const exp_num& rhs); 
 
-    //we need boolean operations for the expression class
+    //bool operators return fals if the operation can't be proceded with 
     bool add_with(const exp_num& rhs);
     bool sub_with(const exp_num& rhs);
     bool mult_by(const exp_num& rhs);
@@ -64,6 +64,9 @@ template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const exp_num<T>& rhs);
 template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const T& rhs);
+
+//these operators create a new exp_num object, which is (base, exponent) 
+//if the operation failed the result is (0,-1) = 1/0 division by 0
 template <Arithmetic T>
 inline exp_num<T> operator+(const exp_num<T>& lhs, const exp_num<T>& rhs);
 template <Arithmetic T>

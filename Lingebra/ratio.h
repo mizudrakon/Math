@@ -80,24 +80,16 @@ public:
     
     //MEMBER OPERATORS
     rational& operator=(rational rn)noexcept; 
-
     rational& operator+=(const rational& frac);
-
     rational& operator-=(const rational& frac);
-
     rational& operator*=(const rational& frac);
-    
     rational& operator/=(const rational& frac);
-    
     rational& operator%=(rational frac);
 
     //INCREMENTS
     rational& operator++();
-    
     rational operator++(int);
-
     rational& operator--();
-    
     rational operator--(int);
 
     //function for reducing the fraction
