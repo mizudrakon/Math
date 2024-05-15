@@ -3,6 +3,7 @@
 
 #include "ratio.h"
 #include "my_concepts.hpp"
+#include <memory>
 
 //EXP_NUM falls into EXPRESSION pit whenever we have different bases and irreducible expenents
 //THIS IS A BIT MORE COMPLICATED...
@@ -33,7 +34,7 @@ public:
     void SetBase(int x) { base = x; } 
     rational<T> GetExp() const { return exponent; }
     void SetExp(rational<T> r) { exponent = r; }
-    double to_dbl();
+    double to_dbl() const;
 
     //simplifiying fractions
     void Reduce();
@@ -41,15 +42,15 @@ public:
     //getting a string representation
     std::string str() const;
 
-    //NORMAL operators - work only in limited set of cases
+    //NORMAL operators - work right only in limited set of cases
     auto operator+=(const exp_num& rhs); 
     auto operator-=(const exp_num& rhs); 
     auto operator*=(const exp_num& rhs); 
     auto operator/=(const exp_num& rhs); 
 
-    //we need boolean operations for the expression class
-    bool add(const exp_num& rhs);
-    bool sub(const exp_num& rhs);
+    //bool operators return fals if the operation can't be proceded with 
+    bool add_with(const exp_num& rhs);
+    bool sub_with(const exp_num& rhs);
     bool mult_by(const exp_num& rhs);
     bool div_by(const exp_num& rhs);
 
@@ -57,31 +58,26 @@ public:
 
 template <Arithmetic T>
 inline auto operator<=>(const exp_num<T>& lhs, const exp_num<T>& rhs);
-
 template <Arithmetic T>
 inline auto operator<=>(const exp_num<T>& lhs, const T& rhs);
-
 template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const exp_num<T>& rhs);
-
 template <Arithmetic T>
 inline auto operator==(const exp_num<T>& lhs, const T& rhs);
 
+//these operators create a new exp_num object, which is (base, exponent) 
+//if the operation failed the result is (0,-1) = 1/0 division by 0
 template <Arithmetic T>
-inline exp_num<T>& operator+(const exp_num<T>& lhs, const exp_num<T>& rhs);
-
+inline exp_num<T> operator+(const exp_num<T>& lhs, const exp_num<T>& rhs);
 template <Arithmetic T>
-inline exp_num<T>& operator-(const exp_num<T>& a, const exp_num<T>& b);
-
+inline exp_num<T> operator-(const exp_num<T>& a, const exp_num<T>& b);
 template <Arithmetic T>
 //multiplies only if a nad b are of the same base or their exps are 1
-inline exp_num<T>& operator*(const exp_num<T>& a, const exp_num<T>& b);
-
+inline exp_num<T> operator*(const exp_num<T>& a, const exp_num<T>& b);
 template <Arithmetic T>
-inline exp_num<T>& operator/(const exp_num<T>& a, const exp_num<T>& b);
-
+inline exp_num<T> operator/(const exp_num<T>& a, const exp_num<T>& b);
 template <Arithmetic T>
-inline exp_num<T>& operator%(const exp_num<T>& a, const exp_num<T>& b);
+inline exp_num<T> operator%(const exp_num<T>& a, const exp_num<T>& b);
 
 //formater for rational class to print it directly with print()
 template<typename T>

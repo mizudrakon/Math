@@ -7,6 +7,7 @@ concept Arithmetic = requires(T a, T b){
     a + b;
     a - b;
     a * b;
+    a / b;
     a % b;
     a == b;
     a < b;

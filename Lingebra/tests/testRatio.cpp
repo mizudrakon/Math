@@ -1,4 +1,5 @@
 #include "../ratio.h"
+#include "../exp_num.h"
 
 
 const auto make_frac = make_rational<int>; 
@@ -65,7 +66,7 @@ int main(int argc, char* argv[])
     //dest 6/1?
     //dest 1/7?
 #endif
-    
+#ifdef TEST2
     auto a = make_frac(1,2);
     auto b = make_frac(1,7);
     print("a < b: {}:\n", a < b);
@@ -127,8 +128,11 @@ int main(int argc, char* argv[])
     for (auto i = make_frac(8,1); i > step; i /= 2){
         print("/2 {}\n",i);
     }
+#endif
+    //Test rational<exp_num<int>>
+    using exp_frac = rational<exp_num<int>>;
 
-    //MORE TESTS: %
-    
+    exp_frac df;
+    exp_num<int> exi;
 
 }

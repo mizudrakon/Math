@@ -13,6 +13,5 @@
  I've started working on exp_num as a number with an exponent, this should be useful to hold irrational numbers like sqrt(2), but the question is, what std classes are already in c++, because this seems more and more like me jumping into defining a whole new number class hierarchy just beyond the next corner...
 
 ### expression
-* is supposed to collect multiple exp_nums that can't be cleanly evaluated into a single integer with fraction exponent.
-* (+/-) we can only cleanly add numbers that that have exp = 1, 0, -1, otherwise we have to bring them up to the power of exp.
-    * exp = p/q -> bring n to the power of p
+- can collect any number type that allows operations that return a truth value -> failure means the number is added to the expression rather than evaluated.   
+- so far exp_num fits the ExpressionValue type, but I need to fix rational to work as well. 
