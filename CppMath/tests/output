@@ -1,0 +1,415 @@
+-5 % 2 = -1
+default const number (0) : 0
+one argument (1) :1
+num (2/3) :2/3
+ostream: 2/3
+rational 2/1 destructor
+num += 2 (8/3):8/3
+rational 4/1 destructor
+num -= 4 (-4/3):(-4/3)
+making a 1/2 rational
+++num (-1/3):(-1/3)
+copy ctor -1/3
+num++ (-1/3 -> 2/3):(-1/3)
+rational -1/3 destructor
+num :2/3
+--num (-1/3):(-1/3)
+copy ctor -1/3
+num-- (-1/3 -> -4/3):(-1/3)
+rational -1/3 destructor
+num :(-4/3)
+3 defined as 6/2: 3
+3 + (-4/3) = 5/3
+5/3 + 1/3 = making a 1/3 rational
+rational 1/3 destructor
+2
+
+2 <= 3
+
+making a 2/7 rational
+pause
+making a 6/1 rational
+pause
+making a 1/7 rational
+pause
+STARTING += 1/7:
+value:2/7, 
+value:3/7, 
+value:4/7, 
+value:5/7, 
+value:6/7, 
+rational 4/7 destructor
+rational 4/1 destructor
+value:2/7, 
+trying a while loop:
+copy ctor 2/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 2/7 destructor
+value:2/7, 
+copy ctor 3/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 3/7 destructor
+value:3/7, 
+copy ctor 4/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 4/7 destructor
+value:4/7, 
+copy ctor 5/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 5/7 destructor
+value:5/7, 
+copy ctor 6/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 6/7 destructor
+value:6/7, 
+copy ctor 1/7
+copy ctor 1/1
+rational 1/1 destructor
+rational 1/7 destructor
+value:1, 
+copy ctor 8/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 8/7 destructor
+value:8/7, 
+copy ctor 9/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 9/7 destructor
+value:9/7, 
+copy ctor 10/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 10/7 destructor
+value:10/7, 
+copy ctor 11/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 11/7 destructor
+value:11/7, 
+copy ctor 12/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 12/7 destructor
+value:12/7, 
+copy ctor 13/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 13/7 destructor
+value:13/7, 
+copy ctor 1/7
+copy ctor 2/1
+rational 2/1 destructor
+rational 1/7 destructor
+value:2, 
+copy ctor 15/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 15/7 destructor
+value:15/7, 
+copy ctor 16/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 16/7 destructor
+value:16/7, 
+copy ctor 17/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 17/7 destructor
+value:17/7, 
+copy ctor 18/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 18/7 destructor
+value:18/7, 
+copy ctor 19/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 19/7 destructor
+value:19/7, 
+copy ctor 20/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 20/7 destructor
+value:20/7, 
+copy ctor 1/7
+copy ctor 3/1
+rational 3/1 destructor
+rational 1/7 destructor
+value:3, 
+copy ctor 22/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 22/7 destructor
+value:22/7, 
+copy ctor 23/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 23/7 destructor
+value:23/7, 
+copy ctor 24/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 24/7 destructor
+value:24/7, 
+copy ctor 25/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 25/7 destructor
+value:25/7, 
+copy ctor 26/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 26/7 destructor
+value:26/7, 
+copy ctor 27/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 27/7 destructor
+value:27/7, 
+copy ctor 1/7
+copy ctor 4/1
+rational 4/1 destructor
+rational 1/7 destructor
+value:4, 
+copy ctor 29/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 29/7 destructor
+value:29/7, 
+copy ctor 30/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 30/7 destructor
+value:30/7, 
+copy ctor 31/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 31/7 destructor
+value:31/7, 
+copy ctor 32/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 32/7 destructor
+value:32/7, 
+copy ctor 33/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 33/7 destructor
+value:33/7, 
+copy ctor 34/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 34/7 destructor
+value:34/7, 
+copy ctor 1/7
+copy ctor 5/1
+rational 5/1 destructor
+rational 1/7 destructor
+value:5, 
+copy ctor 36/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 36/7 destructor
+value:36/7, 
+copy ctor 37/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 37/7 destructor
+value:37/7, 
+copy ctor 38/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 38/7 destructor
+value:38/7, 
+copy ctor 39/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 39/7 destructor
+value:39/7, 
+copy ctor 40/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 40/7 destructor
+value:40/7, 
+copy ctor 41/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 41/7 destructor
+value:41/7, 
+copy ctor 1/7
+copy ctor 6/1
+rational 6/1 destructor
+rational 1/7 destructor
+final: 6
+
+making a 1/7 rational
+rational 6/1 destructor
+making a -6/1 rational
+rational 6/1 destructor
+making a 1/7 rational
+rational 1/7 destructor
+STARTING -= 1/7:
+copy ctor 1/7
+copy ctor -6/1
+rational -6/1 destructor
+rational 1/7 destructor
+value:1/7, value:0, copy ctor -1/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -1/7 destructor
+value:(-1/7), copy ctor -2/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -2/7 destructor
+value:(-2/7), copy ctor -3/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -3/7 destructor
+value:(-3/7), copy ctor -4/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -4/7 destructor
+value:(-4/7), copy ctor -5/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -5/7 destructor
+value:(-5/7), copy ctor -6/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -6/7 destructor
+value:(-6/7), value:-1, copy ctor -8/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -8/7 destructor
+value:(-8/7), copy ctor -9/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -9/7 destructor
+value:(-9/7), copy ctor -10/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -10/7 destructor
+value:(-10/7), copy ctor -11/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -11/7 destructor
+value:(-11/7), copy ctor -12/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -12/7 destructor
+value:(-12/7), copy ctor -13/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -13/7 destructor
+value:(-13/7), value:-2, copy ctor -15/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -15/7 destructor
+value:(-15/7), copy ctor -16/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -16/7 destructor
+value:(-16/7), copy ctor -17/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -17/7 destructor
+value:(-17/7), copy ctor -18/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -18/7 destructor
+value:(-18/7), copy ctor -19/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -19/7 destructor
+value:(-19/7), copy ctor -20/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -20/7 destructor
+value:(-20/7), value:-3, copy ctor -22/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -22/7 destructor
+value:(-22/7), copy ctor -23/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -23/7 destructor
+value:(-23/7), copy ctor -24/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -24/7 destructor
+value:(-24/7), copy ctor -25/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -25/7 destructor
+value:(-25/7), copy ctor -26/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -26/7 destructor
+value:(-26/7), copy ctor -27/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -27/7 destructor
+value:(-27/7), value:-4, copy ctor -29/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -29/7 destructor
+value:(-29/7), copy ctor -30/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -30/7 destructor
+value:(-30/7), copy ctor -31/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -31/7 destructor
+value:(-31/7), copy ctor -32/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -32/7 destructor
+value:(-32/7), copy ctor -33/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -33/7 destructor
+value:(-33/7), copy ctor -34/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -34/7 destructor
+value:(-34/7), value:-5, copy ctor -36/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -36/7 destructor
+value:(-36/7), copy ctor -37/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -37/7 destructor
+value:(-37/7), copy ctor -38/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -38/7 destructor
+value:(-38/7), copy ctor -39/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -39/7 destructor
+value:(-39/7), copy ctor -40/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -40/7 destructor
+value:(-40/7), copy ctor -41/7
+copy ctor -6/1
+rational -6/1 destructor
+rational -41/7 destructor
+value:(-41/7), final: -6
+rational 1/7 destructor
+rational -6/1 destructor
+rational -6/1 destructor
+rational 2/1 destructor
+rational 3/1 destructor
+rational 1/2 destructor
+rational -4/3 destructor
+rational 1/1 destructor
+rational 0/1 destructor
