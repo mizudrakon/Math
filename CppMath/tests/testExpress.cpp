@@ -2,5 +2,9 @@
 
 int main(void)
 {
-   //declare a basic expression 0/1
+   value_node vn(0);
+   if (vn.getOp() == Op::val)
+      print("it is working\n");
+      vn.printNode();
+      print("\n");
 }
