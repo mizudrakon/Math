@@ -1,6 +1,7 @@
 #include "my_concepts.hpp"
 #include <memory>
 #include <format>
+#include <string>
 
 /*  expression as a tree of runtime polymorphic nodes - value or op nodes 
     - so far it's a rough sketch, probably can just look and see from the code below:
@@ -26,7 +27,7 @@ class node
 {
 public:
     virtual ~node() = default;
-    virtual void printNode() const = 0;
+    virtual std::string str() const = 0;
     
     virtual int getVal() const = 0;
     virtual Op getOp() const = 0;
@@ -55,7 +56,7 @@ public:
         print("value node dest\n");
     } 
 
-    void printNode() const override { print("{}",val); }
+    std::string str() const override { return "{}"; }
     int getVal() const override {return val;}
     Op getOp() const override { 
         return Op::val;
@@ -99,7 +100,7 @@ public:
     ~op_node(){
         print("op_node dest\n");
     }
-    void printNode() const override;
+    std::string str() const override;
     int getVal() const override { return 0; }//there is no value
     Op getOp() const override { return op; }
 
@@ -128,36 +129,37 @@ public:
 };
 
 //I'll probably change printNode to str()
-inline void op_node::printNode() const
+inline std::string op_node::str() const
 {
     switch (op)
     {
     case Op::plus:
-        print("+");
+        return "+";
         break;
     
     case Op::minus:
-        print("-");
+        return "-";
         break;
         
     case Op::mult:
-        print("*");
+        return "*";
         break;
 
     case Op::div:
-        print("/");
+        return "/";
         break;
 
     case Op::pow:
-        print("^");
+        return "^";
         break;
 
     case Op::root:
-        print("^1/");
+        return "^1/";
         break;
     default:
         break;
     }
+    return "FAIL";
 }
 
 class expression 
@@ -165,5 +167,9 @@ class expression
     unique_ptr<node> head;
 public:
     expression(): head(make_unique<value_node>(0)){ print("default expression ctor\n");}
+    expression(int val): head(make_unique<value_node>(val)){print("expression int ctor\n");}
+    expression(expression&& exs): head(std::move(exs.head)){print("expression move ctor\n");}
+    //copy constructor and assignemnt will need to traverse the tree
     ~expression() = default;//unique pointers should take care of the tree structure
+    
 };
