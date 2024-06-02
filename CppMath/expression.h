@@ -39,10 +39,13 @@ public:
     virtual void setLeft(unique_ptr<node> left) = 0;
     virtual void setRight(unique_ptr<node> right) = 0;
 
+    virtual bool op_allowed(Op op, int rhs) const = 0;
+
     virtual bool operator==(const node& nd) const = 0;
     virtual node& operator+(const node& nd) = 0;
     virtual node& operator-(const node& nd) = 0;
     virtual node& operator*(const node& nd) = 0;
+
 
 };
 
@@ -76,6 +79,7 @@ public:
         print("trying to set value node son!\n");
     }
 
+    bool op_allowed(Op op, int rhs) const override;
     
     bool operator==(const node& nd) const override {
         return val == nd.getVal();
@@ -94,6 +98,19 @@ public:
     }
 
 };
+
+bool value_node::op_allowed(Op op, int rhs) const {
+    switch (op)
+    {
+        case Op::div:
+            if (val % rhs)
+                return false;
+            break;
+        default:
+            break;
+    }
+    return true;
+}
 
 class op_node:public node
 {
@@ -141,6 +158,8 @@ public:
         right = std::move(nd);
     }
 
+    bool op_allowed(Op op, int rhs) const override;
+
     //we need to compare operators to compare expressions    
     bool operator==(const node& nd) const override {
         return op == nd.getOp();
@@ -163,36 +182,58 @@ inline std::string op_node::str() const
 {
     switch (op)
     {
-    case Op::plus:
-        return "+";
-        break;
-    
-    case Op::minus:
-        return "-";
-        break;
+        case Op::plus:
+            return "+";
+            break;
         
-    case Op::mult:
-        return "*";
-        break;
+        case Op::minus:
+            return "-";
+            break;
+            
+        case Op::mult:
+            return "*";
+            break;
 
-    case Op::div:
-        return "/";
-        break;
-    /*
-    case Op::pow:
-        return "^";
-        break;
+        case Op::div:
+            return "/";
+            break;
+        /*
+        case Op::pow:
+            return "^";
+            break;
 
-    case Op::root:
-        return "^1/";
-        break;
-    */
-    default:
-        break;
+        case Op::root:
+            return "^1/";
+            break;
+        */
+        default:
+            break;
     }
     return "FAIL";
 }
 
+bool op_node::op_allowed(Op op, int rhs) const {
+//should check if there's any point of accessing node's children
+    switch (op)
+    {
+        case Op::plus:
+            return true;
+            break;
+        case Op::minus:
+            return true;
+            break;
+        case Op::mult:
+            return true;
+            break;
+        case Op::div:
+            return true;
+            break;
+        default:
+            break;
+        //this will actually get useful for more operations 
+    }
+    return false;
+}
 class expression 
 {
     unique_ptr<node> head;
