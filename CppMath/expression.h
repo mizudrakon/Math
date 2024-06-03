@@ -221,10 +221,17 @@ inline std::string op_node::str() const
 
 bool op_node::op_allowed(Op rhs_op, int rhs) const {
 //should check if there's any point of accessing node's children
-    if (op == Op::plus || op == Op::minus){
-        if (rhs_op == Op::mult || rhs_op == Op::div)
+    //a subtree defined by multiplication or division can't be modified with addition or subtraction
+    //(it's an indivisible unit)
+    if (rhs_op == Op::plus || rhs_op == Op::minus){
+        if (op == Op::mult || op == Op::div)
             return false;
     }
+    //for the reverse situation, we have the distributivity rule letting us access the lower nodes.
+    //more operations to come that won't let us enter the subtree
+    //if POW
+    //if ROOT
+    //...
     return true;
 }
 class expression 
@@ -259,6 +266,10 @@ public:
         return subtree_str(head.get());
     }
 
+    auto operator==(int rhs) const{
+        if (head.get()->getOp() == Op::val)
+            return head.get()->getVal() <=> rhs;
+    }
     auto operator==(const expression& rhs) const{
         return head.get() <=> rhs.getHead();
     }
