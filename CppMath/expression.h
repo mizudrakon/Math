@@ -42,9 +42,10 @@ public:
     virtual bool op_allowed(Op op, int rhs) const = 0;
 
     virtual bool operator==(const node& nd) const = 0;
-    virtual node& operator+(const node& nd) = 0;
-    virtual node& operator-(const node& nd) = 0;
-    virtual node& operator*(const node& nd) = 0;
+    virtual node& operator+(int) = 0;
+    virtual node& operator-(int) = 0;
+    virtual node& operator*(int) = 0;
+    virtual node& operator/(int) = 0;
 
 
 };
@@ -84,19 +85,22 @@ public:
     bool operator==(const node& nd) const override {
         return val == nd.getVal();
     }
-    node& operator+(const node& nd) override {
-        val += nd.getVal();
+    node& operator+(int rhs) override {
+        val += rhs;
         return *this;
     }
-    node& operator-(const node& nd) override {
-        val -= nd.getVal();
+    node& operator-(int rhs) override {
+        val -= rhs;
         return *this;
     }
-    node& operator*(const node& nd) override {
-        val *= nd.getVal();
+    node& operator*(int rhs) override {
+        val *= rhs;
         return *this;
     }
-
+    node& operator/(int rhs) override {
+        val /= rhs;
+        return *this;
+    }
 };
 
 bool value_node::op_allowed(Op op, int rhs) const {
@@ -158,7 +162,7 @@ public:
         right = std::move(nd);
     }
 
-    bool op_allowed(Op op, int rhs) const override;
+    bool op_allowed(Op rhs_op, int rhs) const override;
 
     //we need to compare operators to compare expressions    
     bool operator==(const node& nd) const override {
@@ -166,13 +170,16 @@ public:
     }
     
     //arithmetic operations don't make much sense for operations
-    node& operator+(const node& nd) override {
+    node& operator+(int O) override {
         return *this;
     }
-    node& operator-(const node& nd) override {
+    node& operator-(int O) override {
         return *this;
     }
-    node& operator*(const node& nd) override {
+    node& operator*(int O) override {
+        return *this;
+    }
+    node& operator/(int O) override {
         return *this;
     }
 };
@@ -212,27 +219,13 @@ inline std::string op_node::str() const
     return "FAIL";
 }
 
-bool op_node::op_allowed(Op op, int rhs) const {
+bool op_node::op_allowed(Op rhs_op, int rhs) const {
 //should check if there's any point of accessing node's children
-    switch (op)
-    {
-        case Op::plus:
-            return true;
-            break;
-        case Op::minus:
-            return true;
-            break;
-        case Op::mult:
-            return true;
-            break;
-        case Op::div:
-            return true;
-            break;
-        default:
-            break;
-        //this will actually get useful for more operations 
+    if (op == Op::plus || op == Op::minus){
+        if (rhs_op == Op::mult || rhs_op == Op::div)
+            return false;
     }
-    return false;
+    return true;
 }
 class expression 
 {
