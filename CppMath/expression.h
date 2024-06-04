@@ -42,10 +42,10 @@ public:
     virtual bool op_allowed(Op op, int rhs) const = 0;
 
     virtual bool operator==(const node& nd) const = 0;
-    virtual node& operator+(int) = 0;
-    virtual node& operator-(int) = 0;
-    virtual node& operator*(int) = 0;
-    virtual node& operator/(int) = 0;
+    virtual node& operator+=(int) = 0;
+    virtual node& operator-=(int) = 0;
+    virtual node& operator*=(int) = 0;
+    virtual node& operator/=(int) = 0;
 
 
 };
@@ -68,7 +68,7 @@ public:
     Op getOp() const override { 
         return Op::val;
     }
-
+    void setVal(int v){ val = v; }
     //value nodes are leaves, so there are no sons 
     node* getLeft() const override {return nullptr;}
     node* getRight() const override {return nullptr;}
@@ -85,19 +85,25 @@ public:
     bool operator==(const node& nd) const override {
         return val == nd.getVal();
     }
-    node& operator+(int rhs) override {
+
+    value_node& operator=(value_node nd) noexcept {
+        std::swap(val,nd.val);
+        return *this;
+    }
+
+    node& operator+=(int rhs) override {
         val += rhs;
         return *this;
     }
-    node& operator-(int rhs) override {
+    node& operator-=(int rhs) override {
         val -= rhs;
         return *this;
     }
-    node& operator*(int rhs) override {
+    node& operator*=(int rhs) override {
         val *= rhs;
         return *this;
     }
-    node& operator/(int rhs) override {
+    node& operator/=(int rhs) override {
         val /= rhs;
         return *this;
     }
@@ -125,8 +131,13 @@ class op_node:public node
 public:
     //ctors
     op_node() = delete;//no default, currently don't know what to do with it
+    op_node(const op_node& o):op(o.op),left(make_unique<node>(*left)),right(make_unique<node>(*right)){}
     op_node(Op o):op(o){}
-    op_node(const node& opn):op(static_cast<op_node>(opn).op){
+    op_node(const node& opn):
+        op(static_cast<op_node>(opn).op),
+        left(std::move(static_cast<op_node>(opn).left)),
+        right(std::move(static_cast<op_node>(op).right))
+    {
         print("op_node copy ctor\n");
         if (left->getOp() == Op::val)
             left = make_unique<value_node>(*opn.getLeft());
@@ -169,17 +180,55 @@ public:
         return op == nd.getOp();
     }
     
+    op_node& operator=(op_node nd) noexcept {
+        std::swap(op, nd.op);
+        std::swap(left, nd.left);
+        std::swap(right, nd.right);
+        return *this;
+    }
+
     //arithmetic operations don't make much sense for operations
-    node& operator+(int O) override {
+    node& operator+=(int O) override {
         return *this;
     }
-    node& operator-(int O) override {
+    node& operator-=(int O) override {
         return *this;
     }
-    node& operator*(int O) override {
+
+    //original node becomes the new left, right is the rhs valu
+    void addNode_up(Op o, int rhs){
+            //make a copy that kidnapps the children
+            auto new_node = make_unique<op_node>(op);
+            new_node->setLeft(std::move(left));
+            new_node->setRight(std::move(right));
+            //move to current left son 
+            setLeft(std::move(new_node));
+            //change op to new op
+            op = Op::mult;
+            //current right will be the multiplier
+            setRight(make_unique<value_node>(rhs));
+    }
+    
+    node& operator*=(int rhs) override {
+        //distribution
+        if (op == Op::plus || op == Op::minus){
+            *left *= rhs;
+            *right *= rhs;
+        } 
+        //chain up
+        else {
+            addNode_up(Op::mult,rhs);
+        }
         return *this;
     }
-    node& operator/(int O) override {
+    //similar to *=
+    node& operator/=(int rhs) override {
+        if (op == Op::plus || op == Op::minus){
+            *left /= rhs;
+            *right /= rhs;
+        } else {
+            addNode_up(Op::div, rhs);
+        }
         return *this;
     }
 };
@@ -270,31 +319,51 @@ public:
         if (head.get()->getOp() == Op::val)
             return head.get()->getVal() <=> rhs;
     }
-    auto operator==(const expression& rhs) const{
-        return head.get() <=> rhs.getHead();
-    }
-    auto& operator+=(const expression& rhs){
+
+    auto& operator+=(int rhs){
+        if (head.get()->getOp() == Op::val)
+            static_cast<value_node>(*head).setVal(head->getVal()+rhs);
+        auto new_head = make_unique<op_node>(Op::plus);
+        new_head->setLeft(std::move(head));
+        new_head->setRight(make_unique<value_node>(rhs));
+        head = std::move(new_head);
         return *this;
     }
     auto& operator++(){
+        operator+=(1);
         return *this;
     }
-    auto& operator++(int){
-        return *this;
+    auto operator++(int){
+        auto old = *this;
+        operator++();
+        return old;
     }
-    auto& operator-=(const expression& rhs){
+    auto& operator-=(int rhs){
+        operator+=(-rhs);
         return *this;
     }
     auto& operator--(){
+        operator-=(1);
         return *this;
     }
-    auto& operator--(int){
+    auto operator--(int){
+        auto old = *this;
+        operator--();
+        return old;
+    }
+    //will this work???
+    auto& operator*=(int rhs){
+        if (head.get()->getOp() == Op::val)
+            static_cast<value_node>(*head).setVal(head->getVal()*rhs);
+        else if (head.get()->getOp() == Op::plus || head.get()->getOp() == Op::minus){
+            *head->getLeft() *= rhs;
+            *head->getRight() *= rhs;
+        }
         return *this;
     }
-    auto& operator*=(const expression& rhs){
-        return *this;
-    }
-    auto& operator/=(const expression& rhs){
+    auto& operator/=(int rhs){
+        if (rhs == 0)
+            throw std::runtime_error("attempted division by 0\n");
         return *this;
     }
 };

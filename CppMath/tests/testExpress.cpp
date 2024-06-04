@@ -18,4 +18,6 @@ int main(void)
    expression defexp{};
    expression eone{1};
    print("default expression: {}, eone: {}\n", defexp.str(), eone.str());
+   eone*=3;
+   print("1 *= 3 : {}\n",eone);
 }
