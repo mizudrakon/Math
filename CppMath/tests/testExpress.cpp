@@ -18,6 +18,12 @@ int main(void)
    expression defexp{};
    expression eone{1};
    print("default expression: {}, eone: {}\n", defexp.str(), eone.str());
+   //simple *= case
+   defexp*=6;
    eone*=3;
-   print("1 *= 3 : {}\n",eone);
+   print("1 *= 3 : {}\n0 *= 6 : {}\n",eone.str(),defexp.str());
+   defexp+=9;
+   print("+= 9: {}\n",defexp.str());
+   auto a = eone + 9;
+   print("{} += 9: {}\n",eone.str(),a.str());
 }

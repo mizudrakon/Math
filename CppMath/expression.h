@@ -131,7 +131,12 @@ class op_node:public node
 public:
     //ctors
     op_node() = delete;//no default, currently don't know what to do with it
-    op_node(const op_node& o):op(o.op),left(make_unique<node>(*left)),right(make_unique<node>(*right)){}
+    /*
+    op_node(const op_node& o):op(o.op){
+        if (o.left->getOp() == Op::val)
+            left = o.left;
+    }
+    */
     op_node(Op o):op(o){}
     op_node(const node& opn):
         op(static_cast<op_node>(opn).op),
@@ -321,12 +326,19 @@ public:
     }
 
     auto& operator+=(int rhs){
+        print("running {} += {}:\n",head->str(),rhs);
         if (head.get()->getOp() == Op::val)
-            static_cast<value_node>(*head).setVal(head->getVal()+rhs);
-        auto new_head = make_unique<op_node>(Op::plus);
-        new_head->setLeft(std::move(head));
-        new_head->setRight(make_unique<value_node>(rhs));
-        head = std::move(new_head);
+        {
+            print("simple case...\n");
+            *head+=rhs;
+        }
+        else {
+            auto new_head = make_unique<op_node>(Op::plus);
+            new_head->setLeft(std::move(head));
+            new_head->setRight(make_unique<value_node>(rhs));
+            head = std::move(new_head);
+        }
+        print("+= finished\n");
         return *this;
     }
     auto& operator++(){
@@ -353,9 +365,10 @@ public:
     }
     //will this work???
     auto& operator*=(int rhs){
-        if (head.get()->getOp() == Op::val)
-            static_cast<value_node>(*head).setVal(head->getVal()*rhs);
-        else if (head.get()->getOp() == Op::plus || head.get()->getOp() == Op::minus){
+        if (head->getOp() == Op::val){
+            *head*=rhs;
+        }
+        else if (head->getOp() == Op::plus || head.get()->getOp() == Op::minus){
             *head->getLeft() *= rhs;
             *head->getRight() *= rhs;
         }
@@ -374,6 +387,12 @@ auto operator<=>(const expression& lhs, const expression& rhs){
 auto operator==(const expression& lhs, const expression& rhs){
     return lhs.getHead()==rhs.getHead();
 }
+auto operator+(expression lhs, int rhs)
+{
+    print("{} + {}:\n",lhs.str(),rhs);
+    lhs += rhs;
+    return lhs;
+}
 auto operator+(expression lhs, const expression& rhs)
 {
     return lhs;
@@ -381,6 +400,10 @@ auto operator+(expression lhs, const expression& rhs)
 auto operator-(expression lhs, const expression& rhs)
 {
     return lhs;
+}
+auto operator*(expression lhs, int rhs)
+{
+    return lhs*=rhs;
 }
 auto operator*(expression lhs, const expression& rhs)
 {
