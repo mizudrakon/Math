@@ -56,6 +56,8 @@ class value_node:public node
 public:
     value_node(){ print("default value node ctor\n");}
     value_node(int value):val(value){ print("value node int ctor\n");}
+    
+    //THE PROBLEM IS ON THE NEXT LINE: can't access variable vn
     value_node(const node& vn):val(static_cast<value_node>(vn).val){ print("value node copy ctor\n");}
     value_node(node&& vn):val(move(static_cast<value_node>(vn).val)){ print("value node move ctor\n");}
     ~value_node(){
@@ -305,6 +307,12 @@ public:
         else
             head = make_unique<op_node>(*p_rhs);
     }
+    auto& operator=(expression rhs) noexcept {
+        print("expression assignment swap ctor\n");
+        std::swap(head,rhs.head);
+        return *this;
+    }
+
 
     node* getHead() const{
         return head.get();
@@ -395,10 +403,12 @@ auto operator+(expression lhs, int rhs)
 }
 auto operator+(expression lhs, const expression& rhs)
 {
+
     return lhs;
 }
-auto operator-(expression lhs, const expression& rhs)
+auto operator-(expression lhs, int rhs)
 {
+    lhs += rhs;
     return lhs;
 }
 auto operator*(expression lhs, int rhs)
