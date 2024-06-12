@@ -58,7 +58,7 @@ public:
     value_node(int value):val(value){ print("value node int ctor\n");}
     
     //THE PROBLEM IS ON THE NEXT LINE: can't access variable vn
-    value_node(const node& vn):val(static_cast<value_node>(vn).val){ print("value node copy ctor\n");}
+    value_node(const node& vn):val(vn.getVal()){ print("value node copy ctor\n");}
     value_node(node&& vn):val(move(static_cast<value_node>(vn).val)){ print("value node move ctor\n");}
     ~value_node(){
         print("value node dest\n");
