@@ -31,6 +31,7 @@ public:
     virtual std::string str() const = 0;
     
     virtual int getVal() const = 0;
+    virtual void setVal(int) = 0;
     virtual Op getOp() const = 0;
 
     virtual node* getLeft() const = 0;
@@ -58,19 +59,19 @@ public:
     value_node(int value):val(value){ print("value node int ctor\n");}
     
     //THE PROBLEM IS ON THE NEXT LINE: can't access variable vn
-    value_node(const node& vn):val(vn.getVal()){ print("value node copy ctor\n");}
+    value_node(const node& vn):val(vn.getVal()){ print("value {} node copy ctor\n", val);}
     value_node(node&& vn):val(move(static_cast<value_node>(vn).val)){ print("value node move ctor\n");}
     ~value_node(){
-        print("value node dest\n");
+        print("value {} node dest\n", val);
     } 
 
     std::string str() const override { return std::string("{"+std::to_string(val)+"}"); }
     //getters:
     int getVal() const override {return val;}
+    void setVal(int v) override { val = v; }
     Op getOp() const override { 
         return Op::val;
     }
-    void setVal(int v){ val = v; }
     //value nodes are leaves, so there are no sons 
     node* getLeft() const override {return nullptr;}
     node* getRight() const override {return nullptr;}
@@ -89,6 +90,7 @@ public:
     }
 
     value_node& operator=(value_node nd) noexcept {
+        print("value_node swap copy creator\n");
         std::swap(val,nd.val);
         return *this;
     }
@@ -139,13 +141,13 @@ public:
             left = o.left;
     }
     */
-    op_node(Op o):op(o){}
+    op_node(Op o):op(o){ print("OP_NODE {} ctor\n", str()); }
     op_node(const node& opn):
         op(static_cast<op_node>(opn).op),
         left(std::move(static_cast<op_node>(opn).left)),
         right(std::move(static_cast<op_node>(op).right))
     {
-        print("op_node copy ctor\n");
+        print("OP_NODE copy ctor\n");
         if (left->getOp() == Op::val)
             left = make_unique<value_node>(*opn.getLeft());
         else left = make_unique<op_node>(*opn.getLeft());
@@ -160,12 +162,13 @@ public:
         print("op_node move ctor\n");
     }
     ~op_node(){
-        print("op_node dest\n");
+        print("op_node {} dest\n", str());
     }
     std::string str() const override;
     
     //getters:
     int getVal() const override { return 0; }//there is no value
+    void setVal(int o) override { return; }
     Op getOp() const override { return op; }
 
     //return observers:
@@ -188,6 +191,7 @@ public:
     }
     
     op_node& operator=(op_node nd) noexcept {
+        print("op_node swap copy ctor\n");
         std::swap(op, nd.op);
         std::swap(left, nd.left);
         std::swap(right, nd.right);
@@ -299,6 +303,7 @@ public:
     expression(int val): head(make_unique<value_node>(val)){print("expression int ctor\n");}
     expression(expression&& exs): head(std::move(exs.head)){print("expression move ctor\n");}
     expression(const expression& rhs){
+        print("expression copy ctor\n");
         auto p_rhs = rhs.head.get();
         //copy constructors should work recursively, so it's just about finding out what the head is
         if (p_rhs->getOp() == Op::val)
@@ -309,7 +314,7 @@ public:
     }
     auto& operator=(expression rhs) noexcept {
         print("expression assignment swap ctor\n");
-        std::swap(head,rhs.head);
+        std::swap(head, rhs.head);
         return *this;
     }
 
@@ -334,10 +339,10 @@ public:
     }
 
     auto& operator+=(int rhs){
-        print("running {} += {}:\n",head->str(),rhs);
+        //print("expression {} op+= {}:\n",head->str(),rhs);
         if (head.get()->getOp() == Op::val)
         {
-            print("simple case...\n");
+         //   print("simple case...\n");
             *head+=rhs;
         }
         else {
@@ -346,7 +351,7 @@ public:
             new_head->setRight(make_unique<value_node>(rhs));
             head = std::move(new_head);
         }
-        print("+= finished\n");
+        //print("+= finished\n");
         return *this;
     }
     auto& operator++(){
@@ -385,39 +390,73 @@ public:
     auto& operator/=(int rhs){
         if (rhs == 0)
             throw std::runtime_error("attempted division by 0\n");
+        if (head->getOp() == Op::val)
+            if (head->getVal() % rhs == 0)
+                head->setVal(head->getVal() / rhs);
+            else {
+                auto new_head = make_unique<op_node>(Op::div);
+                new_head->setLeft(std::move(head));
+                new_head->setRight(make_unique<value_node>(rhs));
+                head = std::move(new_head);
+            }
+        else
+            *head /= rhs;
         return *this;
     }
 };
 
+auto operator<=>(const expression& lhs, int rhs){
+    if (lhs.getHead()->getOp() == Op::val)
+        return lhs.getHead()->getVal()<=>rhs;
+    return lhs.getHead()->getVal() <=> 0;
+}
 auto operator<=>(const expression& lhs, const expression& rhs){
     return lhs.getHead()<=>rhs.getHead();
 }
 auto operator==(const expression& lhs, const expression& rhs){
     return lhs.getHead()==rhs.getHead();
 }
-auto operator+(expression lhs, int rhs)
+auto operator==(const expression& lhs, int rhs){
+    if (lhs.getHead()->getOp() == Op::val)
+        return lhs.getHead()->getVal()==rhs;
+    return false;
+}
+auto operator+(const expression& lhs, int rhs)
 {
-    print("{} + {}:\n",lhs.str(),rhs);
-    lhs += rhs;
-    return lhs;
+    auto answ(lhs);
+    answ += rhs;
+    return answ;
 }
 auto operator+(expression lhs, const expression& rhs)
 {
-
     return lhs;
 }
-auto operator-(expression lhs, int rhs)
+auto operator-(const expression& lhs, int rhs)
 {
-    lhs += rhs;
+    auto answ(lhs);
+    answ -= rhs;
+    return answ;
+}
+auto operator-(expression lhs, const expression& rhs)
+{
     return lhs;
 }
-auto operator*(expression lhs, int rhs)
+auto operator*(const expression& lhs, int rhs)
 {
-    return lhs*=rhs;
+    auto answ(lhs);
+    answ *= rhs;
+    return answ;
 }
 auto operator*(expression lhs, const expression& rhs)
 {
     return lhs;
+}
+auto operator/(const expression& lhs, int rhs)
+{
+    //print("{} op/ {}:\n",lhs.str(),rhs);
+    auto answ(lhs);
+    answ /= rhs;
+    return answ;
 }
 auto operator/(expression lhs, const expression& rhs)
 {
