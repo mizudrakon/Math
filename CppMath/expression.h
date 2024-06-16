@@ -338,13 +338,34 @@ public:
             return head.get()->getVal() <=> rhs;
     }
 
+    //find a val node after a plus or minus node to modiffy
+    node* find_val(node* p_node){
+        auto node_op = p_node->getOp();
+        if (node_op == Op::val) return p_node;
+        if (node_op != Op::plus && node_op != Op::minus){
+            return nullptr;
+        }
+        auto p_res = find_val(p_node->getLeft());
+        if (p_res != nullptr)
+            return p_res;
+        p_res = find_val(p_node->getRight());
+        return p_res;
+    }
+
     auto& operator+=(int rhs){
         //print("expression {} op+= {}:\n",head->str(),rhs);
+        auto node = head.get();
+        
+        //   print("simple case...\n");
         if (head.get()->getOp() == Op::val)
         {
-         //   print("simple case...\n");
             *head+=rhs;
         }
+        //difficult case - search for a moddiffyable value node
+        auto p_valNode = find_val(node);
+        if (p_valNode->getOp() == Op::val) 
+            p_valNode->setVal(p_valNode->getVal() + rhs); 
+        //the rest - can't moddify
         else {
             auto new_head = make_unique<op_node>(Op::plus);
             new_head->setLeft(std::move(head));
