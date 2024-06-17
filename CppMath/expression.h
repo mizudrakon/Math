@@ -354,17 +354,25 @@ public:
 
     auto& operator+=(int rhs){
         //print("expression {} op+= {}:\n",head->str(),rhs);
-        auto node = head.get();
+        auto nd = head.get();
         
         //   print("simple case...\n");
         if (head.get()->getOp() == Op::val)
         {
+            print("simple case...\n");
             *head+=rhs;
+            return *this;
         }
         //difficult case - search for a moddiffyable value node
-        auto p_valNode = find_val(node);
-        if (p_valNode->getOp() == Op::val) 
-            p_valNode->setVal(p_valNode->getVal() + rhs); 
+        print("starting find_val\n"); 
+        auto p_valNode = find_val(nd);
+        print("ended find_val\n");
+        if (p_valNode != nullptr) 
+        {    
+            print("found val to modify: {}\n", p_valNode->str());
+            *p_valNode += rhs; 
+            print("val after modification: {}\n", p_valNode->str());
+        }
         //the rest - can't moddify
         else {
             auto new_head = make_unique<op_node>(Op::plus);
@@ -411,15 +419,13 @@ public:
     auto& operator/=(int rhs){
         if (rhs == 0)
             throw std::runtime_error("attempted division by 0\n");
-        if (head->getOp() == Op::val)
-            if (head->getVal() % rhs == 0)
-                head->setVal(head->getVal() / rhs);
-            else {
-                auto new_head = make_unique<op_node>(Op::div);
-                new_head->setLeft(std::move(head));
-                new_head->setRight(make_unique<value_node>(rhs));
-                head = std::move(new_head);
-            }
+        if (head->getOp() == Op::val && head->getVal() % rhs != 0)
+        {   
+            auto new_head = make_unique<op_node>(Op::div);
+            new_head->setLeft(std::move(head));
+            new_head->setRight(make_unique<value_node>(rhs));
+            head = std::move(new_head);
+        }
         else
             *head /= rhs;
         return *this;
