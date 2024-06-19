@@ -215,7 +215,7 @@ public:
             //move to current left son 
             setLeft(std::move(new_node));
             //change op to new op
-            op = Op::mult;
+            op = o;
             //current right will be the multiplier
             setRight(make_unique<value_node>(rhs));
     }
@@ -410,6 +410,8 @@ public:
         if (head->getOp() == Op::val){
             *head*=rhs;
         }
+        else if (head->getOp() == Op::div)
+            *head->getLeft() *= rhs;
         else if (head->getOp() == Op::plus || head.get()->getOp() == Op::minus){
             *head->getLeft() *= rhs;
             *head->getRight() *= rhs;
@@ -419,7 +421,17 @@ public:
     auto& operator/=(int rhs){
         if (rhs == 0)
             throw std::runtime_error("attempted division by 0\n");
-        if (head->getOp() == Op::val && head->getVal() % rhs != 0)
+        // div requires multiplying the right son
+        else if (head->getOp() == Op::div){
+            *head->getRight() *= rhs;
+        }
+        // + or - requires recursion to both sons
+        else if (head->getOp() == Op::plus || head.get()->getOp() == Op::minus){
+            *head->getLeft() /= rhs;
+            *head->getRight() /= rhs;
+        }
+        // can't divide -> make new father / 
+        else if (head->getOp() == Op::val && head->getVal() % rhs != 0)
         {   
             auto new_head = make_unique<op_node>(Op::div);
             new_head->setLeft(std::move(head));
@@ -489,3 +501,12 @@ auto operator/(expression lhs, const expression& rhs)
 {
     return lhs;
 }
+
+//formater for expression class
+template<>
+struct std::formatter<expression> : std::formatter<int> {
+    template<typename Context>
+    auto format(const expression& exp, Context& ctx) const {
+        return std::format_to(ctx.out(), "{}", exp.str());
+    }
+};

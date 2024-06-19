@@ -39,5 +39,8 @@ int main(void)
    print("3/4 + 5 : {}\n", eone.str());
    eone += 3;
    print("(3/4 + 5) + 3 : {}\n", eone.str());
-
+   eone *= 2;
+   print("(3/4 + 8) * 2 : {}\n", eone.str());
+   eone /= 8;
+   print("(3/4)*2 + 16) / 8 : {}\n", eone.str());
 }
