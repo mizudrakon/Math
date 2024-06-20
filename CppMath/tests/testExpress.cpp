@@ -35,6 +35,8 @@ int main(void)
    print("{} - 2: {}\n\n",a.str(),defexp.str());
    eone /= 4;
    print("3/=4 : {}\n", eone.str());
+   eone *= 2;
+   print("3/4 *= 2 : {}", eone);
    eone += 5;
    print("3/4 + 5 : {}\n", eone.str());
    eone += 3;
@@ -43,4 +45,5 @@ int main(void)
    print("(3/4 + 8) * 2 : {}\n", eone.str());
    eone /= 8;
    print("(3/4)*2 + 16) / 8 : {}\n", eone.str());
+   //will this work?
 }

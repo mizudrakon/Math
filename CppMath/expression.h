@@ -84,7 +84,7 @@ public:
     }
 
     bool op_allowed(Op op, int rhs) const override;
-    
+   
     bool operator==(const node& nd) const override {
         return val == nd.getVal();
     }
@@ -208,21 +208,32 @@ public:
 
     //original node becomes the new left, right is the rhs valu
     void addNode_up(Op o, int rhs){
-            //make a copy that kidnapps the children
-            auto new_node = make_unique<op_node>(op);
-            new_node->setLeft(std::move(left));
-            new_node->setRight(std::move(right));
-            //move to current left son 
-            setLeft(std::move(new_node));
-            //change op to new op
-            op = o;
-            //current right will be the multiplier
-            setRight(make_unique<value_node>(rhs));
+        //make a copy that kidnapps the children
+        auto new_node = make_unique<op_node>(op);
+        new_node->setLeft(std::move(left));
+        new_node->setRight(std::move(right));
+        //move to current left son 
+        setLeft(std::move(new_node));
+        //change op to new op
+        op = o;
+        //current right will be the multiplier
+        setRight(make_unique<value_node>(rhs));
     }
-    
+
+    void addNode(unique_ptr<node> son, Op o, int rhs){
+        auto new_node = make_unique<op_node>(op);
+        new_node->setLeft(std::move(son));
+        new_node->setRight(make_unique<value_node>(rhs));
+        son = std::move(new_node);
+    } 
+
     node& operator*=(int rhs) override {
         //distribution
-        if (op == Op::plus || op == Op::minus){
+        if (op == Op::div)
+        {
+            *left *= rhs;   
+        }
+        else if (op == Op::plus || op == Op::minus){
             *left *= rhs;
             *right *= rhs;
         } 
@@ -234,9 +245,17 @@ public:
     }
     //similar to *=
     node& operator/=(int rhs) override {
-        if (op == Op::plus || op == Op::minus){
-            *left /= rhs;
-            *right /= rhs;
+        if (op == Op::div)
+        {
+            *right *= rhs;
+        }
+        else if (op == Op::plus || op == Op::minus){
+            if (left->getOp() == Op::val && left->getVal() % rhs != 0)
+                addNode(std::move(left), Op::div, rhs);
+            else *left /= rhs;
+            if (right->getOp() == Op::val && right->getVal() % rhs != 0)
+                addNode(std::move(right), Op::div, rhs);
+            else *right /= rhs;
         } else {
             addNode_up(Op::div, rhs);
         }
