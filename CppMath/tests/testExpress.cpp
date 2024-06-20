@@ -17,33 +17,32 @@ int main(void)
    print("testing expression:\n");
    expression defexp{};
    expression eone{1};
-   print("default expression: {}, eone: {}\n", defexp.str(), eone.str());
+   print("default expression: {}, eone: {}\n", defexp, eone);
    ++defexp; // 0 += 1 = 1
-   print("def += 1: {}\n",defexp.str());
+   print("0 += 1: {} -> {}\n",defexp, "{1}" == defexp.str());
    defexp*=9; // 1 *= 9 = 9
-   print("op*= 9: {}\n{} ",defexp.str(),eone.str());
+   print("op*=:\n1 *= 9: {} -> {}\n", defexp, "{9}" == defexp.str());
    eone*=3; // 1 *= 3 = 3
-   print("op*= 3 : {}\n{} ",eone.str(),defexp.str());
+   print("1 *= 3 : {} -> {}\n",eone, "{3}" == eone.str());
    defexp--; // 9 -= 1 = 8
-   print("-= 1: {}\n",defexp.str(), eone.str());
+   print("9 -= 1: {}\n",defexp, defexp.str() == "{8}");
    defexp /= 4; // 8 /= 4 = 2 defexp
-   print("/= 4: {}\n",defexp.str());
+   print("op/=:\n8 /= 4: {}\n",defexp.str());
    print("\nTESTING NONMEMBER + and -:\n");
    auto a = eone + 9; // 3 + 9 = 12
-   print("{} + 9: {}\n\n",eone.str(),a.str());
+   print("{} + 9: {} -> {}\n\n",eone.str(),a, a.str() == "{12}");
    defexp = a - 2; // 12 - 2 = 10 dest 2
-   print("{} - 2: {}\n\n",a.str(),defexp.str());
+   print("{} - 2: {} -> {}\n\n",a.str(), defexp,defexp.str() == "{10}");
    eone /= 4;
-   print("3/=4 : {}\n", eone.str());
+   print("3/=4 : {} -> {}\n", eone.str(), "{3}/{4}" == eone.str());
    eone *= 2;
-   print("3/4 *= 2 : {}", eone);
+   print("3/4 *= 2 : {} -> {}\n", eone, "{6}/{4}" == eone.str());
    eone += 5;
-   print("3/4 + 5 : {}\n", eone.str());
+   print("6/4 + 5 : {} -> {}\n", eone, "{6}/{4}+{5}" == eone.str());
    eone += 3;
-   print("(3/4 + 5) + 3 : {}\n", eone.str());
+   print("(6/4 + 5) + 3 : {} -> {}\n", eone, "{6}/{4}+{8}" == eone.str());
    eone *= 2;
-   print("(3/4 + 8) * 2 : {}\n", eone.str());
+   print("(6/4 + 8) * 2 : {} -> {}\n", eone, "{12}/{4}+{16}" == eone.str());
    eone /= 8;
-   print("(3/4)*2 + 16) / 8 : {}\n", eone.str());
-   //will this work?
+   print("(12/4) + 16) / 8 : {} -> {}\n", eone, "{12}/{32}+{2}" == eone.str());
 }
