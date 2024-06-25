@@ -1,7 +1,8 @@
 CXX = g++
 CXXFLAGS = -std=c++20 -g
 TARGET = run
-SRC = testExpress.cpp
+# Pickt the file to compile: testRatio.cpp, testExp.cpp
+SRC = testRatio.cpp
 OBJ = $(SRC:.cpp=.o)
 
 # Default target to build the project
