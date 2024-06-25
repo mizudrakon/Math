@@ -3,7 +3,7 @@
 int main(void)
 {
    print("testing value nodes:\n");
-   value_node vn(0);
+   val_node vn(0);
    if (vn.getOp() == Op::val)
       print("it is working\n");
       print("{}",vn.str());
