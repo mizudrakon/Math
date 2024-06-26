@@ -28,10 +28,10 @@ public:
     {
         print("OP_NODE copy ctor\n");
         if (left->getOp() == Op::val)
-            left = make_unique<value_node>(*opn.getLeft());
+            left = make_unique<val_node>(*opn.getLeft());
         else left = make_unique<op_node>(*opn.getLeft());
         if (left->getOp() == Op::val)
-            right = make_unique<value_node>(*opn.getRight());
+            right = make_unique<val_node>(*opn.getRight());
         else right = make_unique<op_node>(*opn.getRight());
         //this should work recursively
     }
@@ -96,13 +96,13 @@ public:
         //change op to new op
         op = o;
         //current right will be the multiplier
-        setRight(make_unique<value_node>(rhs));
+        setRight(make_unique<val_node>(rhs));
     }
 
     void addNode(unique_ptr<node> son, Op o, int rhs){
         auto new_node = make_unique<op_node>(op);
         new_node->setLeft(std::move(son));
-        new_node->setRight(make_unique<value_node>(rhs));
+        new_node->setRight(make_unique<val_node>(rhs));
         son = std::move(new_node);
     } 
 
