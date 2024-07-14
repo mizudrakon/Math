@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MYCONCEPTS_H
+#define MYCONCEPTS_H
 
 #include <concepts>
 
@@ -31,3 +32,5 @@ concept Container = requires(C lst){
     lst.end();
     lst[0];
 };
+
+#endif
