@@ -1,0 +1,11 @@
+{
+	"nodes":[
+		{"id":"edc347e5d0ad972d","type":"file","file":"triangle not square.md","x":15,"y":-201,"width":345,"height":241},
+		{"id":"3976a869966dd36f","type":"text","text":"# for contradiction\n$\\exists a,b,c \\in \\mathbb{N}:a^2+b^2=c^2$\nAND\n$<a,b,c>$ is a Pythagorean triplet\nAND\n$P = \\frac{ab}{2}=p^2$\n\n","x":160,"y":257,"width":400,"height":223},
+		{"id":"e21cf30b193cd46d","x":660,"y":-100,"width":400,"height":400,"type":"file","file":"Pythagorean triplet.md"}
+	],
+	"edges":[
+		{"id":"7d9dded13ae8d137","fromNode":"edc347e5d0ad972d","fromSide":"bottom","toNode":"3976a869966dd36f","toSide":"top"},
+		{"id":"24e46049d8a35072","fromNode":"e21cf30b193cd46d","fromSide":"left","toNode":"3976a869966dd36f","toSide":"right"}
+	]
+}
