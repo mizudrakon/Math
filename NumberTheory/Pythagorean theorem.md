@@ -1,0 +1,1 @@
+$a,b,c \in \mathbb{N}: a^2+b^2=c^2 \Leftrightarrow a,b,c$ give us a right-angle $\triangle$ where *c* is the hypotenuse.
