@@ -1,0 +1,2 @@
+- complementing rational numbers $\mathbb{Q}$ into real numbers $\mathbb{R}$;   
+- there is no periodically repeating sequence in irrational numbers, otherwise they'd be expressible through a ratio of whole numbers.

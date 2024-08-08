@@ -1,0 +1,1 @@
+for $\{m_1,\dots, m_k\}$ indivisible, then the cluster: $x \equiv r_1(\mod m_1)$ , ..., $x\equiv r_k (\mod m_k)$ has a single solution $x (\mod m)$ where $m=m_1m_2\dots m_k$ 
