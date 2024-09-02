@@ -70,7 +70,7 @@ public:
     auto& operator+=(int rhs){
         //print("expression {} op+= {}:\n",head->str(),rhs);
         auto nd = head.get();
-        
+        if (rhs == 0) return *this; //0 is neutral for addition and subtraction 
         //   print("simple case...\n");
         if (head.get()->getOp() == Op::val)
         {
@@ -122,9 +122,11 @@ public:
     }
     //will this work???
     auto& operator*=(int rhs){
-        if (head->getOp() == Op::val){
+        if (rhs == 1) return *this;//do nothing
+        if (head->getOp() == Op::val)
             *head*=rhs;
-        }
+        else if (rhs == 0)//will turn any expression 0
+            head = make_unique<val_node>(0);
         else if (head->getOp() == Op::div)
             *head->getLeft() *= rhs;
         else if (head->getOp() == Op::plus || head.get()->getOp() == Op::minus){
@@ -134,6 +136,7 @@ public:
         return *this;
     }
     auto& operator/=(int rhs){
+        if (rhs == 1) return *this;//do nothing
         if (rhs == 0)
             throw std::runtime_error("attempted division by 0\n");
         // div requires multiplying the right son
