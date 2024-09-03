@@ -186,6 +186,18 @@ auto operator+(const expression& lhs, int rhs)
 }
 auto operator+(expression lhs, const expression& rhs)
 {
+    //if rhs is a single value, just int add it
+    if (rhs.getHead()->getOp() == Op::val){
+        return lhs + rhs.getHead()->getVal();
+    }
+    else if (lhs.getHead()->getOp() == Op::val){
+        int val = lhs.getHead()->getVal();
+        lhs = rhs;
+        return lhs + val;
+    }
+    //both are complex
+    //head is +/- -> explore
+    //head is other -> new head + and branch
     return lhs;
 }
 auto operator-(const expression& lhs, int rhs)
