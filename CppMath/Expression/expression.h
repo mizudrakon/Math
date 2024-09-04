@@ -27,16 +27,24 @@ public:
         else
             head = make_unique<op_node>(*p_rhs);
     }
+
+    expression(const expression& lhs, const expression& rhs, Op o): head(make_unique<op_node>(o))
+    {
+        head->setLeft(make_unique<op_node>(lhs.getHead()));
+        head->setRight(make_unique<op_node>(rhs.getHead()));
+    }
+
     auto& operator=(expression rhs) noexcept {
         print("expression assignment swap ctor\n");
         std::swap(head, rhs.head);
         return *this;
     }
 
-
     node* getHead() const{
         return head.get();
     }
+
+
 
     string subtree_str(const node* nd) const{
         if (nd->getOp() == Op::val)
@@ -184,7 +192,7 @@ auto operator+(const expression& lhs, int rhs)
     answ += rhs;
     return answ;
 }
-auto operator+(expression lhs, const expression& rhs)
+auto operator+(const expression& lhs, const expression& rhs)
 {
     //if rhs is a single value, just int add it
     if (rhs.getHead()->getOp() == Op::val){
@@ -192,13 +200,15 @@ auto operator+(expression lhs, const expression& rhs)
     }
     else if (lhs.getHead()->getOp() == Op::val){
         int val = lhs.getHead()->getVal();
-        lhs = rhs;
         return lhs + val;
     }
-    //both are complex
+    //both are more complex trees
     //head is +/- -> explore
     //head is other -> new head + and branch
-    return lhs;
+    else if (lhs.getHead()->getOp() != Op::plus &&  lhs.getHead()->getOp() != Op::minus)
+        expression answ(lhs,rhs,Op::plus);
+    expression answ(lhs);//todo
+    return answ;
 }
 auto operator-(const expression& lhs, int rhs)
 {

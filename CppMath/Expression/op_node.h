@@ -99,6 +99,15 @@ public:
         setRight(make_unique<val_node>(rhs));
     }
 
+    void addNode_up(Op o, unique_ptr<node> rhs){
+        auto new_node = make_unique<op_node>(op);
+        new_node->setLeft(std::move(left));
+        new_node->setRight(std::move(right));
+        setLeft(std::move(new_node));
+        op = o;
+        setRight(std::move(rhs));
+    }
+
     void addNode(unique_ptr<node> son, Op o, int rhs){
         auto new_node = make_unique<op_node>(op);
         new_node->setLeft(std::move(son));
