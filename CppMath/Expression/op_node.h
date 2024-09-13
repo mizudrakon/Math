@@ -49,7 +49,9 @@ public:
     int getVal() const override { return 0; }//there is no value
     void setVal(int o) override { return; }
     Op getOp() const override { return op; }
-
+    void setOp(Op o) override {
+        op = o;
+    }
     //return observers:
     node* getLeft() const override {return left.get();}
     node* getRight() const override {return right.get();}

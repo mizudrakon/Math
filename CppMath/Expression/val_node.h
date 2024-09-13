@@ -24,6 +24,9 @@ public:
     Op getOp() const override { 
         return Op::val;
     }
+    void setOp(Op o) override {
+        return;
+    }
     //value nodes are leaves, so there are no sons 
     node* getLeft() const override {return nullptr;}
     node* getRight() const override {return nullptr;}

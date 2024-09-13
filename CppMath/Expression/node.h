@@ -31,6 +31,7 @@ public:
     virtual int getVal() const = 0;
     virtual void setVal(int) = 0;
     virtual Op getOp() const = 0;
+    virtual void setOp(Op) = 0;
 
     virtual node* getLeft() const = 0;
     virtual node* getRight() const = 0;

@@ -75,6 +75,15 @@ public:
         return p_res;
     }
 
+    void swap_ops(node* p_node){
+        auto node_op = p_node->getOp();
+        if (node_op == Op::val) return;
+        if (node_op == Op::plus) p_node->setOp(Op::minus);
+        if (node_op == Op::minus) p_node->setOp(Op::plus);
+        swap_ops(p_node->getLeft());
+        swap_ops(p_node->getRight());
+    }
+
     auto& operator+=(int rhs){
         //print("expression {} op+= {}:\n",head->str(),rhs);
         auto nd = head.get();
@@ -106,6 +115,31 @@ public:
         //print("+= finished\n");
         return *this;
     }
+
+    auto& operator+=(const expression& rhs){
+        //either this or rhs has a value node as its head:
+        //rhs or both
+        if (rhs.getHead()->getOp() == Op::val){
+            operator+=(rhs.getHead()->getVal());
+            return *this;
+        }
+        //this is value, rhs is op
+        else if (head->getOp() == Op::val){
+            int v = head->getVal();//copy our value
+            expression answ(rhs);//make a copy of rhs
+            answ += v;//add value to rhs copy
+            std::swap(head,answ.head);//take the answer's head!!!
+            return *this;
+        }
+        //both are op
+        auto new_head = make_unique<op_node>(Op::plus);
+        new_head->setLeft(std::move(head));
+        auto rhs_copy = rhs;
+        new_head->setRight(std::move(rhs_copy.head));
+        head = std::move(new_head);
+        return *this;
+    }
+
     auto& operator++(){
         operator+=(1);
         return *this;
@@ -116,6 +150,28 @@ public:
         return old;
     }
     auto& operator-=(int rhs){
+        operator+=(-rhs);
+        return *this;
+    }
+    auto operator-(){
+        auto copy = *this;
+        if (copy.head->getOp() == Op::val)
+            *copy.head *= -1;    
+        else {
+            //switch all + ops to - and - to +
+            //switch value in the left minimum
+            auto it = *copy.head;
+            while (it.getOp() != Op::val){
+                it = *it.getLeft();
+            }
+            if (it.getOp() == Op::val)
+                it *= -1;
+            swap_ops(copy.head.get());
+        }
+        return copy;
+    }
+
+    auto& operator-=(expression rhs){
         operator+=(-rhs);
         return *this;
     }
@@ -135,7 +191,7 @@ public:
             *head*=rhs;
         else if (rhs == 0)//will turn any expression 0
             head = make_unique<val_node>(0);
-        else if (head->getOp() == Op::div)
+        else if (head->getOp() == Op::div || head->getOp() == Op::mult)
             *head->getLeft() *= rhs;
         else if (head->getOp() == Op::plus || head.get()->getOp() == Op::minus){
             *head->getLeft() *= rhs;
@@ -194,20 +250,8 @@ auto operator+(const expression& lhs, int rhs)
 }
 auto operator+(const expression& lhs, const expression& rhs)
 {
-    //if rhs is a single value, just int add it
-    if (rhs.getHead()->getOp() == Op::val){
-        return lhs + rhs.getHead()->getVal();
-    }
-    else if (lhs.getHead()->getOp() == Op::val){
-        int val = lhs.getHead()->getVal();
-        return lhs + val;
-    }
-    //both are more complex trees
-    //head is +/- -> explore
-    //head is other -> new head + and branch
-    else if (lhs.getHead()->getOp() != Op::plus &&  lhs.getHead()->getOp() != Op::minus)
-        expression answ(lhs,rhs,Op::plus);
-    expression answ(lhs);//todo
+    auto answ(lhs);
+    answ += rhs;
     return answ;
 }
 auto operator-(const expression& lhs, int rhs)
@@ -218,6 +262,7 @@ auto operator-(const expression& lhs, int rhs)
 }
 auto operator-(expression lhs, const expression& rhs)
 {
+    auto answ(lhs);
     return lhs;
 }
 auto operator*(const expression& lhs, int rhs)
