@@ -219,6 +219,11 @@ public:
         }
         return *this;
     }
+
+    auto& operator*=(const expression& rhs){
+        return *this;
+    }
+
     auto& operator/=(int rhs){
         if (rhs == 1) return *this;//do nothing
         if (rhs == 0)
@@ -244,6 +249,11 @@ public:
             *head /= rhs;
         return *this;
     }
+
+    auto& operator/=(const expression& rhs){
+        return *this;
+    }
+
 };
 
 auto operator<=>(const expression& lhs, int rhs){
@@ -282,10 +292,12 @@ auto operator-(const expression& lhs, int rhs)
     answ -= rhs;
     return answ;
 }
+//NOT TESTED
 auto operator-(expression lhs, const expression& rhs)
 {
     auto answ(lhs);
-    return lhs;
+    answ -= rhs;
+    return answ;
 }
 auto operator*(const expression& lhs, int rhs)
 {
@@ -293,9 +305,12 @@ auto operator*(const expression& lhs, int rhs)
     answ *= rhs;
     return answ;
 }
+//we don't have *= yet
 auto operator*(expression lhs, const expression& rhs)
 {
-    return lhs;
+    auto answ(lhs);
+    answ *= rhs;
+    return answ;
 }
 auto operator/(const expression& lhs, int rhs)
 {

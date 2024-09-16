@@ -4,8 +4,9 @@
 
 ## Last changes
 
-- expression \+ expression, swap_ops(), \-expression
-- all of these are untested
+- all of these are untested - e+e and -expression got some testing done
+- fixed copy constructor for expression, added setLeft/Right(const node&) to simplify
+- need to finish e*e and e/e before starting pow and sqrt
 
 ### Supported operations
 
