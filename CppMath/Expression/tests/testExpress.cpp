@@ -1,5 +1,9 @@
 #include "../expression.h"
 
+void Assert(const string& name, expression e, const string& expected){
+   print("test: {}\n  expected: {}\n    actual: {}\n    result: {}\n", name, expected, e.str(), expected == e.str());
+}
+
 int main(void)
 {
    print("testing value nodes:\n");
@@ -24,10 +28,11 @@ int main(void)
    print("op*=:\n1 *= 9: {} -> {}\n", defexp, "{9}" == defexp.str());
    eone*=3; // 1 *= 3 = 3
    print("1 *= 3 : {} -> {}\n",eone, "{3}" == eone.str());
+
    defexp--; // 9 -= 1 = 8
-   print("9 -= 1: {}\n",defexp, defexp.str() == "{8}");
+   print("9 -= 1: {} -> {}\n",defexp, defexp.str() == "{8}");
    defexp /= 4; // 8 /= 4 = 2 defexp
-   print("op/=:\n8 /= 4: {}\n",defexp.str());
+   print("op/=:\n8 /= 4: {} -> {}\n",defexp.str(), defexp.str() == "{2}");
    print("\nTESTING NONMEMBER + and -:\n");
    auto a = eone + 9; // 3 + 9 = 12
    print("{} + 9: {} -> {}\n\n",eone.str(),a, a.str() == "{12}");
@@ -45,4 +50,6 @@ int main(void)
    print("(6/4 + 8) * 2 : {} -> {}\n", eone, "{12}/{4}+{16}" == eone.str());
    eone /= 8;
    print("(12/4) + 16) / 8 : {} -> {}\n", eone, "{12}/{32}+{2}" == eone.str());
+   Assert("e+e", eone + defexp, "{12}/{32}+{12}");
+   Assert("-e",-eone,"{-12}/{32}-{2}");
 }

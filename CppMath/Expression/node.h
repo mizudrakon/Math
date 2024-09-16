@@ -9,9 +9,17 @@ constexpr void print(const std::string_view text, auto&&... args){
     fputs(std::vformat(text,std::make_format_args(args...)).c_str(), stdout);
 }
 
+//#define CONSTRUCTOR_TEST
+
+const void test_msg(const std::string_view text, auto&&... args){
+#ifdef CONSTRUCTOR_TEST    
+    print("test_msg: ");
+    fputs(std::vformat(text,std::make_format_args(args...)).c_str(), stdout);
+#endif
+}
+
 using std::make_unique, std::unique_ptr, std::move;
 using std::string;
-
 enum class Op {
     plus,
     minus,
@@ -27,7 +35,9 @@ class node
 public:
     virtual ~node() = default;
     virtual std::string str() const = 0;
-    
+
+    virtual void copy(const node& nd) = 0;
+
     virtual int getVal() const = 0;
     virtual void setVal(int) = 0;
     virtual Op getOp() const = 0;
@@ -38,6 +48,9 @@ public:
 
     virtual void setLeft(unique_ptr<node> left) = 0;
     virtual void setRight(unique_ptr<node> right) = 0;
+
+    virtual void setLeft(const node&) = 0;
+    virtual void setRight(const node&) = 0;
 
     virtual bool op_allowed(Op op, int rhs) const = 0;
 

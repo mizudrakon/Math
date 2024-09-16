@@ -14,28 +14,45 @@ class expression
     unique_ptr<node> head;
 public:
     ~expression() = default;//unique pointers should take care of the tree structure
-    expression(): head(make_unique<val_node>(0)){ print("default expression ctor\n");}
-    expression(int val): head(make_unique<val_node>(val)){print("expression int ctor\n");}
-    expression(expression&& exs): head(std::move(exs.head)){print("expression move ctor\n");}
-    expression(const expression& rhs){
-        print("expression copy ctor\n");
-        auto p_rhs = rhs.head.get();
-        //copy constructors should work recursively, so it's just about finding out what the head is
-        if (p_rhs->getOp() == Op::val)
-            head = make_unique<val_node>(*p_rhs);
-            //val_node doesn't actually have children
-        else
-            head = make_unique<op_node>(*p_rhs);
+    expression(): head(make_unique<val_node>(0)){ 
+        
+        test_msg("default expression ctor\n");
+    
+    }
+    expression(int val): head(make_unique<val_node>(val)){
+        
+        test_msg("expression int ctor\n");
+    
+    }
+    expression(expression&& exs): head(std::move(exs.head)){
+        
+        test_msg("expression move ctor\n");
+    
+    }
+    
+    expression(const expression& rhs) 
+    {
+        if (rhs.getHead()->getOp()==Op::val){
+            val_node rhead = *rhs.getHead();//copy of rhs.head?
+            head = make_unique<val_node>(std::move(rhead));
+        } else {
+            op_node rhead = *rhs.getHead();//PROBLEM!!!
+            head = make_unique<op_node>(std::move(rhead));
+        }
     }
 
-    expression(const expression& lhs, const expression& rhs, Op o): head(make_unique<op_node>(o))
+    //NOT TESTED!
+    expression(const expression& lhs, const expression& rhs, Op o): 
+        head(make_unique<op_node>(o))
     {
-        head->setLeft(make_unique<op_node>(lhs.getHead()));
-        head->setRight(make_unique<op_node>(rhs.getHead()));
+        head->setRight(*lhs.getHead());
+        head->setRight(*rhs.getHead());
     }
 
     auto& operator=(expression rhs) noexcept {
-        print("expression assignment swap ctor\n");
+        
+        test_msg("expression assignment swap ctor\n");
+    
         std::swap(head, rhs.head);
         return *this;
     }
@@ -43,8 +60,6 @@ public:
     node* getHead() const{
         return head.get();
     }
-
-
 
     string subtree_str(const node* nd) const{
         if (nd->getOp() == Op::val)
@@ -85,25 +100,23 @@ public:
     }
 
     auto& operator+=(int rhs){
-        //print("expression {} op+= {}:\n",head->str(),rhs);
         auto nd = head.get();
         if (rhs == 0) return *this; //0 is neutral for addition and subtraction 
-        //   print("simple case...\n");
         if (head.get()->getOp() == Op::val)
         {
-            print("simple case...\n");
+            //print("simple case...\n");
             *head+=rhs;
             return *this;
         }
         //difficult case - search for a moddiffyable value node
-        print("starting find_val\n"); 
+        //print("starting find_val\n"); 
         auto p_valNode = find_val(nd);
-        print("ended find_val\n");
+        //print("ended find_val\n");
         if (p_valNode != nullptr) 
         {    
-            print("found val to modify: {}\n", p_valNode->str());
+            //print("found val to modify: {}\n", p_valNode->str());
             *p_valNode += rhs; 
-            print("val after modification: {}\n", p_valNode->str());
+            //print("val after modification: {}\n", p_valNode->str());
         }
         //the rest - can't moddify
         else {
@@ -119,7 +132,9 @@ public:
     auto& operator+=(const expression& rhs){
         //either this or rhs has a value node as its head:
         //rhs or both
+        //print("checking rhs == val\n");
         if (rhs.getHead()->getOp() == Op::val){
+            //print("rhs is val\n");
             operator+=(rhs.getHead()->getVal());
             return *this;
         }
@@ -153,24 +168,26 @@ public:
         operator+=(-rhs);
         return *this;
     }
+
+    //NOT TESTED!!!
     auto operator-(){
         auto copy = *this;
         if (copy.head->getOp() == Op::val)
             *copy.head *= -1;    
         else {
-            //switch all + ops to - and - to +
             //switch value in the left minimum
-            auto it = *copy.head;
-            while (it.getOp() != Op::val){
-                it = *it.getLeft();
+            auto it = copy.getHead();
+            while (it->getOp() != Op::val){
+                it = it->getLeft();
             }
-            if (it.getOp() == Op::val)
-                it *= -1;
+            if (it->getOp() == Op::val)
+                *it *= -1;
+            //switch all + ops to - and - to +
             swap_ops(copy.head.get());
         }
         return copy;
     }
-
+    //NOT TESTED!!!
     auto& operator-=(expression rhs){
         operator+=(-rhs);
         return *this;
@@ -180,6 +197,9 @@ public:
         return *this;
     }
     auto operator--(int){
+    
+        test_msg("operator--(int)\n");
+    
         auto old = *this;
         operator--();
         return old;
@@ -250,7 +270,9 @@ auto operator+(const expression& lhs, int rhs)
 }
 auto operator+(const expression& lhs, const expression& rhs)
 {
+    //print("making lhs copy\n");
     auto answ(lhs);
+    //print("lhs copy created\n");
     answ += rhs;
     return answ;
 }

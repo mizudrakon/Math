@@ -20,28 +20,58 @@ public:
             left = o.left;
     }
     */
-    op_node(Op o):op(o){ print("OP_NODE {} ctor\n", str()); }
+    op_node(Op o):op(o){ 
+    #ifdef TEST    
+        print("OP_NODE {} ctor\n", str()); 
+    #endif
+    }
+
     op_node(const node& opn):
-        op(static_cast<op_node>(opn).op),
-        left(std::move(static_cast<op_node>(opn).left)),
-        right(std::move(static_cast<op_node>(op).right))
+        op(opn.getOp())
+        //op(static_cast<op_node>(opn).op)
     {
-        print("OP_NODE copy ctor\n");
-        if (left->getOp() == Op::val)
+    #ifdef TEST    
+        print("OP_NODE node& copy ctor\n");
+    #endif
+        if (opn.getLeft()->getOp() == Op::val)
             left = make_unique<val_node>(*opn.getLeft());
         else left = make_unique<op_node>(*opn.getLeft());
-        if (left->getOp() == Op::val)
+        if (opn.getRight()->getOp() == Op::val)
             right = make_unique<val_node>(*opn.getRight());
         else right = make_unique<op_node>(*opn.getRight());
         //this should work recursively
     }
-    op_node(node&& opn):op(move(static_cast<op_node>(opn).op)),left(move(static_cast<op_node>(opn).left)),
-    right(move(static_cast<op_node>(opn).right))
+
+
+    op_node(const op_node& opn):
+        op(opn.getOp())
     {
+    #ifdef TEST    
+        print("OP_NODE copy ctor\n");
+    #endif
+        if (opn.getLeft()->getOp() == Op::val)
+            left = make_unique<val_node>(*opn.getLeft());
+        else left = make_unique<op_node>(*opn.getLeft());
+        if (opn.getRight()->getOp() == Op::val)
+            right = make_unique<val_node>(*opn.getRight());
+        else right = make_unique<op_node>(*opn.getRight());
+        //this should work recursively
+    }
+
+
+    op_node(node&& opn):
+        op(move(static_cast<op_node>(opn).op)),
+        left(move(static_cast<op_node>(opn).left)),
+        right(move(static_cast<op_node>(opn).right))
+    {
+    #ifdef TEST    
         print("op_node move ctor\n");
+    #endif
     }
     ~op_node(){
+    #ifdef TEST    
         print("op_node {} dest\n", str());
+    #endif
     }
     std::string str() const override;
     
@@ -52,6 +82,22 @@ public:
     void setOp(Op o) override {
         op = o;
     }
+
+    void copy(const node& nd) override
+    {
+        op = nd.getOp();
+    #ifdef TEST    
+        print("OP_NODE pointer copy ctor\n");
+    #endif
+        if (nd.getLeft()->getOp() == Op::val)
+            left = make_unique<val_node>(*nd.getLeft());
+        else left = make_unique<op_node>(*nd.getLeft());
+        if (nd.getRight()->getOp() == Op::val)
+            right = make_unique<val_node>(*nd.getRight());
+        else right = make_unique<op_node>(*nd.getRight());
+        //this should work recursively
+    }
+
     //return observers:
     node* getLeft() const override {return left.get();}
     node* getRight() const override {return right.get();}
@@ -60,8 +106,34 @@ public:
     void setLeft(unique_ptr<node> nd) override {
         left = std::move(nd);
     }
+
+
+
     void setRight(unique_ptr<node> nd) override {
         right = std::move(nd);
+    }
+
+
+    void setLeft(const node& nd) override {
+        if (nd.getOp()==Op::val){
+            val_node new_left = nd;//copy of rhs.head?
+            left = make_unique<val_node>(std::move(new_left));
+        } else {
+            op_node new_left = nd;//PROBLEM!!!
+            left = make_unique<op_node>(std::move(nd));
+            //print("made copy of op head\n");
+        }
+    }
+
+    void setRight(const node& nd) override {
+        if (nd.getOp()==Op::val){
+            val_node new_right = nd;//copy of rhs.head?
+            right = make_unique<val_node>(std::move(new_right));
+        } else {
+            op_node new_right = nd;//PROBLEM!!!
+            right = make_unique<op_node>(std::move(new_right));
+            //print("made copy of op head\n");
+        }
     }
 
     bool op_allowed(Op rhs_op, int rhs) const override;
@@ -72,7 +144,9 @@ public:
     }
     
     op_node& operator=(op_node nd) noexcept {
+    #ifdef TEST    
         print("op_node swap copy ctor\n");
+    #endif
         std::swap(op, nd.op);
         std::swap(left, nd.left);
         std::swap(right, nd.right);
@@ -197,6 +271,7 @@ struct std::formatter<op_node> : std::formatter<int> {
     }
 };
 
+//this will probably be scrapped
 bool op_node::op_allowed(Op rhs_op, int rhs) const {
 //should check if there's any point of accessing node's children
     //a subtree defined by multiplication or division can't be modified with addition or subtraction
