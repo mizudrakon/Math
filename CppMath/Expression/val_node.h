@@ -44,10 +44,9 @@ public:
     void setOp(Op o) override {
         return;
     }
+    bool is_val() const override { return true; }
 
-    void copy(const node& nd) override {
 
-    }
     //value nodes are leaves, so there are no sons 
     node* getLeft() const override {return nullptr;}
     node* getRight() const override {return nullptr;}
@@ -68,7 +67,7 @@ public:
     }
 
 
-    bool op_allowed(Op op, int rhs) const override;
+    //bool op_allowed(Op op, int rhs) const override;
    
     bool operator==(const node& nd) const override {
         return val == nd.getVal();
@@ -100,6 +99,20 @@ public:
     }
 };
 
+//formater for expression class
+template<>
+struct std::formatter<val_node> : std::formatter<int> {
+    template<typename Context>
+    auto format(const val_node& vn, Context& ctx) const {
+        return std::format_to(ctx.out(), "{}", vn.str());
+    }
+};
+
+#endif
+
+
+
+/*
 bool val_node::op_allowed(Op op, int rhs) const {
     switch (op)
     {
@@ -112,14 +125,4 @@ bool val_node::op_allowed(Op op, int rhs) const {
     }
     return true;
 }
-
-//formater for expression class
-template<>
-struct std::formatter<val_node> : std::formatter<int> {
-    template<typename Context>
-    auto format(const val_node& vn, Context& ctx) const {
-        return std::format_to(ctx.out(), "{}", vn.str());
-    }
-};
-
-#endif
+*/

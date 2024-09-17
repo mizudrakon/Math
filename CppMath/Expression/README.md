@@ -7,6 +7,8 @@
 - all of these are untested - e+e and -expression got some testing done
 - fixed copy constructor for expression, added setLeft/Right(const node&) to simplify
 - need to finish e*e and e/e before starting pow and sqrt
+- operator\*= int modified for 'other' cases NOT TESTED!!! (other cases not implemented yet)
+- all non-member operators make an lhs expression copy, moddify it, and return it as the result.
 
 ### Supported operations
 
@@ -31,12 +33,15 @@
 
 - (\*= int) $\checkmark$?  
 - (\* int) works as (copy \*= int) $\checkmark$?
-- (\*= expression) missing $\times$
+- (\*= expression)
+  - checks simple cases of one expression being just a hidden value -> \*= int
+  - else connects the two expr with op_node \*
 
 #### / division  
 
 - (\/= int) $\checkmark$?  
-- (\-= expression) missing $\times$
+- (\-= expression)
+  - works the same as in multiplication
 
 ### more missing
 

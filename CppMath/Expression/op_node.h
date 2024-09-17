@@ -82,21 +82,7 @@ public:
     void setOp(Op o) override {
         op = o;
     }
-
-    void copy(const node& nd) override
-    {
-        op = nd.getOp();
-    #ifdef TEST    
-        print("OP_NODE pointer copy ctor\n");
-    #endif
-        if (nd.getLeft()->getOp() == Op::val)
-            left = make_unique<val_node>(*nd.getLeft());
-        else left = make_unique<op_node>(*nd.getLeft());
-        if (nd.getRight()->getOp() == Op::val)
-            right = make_unique<val_node>(*nd.getRight());
-        else right = make_unique<op_node>(*nd.getRight());
-        //this should work recursively
-    }
+    bool is_val() const override { return false; }
 
     //return observers:
     node* getLeft() const override {return left.get();}
@@ -106,7 +92,6 @@ public:
     void setLeft(unique_ptr<node> nd) override {
         left = std::move(nd);
     }
-
 
 
     void setRight(unique_ptr<node> nd) override {
@@ -136,7 +121,7 @@ public:
         }
     }
 
-    bool op_allowed(Op rhs_op, int rhs) const override;
+    //bool op_allowed(Op rhs_op, int rhs) const override;
 
     //we need to compare operators to compare expressions    
     bool operator==(const node& nd) const override {
@@ -161,7 +146,8 @@ public:
         return *this;
     }
 
-    //original node becomes the new left, right is the rhs valu
+    //original node becomes the new left, right is the rhs value
+    //the original node shouldn't actually move, the pointer to it should still be valid
     void addNode_up(Op o, int rhs){
         //make a copy that kidnapps the children
         auto new_node = make_unique<op_node>(op);
@@ -175,14 +161,16 @@ public:
         setRight(make_unique<val_node>(rhs));
     }
 
+    //same with pointer to node
     void addNode_up(Op o, unique_ptr<node> rhs){
-        auto new_node = make_unique<op_node>(op);
-        new_node->setLeft(std::move(left));
+        auto new_node = make_unique<op_node>(op);//make a copy of *this
+        new_node->setLeft(std::move(left));//move children to the copy
         new_node->setRight(std::move(right));
-        setLeft(std::move(new_node));
+        setLeft(std::move(new_node));//set copy as *this.left
         op = o;
-        setRight(std::move(rhs));
+        setRight(std::move(rhs));//set rhs as *this.right
     }
+
 
     void addNode(unique_ptr<node> son, Op o, int rhs){
         auto new_node = make_unique<op_node>(op);
@@ -193,7 +181,7 @@ public:
 
     node& operator*=(int rhs) override {
         //distribution
-        if (op == Op::div)
+        if (op == Op::div || op == Op::mult)
         {
             *left *= rhs;   
         }
@@ -272,20 +260,20 @@ struct std::formatter<op_node> : std::formatter<int> {
 };
 
 //this will probably be scrapped
-bool op_node::op_allowed(Op rhs_op, int rhs) const {
+//bool op_node::op_allowed(Op rhs_op, int rhs) const {
 //should check if there's any point of accessing node's children
     //a subtree defined by multiplication or division can't be modified with addition or subtraction
     //(it's an indivisible unit)
-    if (rhs_op == Op::plus || rhs_op == Op::minus){
+/*    if (rhs_op == Op::plus || rhs_op == Op::minus){
         if (op == Op::mult || op == Op::div)
             return false;
-    }
+    }*/
     //for the reverse situation, we have the distributivity rule letting us access the lower nodes.
     //more operations to come that won't let us enter the subtree
     //if POW
     //if ROOT
     //...
-    return true;
-}
+//    return true;
+//}
 
 #endif

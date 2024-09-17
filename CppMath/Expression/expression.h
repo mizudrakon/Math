@@ -90,6 +90,10 @@ public:
         return p_res;
     }
 
+    bool is_val() const {
+        return head->getOp() == Op::val;
+    }
+
     void swap_ops(node* p_node){
         auto node_op = p_node->getOp();
         if (node_op == Op::val) return;
@@ -133,13 +137,13 @@ public:
         //either this or rhs has a value node as its head:
         //rhs or both
         //print("checking rhs == val\n");
-        if (rhs.getHead()->getOp() == Op::val){
+        if (rhs.is_val()){
             //print("rhs is val\n");
             operator+=(rhs.getHead()->getVal());
             return *this;
         }
         //this is value, rhs is op
-        else if (head->getOp() == Op::val){
+        else if (is_val()){
             int v = head->getVal();//copy our value
             expression answ(rhs);//make a copy of rhs
             answ += v;//add value to rhs copy
@@ -206,21 +210,49 @@ public:
     }
     //will this work???
     auto& operator*=(int rhs){
-        if (rhs == 1) return *this;//do nothing
-        if (head->getOp() == Op::val)
+        //do nothing for 1
+        if (rhs == 1) return *this;
+        //simple case of single value exression * int
+        if (head->getOp() == Op::val){
             *head*=rhs;
-        else if (rhs == 0)//will turn any expression 0
+        }
+        //simple case of int = 0 -> expression = 0
+        else if (rhs == 0)
             head = make_unique<val_node>(0);
-        else if (head->getOp() == Op::div || head->getOp() == Op::mult)
-            *head->getLeft() *= rhs;
+        else if (head->getOp() != Op::plus && head->getOp() != Op::minus){
+            //for * and / we want to multiply exactly one value node
+            //in case of div it has to be the left one
+            if (head->getOp() == Op::div || head->getOp() == Op::mult)
+                *head->getLeft() *= rhs;
+            else //pow or sqrt, or another function -> make new branch above
+                static_cast<op_node>(*head).addNode_up(Op::plus,rhs); //UNTESTED!!!
+        }
+        //for + and -, the * is distributed
         else if (head->getOp() == Op::plus || head.get()->getOp() == Op::minus){
             *head->getLeft() *= rhs;
             *head->getRight() *= rhs;
         }
         return *this;
     }
-
+    //NOT TESTED!!!
     auto& operator*=(const expression& rhs){
+        //should probably just connect it up
+        //simple case *= int
+        if (rhs.is_val())
+            operator*=(rhs.getHead()->getVal());
+        //*this.is_val so copy rhs, multiply it with *this.val and move it
+        else if (is_val()){
+            int val = head->getVal();
+            auto new_head = make_unique<op_node>(rhs.getHead());
+            *new_head *= val;
+            head = std::move(new_head);
+        }
+        //just connect *this and rhs with *
+        else {
+            auto rhs_head_copy = make_unique<op_node>(rhs.getHead());
+            static_cast<op_node>(*head).addNode_up(Op::mult,std::move(rhs_head_copy));
+        }
+
         return *this;
     }
 
@@ -249,11 +281,24 @@ public:
             *head /= rhs;
         return *this;
     }
-
+    //NOT TESTED!!!
     auto& operator/=(const expression& rhs){
+        //same as with *=
+        if (rhs.is_val())
+            operator/=(rhs.getHead()->getVal());
+        else if (is_val()){
+            int val = head->getVal();
+            auto new_head = make_unique<op_node>(rhs.getHead());
+            *new_head /= val;
+            head = std::move(new_head);
+        }
+        //just connect *this and rhs with /
+        else {
+            auto rhs_head_copy = make_unique<op_node>(rhs.getHead());
+            static_cast<op_node>(*head).addNode_up(Op::div,std::move(rhs_head_copy));
+        }
         return *this;
     }
-
 };
 
 auto operator<=>(const expression& lhs, int rhs){
@@ -272,55 +317,45 @@ auto operator==(const expression& lhs, int rhs){
         return lhs.getHead()->getVal()==rhs;
     return false;
 }
-auto operator+(const expression& lhs, int rhs)
+auto operator+(expression lhs, int rhs)
 {
-    auto answ(lhs);
-    answ += rhs;
-    return answ;
+    lhs += rhs;
+    return lhs;
 }
-auto operator+(const expression& lhs, const expression& rhs)
+auto operator+(expression lhs, const expression& rhs)
 {
-    //print("making lhs copy\n");
-    auto answ(lhs);
-    //print("lhs copy created\n");
-    answ += rhs;
-    return answ;
+    lhs += rhs;
+    return lhs;
 }
-auto operator-(const expression& lhs, int rhs)
+auto operator-(expression lhs, int rhs)
 {
-    auto answ(lhs);
-    answ -= rhs;
-    return answ;
+    lhs -= rhs;
+    return lhs;
 }
-//NOT TESTED
+//ALL NOT WELL TESTED!!!
 auto operator-(expression lhs, const expression& rhs)
 {
-    auto answ(lhs);
-    answ -= rhs;
-    return answ;
+    lhs -= rhs;
+    return lhs;
 }
-auto operator*(const expression& lhs, int rhs)
+auto operator*(expression lhs, int rhs)
 {
-    auto answ(lhs);
-    answ *= rhs;
-    return answ;
+    lhs *= rhs;
+    return lhs;
 }
-//we don't have *= yet
 auto operator*(expression lhs, const expression& rhs)
 {
-    auto answ(lhs);
-    answ *= rhs;
-    return answ;
+    lhs *= rhs;
+    return lhs;
 }
-auto operator/(const expression& lhs, int rhs)
+auto operator/(expression lhs, int rhs)
 {
-    //print("{} op/ {}:\n",lhs.str(),rhs);
-    auto answ(lhs);
-    answ /= rhs;
-    return answ;
+    lhs /= rhs;
+    return lhs;
 }
 auto operator/(expression lhs, const expression& rhs)
 {
+    lhs /= rhs;
     return lhs;
 }
 

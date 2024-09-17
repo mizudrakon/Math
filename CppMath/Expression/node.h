@@ -36,12 +36,11 @@ public:
     virtual ~node() = default;
     virtual std::string str() const = 0;
 
-    virtual void copy(const node& nd) = 0;
-
     virtual int getVal() const = 0;
     virtual void setVal(int) = 0;
     virtual Op getOp() const = 0;
     virtual void setOp(Op) = 0;
+    virtual bool is_val() const = 0;
 
     virtual node* getLeft() const = 0;
     virtual node* getRight() const = 0;
@@ -52,7 +51,7 @@ public:
     virtual void setLeft(const node&) = 0;
     virtual void setRight(const node&) = 0;
 
-    virtual bool op_allowed(Op op, int rhs) const = 0;
+    //virtual bool op_allowed(Op op, int rhs) const = 0;
 
     virtual bool operator==(const node& nd) const = 0;
     virtual node& operator+=(int) = 0;
