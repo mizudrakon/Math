@@ -4,22 +4,15 @@
     "type": "split",
     "children": [
       {
-        "id": "d3ede2a65c102c45",
+        "id": "f277936f73d76555",
         "type": "tabs",
         "children": [
           {
-            "id": "049c7e42c38f8e9f",
+            "id": "349cedea46f3e4dc",
             "type": "leaf",
             "state": {
-              "type": "canvas",
-              "state": {
-                "file": "LinearAlgebraPlan.canvas",
-                "viewState": {
-                  "x": -76.7106063311553,
-                  "y": 109.92454506031726,
-                  "zoom": -1
-                }
-              }
+              "type": "empty",
+              "state": {}
             }
           }
         ]
@@ -72,8 +65,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
     "id": "4c07092af5a58be1",
@@ -89,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "LinearAlgebraPlan.canvas",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -106,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "LinearAlgebraPlan.canvas",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -128,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "LinearAlgebraPlan.canvas"
-              }
+              "state": {}
             }
           }
         ]
@@ -150,10 +138,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "049c7e42c38f8e9f",
+  "active": "9550a49f95f2e52c",
   "lastOpenFiles": [
-    "create a link.md",
     "LinearAlgebraPlan.canvas",
+    "create a link.md",
     "Welcome.md"
   ]
 }

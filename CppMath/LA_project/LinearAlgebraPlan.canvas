@@ -11,15 +11,15 @@
 		{"id":"a18cc13a2c5594ea","type":"text","text":"### operators\n* +, -, $\\star$, $\\div$\n* need to be overloades in code, since they can't always be executed.","x":-680,"y":150,"width":275,"height":177},
 		{"id":"c0952ceb1dd112cd","type":"text","text":"### functions\n* goniometric, log\n* just symbols here except for special cases to be implemented later","x":-680,"y":380,"width":282,"height":203},
 		{"id":"1245d2dcd5afa7c8","type":"text","text":"### unknown_variables\n* only symbols\n* mother: numeric -> 1 as fiiller\n* daughter: numeric","x":-669,"y":640,"width":271,"height":173},
-		{"id":"c6cfdb11b675f85b","type":"text","text":"### struct expreasion node\n* runtime polymorphic node","x":-310,"y":160,"width":221,"height":167},
 		{"id":"1ca1b76e0c90e6bc","type":"text","text":"### row space","x":-648,"y":-400,"width":250,"height":60},
 		{"id":"3b1610be58f4c37f","type":"text","text":"### column space","x":-199,"y":-400,"width":250,"height":60},
 		{"id":"7c4e4acbf55f674b","type":"text","text":"#### class Matrix  \n* collects multiple vectors into rows or columns of the matrix\n* allows operations that will be listed\n* make_rows(lvector list)\n* make_columns(lvector list)","x":-449,"y":-800,"width":360,"height":260},
-		{"id":"20a0a3b112bc3dfe","x":173,"y":960,"width":347,"height":165,"type":"text","text":"### expression design\n* binary tree with nodes carrying either op_id $\\neq$ non, or a value\n* I think, I don't need fractions in expressions"},
-		{"id":"e41273cd95c59a4d","x":844,"y":1076,"width":256,"height":124,"type":"text","text":"### class expression\nunique_ptr<node> head"},
-		{"id":"f2890d716a82fde9","x":964,"y":1355,"width":236,"height":165,"type":"text","text":"#### node   \nop_id\nvalue\nunique_ptr left\nunique_ptr right"},
-		{"id":"5a31818d1eebc86a","x":1324,"y":1659,"width":116,"height":181,"type":"text","text":"#### node\nnon\nvalue\nnull\nnull"},
-		{"id":"9d66297ec1e5c32b","x":694,"y":1560,"width":150,"height":170,"type":"text","text":"#### node\nnon\nvalue\nnull\nnull"}
+		{"id":"20a0a3b112bc3dfe","type":"text","text":"### expression design\n* binary tree with nodes carrying either op_id $\\neq$ non, or a value\n* I think, I don't need fractions in expressions","x":173,"y":960,"width":347,"height":165},
+		{"id":"e41273cd95c59a4d","type":"text","text":"### class expression\nunique_ptr<node> head","x":844,"y":1076,"width":256,"height":124},
+		{"id":"f2890d716a82fde9","type":"text","text":"#### node   \nop_id\nvalue\nunique_ptr left\nunique_ptr right","x":964,"y":1355,"width":236,"height":165},
+		{"id":"5a31818d1eebc86a","type":"text","text":"#### node\nnon\nvalue\nnull\nnull","x":1324,"y":1659,"width":116,"height":181},
+		{"id":"9d66297ec1e5c32b","type":"text","text":"#### node\nnon\nvalue\nnull\nnull","x":694,"y":1560,"width":150,"height":170},
+		{"id":"c6cfdb11b675f85b","type":"text","text":"### struct expreasion node\n* runtime polymorphic node","x":-310,"y":160,"width":221,"height":167}
 	],
 	"edges":[
 		{"id":"d60ac969dd31f202","fromNode":"b9ec601142ab7cc9","fromSide":"top","toNode":"d11c1fbfdfc9a74e","toSide":"bottom"},
