@@ -1,5 +1,5 @@
-#include "lvector.hpp"
-#include "ratio.hpp"
+#include "lvector.h"
+#include "ratio.h"
 
 int main(){
     lvector a {1,2,3,4,5,6};

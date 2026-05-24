@@ -1,44 +1,35 @@
 #ifndef LVECTOR_H
 #define LVECTOR_H
 
+#include <array>
+#include <memory>
 #include <initializer_list>
-#include "my_concepts.hpp"
-#include "ratio.h"
+#include <iostream>
+#include <format>
+#include "../my_concepts.hpp"
+//#include "ratio.h"
 
-template <Arithmetic T>
+template <Arithmetic T, size_t Length>
 class lvector
 {
-    T* data;
-    size_t size;
+private:
+    std::shared_ptr<std::array<T,Length>> data_;
 
 public:
-    lvector() = delete;
-    lvector(size_t sz):size(sz),data(new T[sz]){}
-    lvector(std::initializer_list<T> ls){
-        data = new T[ls.size()];
-        size = 0;
-        for (auto e : ls){
-            data[size] = e;
-            ++size;
-        }
-    }
+    //lvector() = delete;
+    lvector(const T& value = 0);
+    lvector(std::initializer_list<T> ls);
+    //lvector(const lvector<T,Length>& vec);
 
-    lvector(const lvector& vec):size(vec.size),data(new T[vec.size]){
-        T* data_it = data;
-        for (auto it = vec.begin(); it < vec.end(); ++it){
-            *data_it = *it;
-            ++data_it;
-        }
-    }
-
-    lvector(lvector&& vec):data(std::move(vec.data)),size(std::move(vec.size)){}
+    //lvector(lvector&& vec):data(std::move(vec.data)),size(std::move(vec.size)){}
     
     ~lvector(){
-        print("vector_dtor\n");
-        delete[] data;
+        // ratio.h has a function print
+        //print("vector_dtor\n");
+        std::cout << "lvector dtor" << std::endl;
     }
     
-    size_t Size() const { return size; }
+    /*
     const Iterator auto begin() const { return data; }//first element
     const Iterator auto end() const { return data+size; }//one past
 
@@ -55,7 +46,7 @@ public:
         }
         return *this;
     }
-    lvector& operator+=(const lvector&vec){
+    lvector& operator+=(const lvector& vec){
         SizeTest(*this,vec);
         for (auto i = 0; i < size; ++i){
             data[i] += vec.data[i];
@@ -76,17 +67,50 @@ public:
         *this += -vec;
         return *this;
     }
-
+    */
     void Print() const {
-        for (auto el : *this){
-            print("{} ", el);
+        std::cout << "[ ";
+        for (auto el : *data_){
+            std::cout << std::format("{} ", el);
+            //print("{} ", el);
         }
-        print("\n");
+        //print("\n");
+        std::cout << "]" << std::endl;
     }
 
 };
 
+template <Arithmetic T, size_t Length>
+lvector<T,Length>::lvector(const T& value)
+    :data_(std::make_shared<std::array<T,Length>>())
+{
+    data_->fill(value);
+}
 
+template <Arithmetic T, size_t Length>
+lvector<T,Length>::lvector(std::initializer_list<T> ls)
+    :data_(std::make_shared<std::array<T,Length>>())
+{
+    size_t i = 0;
+    for (auto e : ls){
+        if (i >= Length)
+            break;
+        (*data_)[i++] = e;
+    }
+}
+
+/*
+template <Arithmetic T, size_t Length>
+lvector<T,Length>::lvector(const lvector<T,Length>& vec):data_()
+{
+    T* data_it = data;
+    for (auto it = vec.begin(); it < vec.end(); ++it){
+        *data_it = *it;
+        ++data_it;
+    }
+}
+*/
+/*
 template <Arithmetic T>
 inline bool SameSize(const lvector<T>& a, const lvector<T>& b){
     return a.Size() == b.Size();
@@ -129,5 +153,5 @@ inline T dot(const lvector<T>&a, const lvector<T>& b){
         answ += (*it) * (*itb);
     return answ;
 }
-
+*/
 #endif
