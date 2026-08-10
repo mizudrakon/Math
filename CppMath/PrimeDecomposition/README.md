@@ -1,1 +1,0 @@
-- The main objective is to calculate a decomposition for a given number and to be able to print itas a tree structure.
