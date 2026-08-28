@@ -67,5 +67,9 @@ int main()
     cryptidmath::Vector<int,3> z{};
     b = b + z;
     std::println("{} == {}+0? {}",a,b, a == b);
+    auto b_copy = b;
+    b *= 2;
+    std::println("{} != {}", b, b_copy);
+    
 
 }

@@ -6,6 +6,7 @@ namespace cryptidmath
     template <Arithmetic Element, size_t size>
     Vector<Element,size>& Vector<Element,size>::operator++()
     {
+        ensure_ownership();
         for (auto& el : *data_)
         {
             ++el;
@@ -25,6 +26,7 @@ namespace cryptidmath
     template <Arithmetic Element, size_t size>
     Vector<Element,size>& Vector<Element,size>::operator--()
     {
+        ensure_ownership();
         for (auto& el : *data_)
         {
             --el;
@@ -40,6 +42,7 @@ namespace cryptidmath
         --(*this);
         return V;
     }
+
     template <Arithmetic Element, size_t size>
     Vector<Element,size> Vector<Element,size>::operator-() const
     {
@@ -52,6 +55,38 @@ namespace cryptidmath
         return result;
     }
     
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator*=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            el *= k;
+        }
+        return *this;
+    }
+ 
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator+=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            el += k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator-=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            el -= k;
+        }
+        return *this;
+    }
 
     template<Arithmetic Element, size_t lsize, size_t rsize>
     Element operator*(const Vector<Element,lsize>& ls, const Vector<Element,rsize>& rs)
@@ -85,6 +120,53 @@ namespace cryptidmath
             ls[i] -= rs[i];
         }
         return ls;
+    }
+
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator*(Vector<Element,rsize> ls_vec, const Element& k)
+    {
+        ls_vec *= k;
+        return ls_vec;
+    }
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator*(const Element& k, Vector<Element,rsize> rs_vec)
+    {
+        rs_vec *= k;
+        return rs_vec;
+    }
+
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator+(Vector<Element,rsize> ls_vec, const Element& k)
+    {
+        ls_vec += k;
+        return ls_vec;
+    }
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator+(const Element& k, Vector<Element,rsize> rs_vec)
+    {
+        rs_vec += k;
+        return rs_vec;
+    }
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator-(Vector<Element,rsize> ls_vec, const Element& k)
+    {
+        ls_vec -= k;
+        return ls_vec;
+    }
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator-(const Element& k, Vector<Element,rsize> rs_vec)
+    {
+        for (size_t i = 0; i < lsize; i++)
+        {
+            rs_vec[i] = k - rs_vec[i];
+        }
+        return rs_vec;
     }
 
     template<Arithmetic Element, size_t lsize, size_t rsize>

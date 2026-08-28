@@ -59,6 +59,7 @@ namespace cryptidmath
 
         Element& operator[](size_t index)
         {
+            ensure_ownership();
             return get(index);
         }        
         const Element& operator[](size_t index) const
@@ -71,6 +72,9 @@ namespace cryptidmath
         Vector& operator--();
         Vector operator--(int);
         Vector operator-() const;
+        Vector& operator*=(const Element& k);
+        Vector& operator+=(const Element& k);
+        Vector& operator-=(const Element& k);
 
     private:
         void ensure_ownership();
@@ -181,8 +185,15 @@ namespace cryptidmath
     Vector<Element,lsize> operator-(Vector<Element,lsize> ls,const Vector<Element,rsize>& rs);
 
     template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator*(Vector<Element,rsize> ls_vec, const Element& k);
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator*(const Element& k, Vector<Element,rsize> rs_vec);
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
     bool operator==(const Vector<Element,lsize>& ls,const Vector<Element,rsize>& rs);
 
+    // ostream& operator<< works for ostream but not print
     template<Arithmetic Element, size_t size>
     std::ostream& operator<<(std::ostream& stream, const Vector<Element,size>& vec)
     {
