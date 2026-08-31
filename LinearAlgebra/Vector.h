@@ -6,6 +6,7 @@
 #include <ostream>
 #include <iostream>
 #include <exception>
+#include <ranges>
 
 #include "my_concepts.hpp"
 
@@ -27,7 +28,9 @@ namespace cryptidmath
         COLUMN,
         ROW
     };
-
+#ifdef OWNERSHIP_TEST
+    size_t eo_counter = 0;
+#endif
     template <Arithmetic Element, size_t size>
     class Vector 
     {
@@ -37,10 +40,12 @@ namespace cryptidmath
         // default orientation is column, but we can optionally pass it to the constructor
 
     public:
+    // CONSTRUCTORS
         Vector(const Element& value = 0, VectorOrientation orientation = VectorOrientation::COLUMN);
         Vector(const std::initializer_list<Element> init_list);
         // Vector(const Matrix&, size_t row or column index)
 
+    // GETTERS & SETTERS
         Element& get(size_t index);
         const Element& get(size_t index) const;
         void set(size_t index, const Element& value);
@@ -59,14 +64,13 @@ namespace cryptidmath
 
         Element& operator[](size_t index)
         {
-            ensure_ownership();
             return get(index);
         }        
         const Element& operator[](size_t index) const
         {
             return get(index);
         }
-
+    // Arithmetic 
         Vector& operator++();
         Vector operator++(int);
         Vector& operator--();
@@ -75,6 +79,9 @@ namespace cryptidmath
         Vector& operator*=(const Element& k);
         Vector& operator+=(const Element& k);
         Vector& operator-=(const Element& k);
+        Vector& operator*=(const Vector<Element,size>& rvec);
+        Vector& operator+=(const Vector<Element,size>& rvec);
+        Vector& operator-=(const Vector<Element,size>& rvec);
 
     private:
         void ensure_ownership();
@@ -108,6 +115,33 @@ namespace cryptidmath
         }
     };
 
+// CONSTRUCTORS begin
+
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>::Vector(const Element& value, VectorOrientation orientation)
+        :data_(std::make_shared<std::array<Element,size>>()),orientation_(orientation)
+    {
+        data_->fill(value);
+    }
+
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>::Vector(const std::initializer_list<Element> init_list)
+        :data_(std::make_shared<std::array<Element,size>>())
+    {
+        if (init_list.size() != size)
+        {
+            throw std::length_error(BAD_SIZE_MSG);
+        }
+        int i = 0;
+        for (auto& el : init_list)
+        {
+            (*data_)[i++] = el;
+        }
+    }
+    
+// CONSTRUCTORS end
+
+// GETTERS & SETTERS begin
     template <Arithmetic Element, size_t size>
     inline Element& Vector<Element,size>::get(size_t index)
     {
@@ -156,12 +190,16 @@ namespace cryptidmath
     template <Arithmetic Element, size_t size>
     void Vector<Element,size>::ensure_ownership()
     {
+#ifdef OWNERSHIP_TEST
+        eo_counter++;
+#endif
         if (data_.use_count() > 1)
         {
             data_ = std::make_shared<std::array<Element,size>>(*data_);
         }
     }
 
+// GETTERS & SETTERS end
 
     template <Arithmetic Element, size_t size>
     void Vector<Element,size>::print(std::ostream& stream, const char* separator) const
@@ -175,23 +213,217 @@ namespace cryptidmath
             << ((orientation_ == VectorOrientation::COLUMN) ? TRANSPOSE : ""); 
     }
 
-    template<Arithmetic Element, size_t lsize, size_t rsize>
-    Element operator*(const Vector<Element,lsize>& ls,const Vector<Element,rsize>& rs);
+// Arithmetic begin 
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator++()
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            ++el;
+        }
+        return *this;
+    }
 
-    template<Arithmetic Element, size_t lsize, size_t rsize>
-    Vector<Element,lsize> operator+(Vector<Element,lsize> ls,const Vector<Element,rsize>& rs);
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size> Vector<Element,size>::operator++(int)
+    {
+        auto V = *this;
+        ++(*this);
+        return V;
+    }
 
-    template<Arithmetic Element, size_t lsize, size_t rsize>
-    Vector<Element,lsize> operator-(Vector<Element,lsize> ls,const Vector<Element,rsize>& rs);
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator--()
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            --el;
+        }
+        return *this;
+    }
 
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size> Vector<Element,size>::operator--(int)
+    {
+        auto V = *this;
+        ensure_ownership();
+        --(*this);
+        return V;
+    }
+
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size> Vector<Element,size>::operator-() const
+    {
+        auto result = *this;
+        result.ensure_ownership();
+        for (auto& el : *(result.data_))
+        {
+            el = -el;
+        }
+        return result;
+    }
+    
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator*=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            el *= k;
+        }
+        return *this;
+    }
+ 
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator+=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            el += k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator-=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto& el : *data_)
+        {
+            el -= k;
+        }
+        return *this;
+    }
+
+    
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator*=(const Vector<Element,size>& rvec)
+    {
+        ensure_ownership();
+        for (auto [ls,rs] : std::ranges::zip_view(*data_,*rvec.data_))
+        {
+            ls *= rs;
+        }
+        return *this;
+    }
+ 
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator+=(const Vector<Element,size>& rvec)
+    {
+        ensure_ownership();
+        for (auto [ls,rs] : std::ranges::zip_view(*data_,*rvec.data_))
+        {
+            ls += rs;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t size>
+    Vector<Element,size>& Vector<Element,size>::operator-=(const Vector<Element,size>& rvec)
+    {
+        ensure_ownership();
+        for (auto [ls,rs] : std::ranges::zip_view(*data_,*rvec.data_))
+        {
+            ls -= rs;
+        }
+        return *this;
+    }
+
+// ARITHEMTIC NON-MEMBER:
     template<Arithmetic Element, size_t lsize, size_t rsize>
-    Vector<Element,lsize> operator*(Vector<Element,rsize> ls_vec, const Element& k);
+    Element operator*(const Vector<Element,lsize>& ls, const Vector<Element,rsize>& rs)
+    {
+        compare_sz(lsize,rsize);
+        Element result{0};
+        for (auto ls_it = ls.cbegin(), rs_it = rs.cbegin(); ls_it < ls.cend();++ls_it,++rs_it)
+        {
+            result += (*ls_it) * (*rs_it);
+        }
+        return result;
+    }
     
     template<Arithmetic Element, size_t lsize, size_t rsize>
-    Vector<Element,lsize> operator*(const Element& k, Vector<Element,rsize> rs_vec);
+    Vector<Element,lsize> operator+(Vector<Element,lsize> ls,const Vector<Element,rsize>& rs)
+    {
+        compare_sz(lsize,rsize);
+        ls += rs;
+        return ls;
+    }
 
     template<Arithmetic Element, size_t lsize, size_t rsize>
-    bool operator==(const Vector<Element,lsize>& ls,const Vector<Element,rsize>& rs);
+    Vector<Element,lsize> operator-(Vector<Element,lsize> ls,const Vector<Element,rsize>& rs)
+    {
+        compare_sz(lsize,rsize);
+        ls -= rs;
+        return ls;
+    }
+
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator*(Vector<Element,rsize> ls_vec, const Element& k)
+    {
+        ls_vec *= k;
+        return ls_vec;
+    }
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator*(const Element& k, Vector<Element,rsize> rs_vec)
+    {
+        rs_vec *= k;
+        return rs_vec;
+    }
+
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator+(Vector<Element,rsize> ls_vec, const Element& k)
+    {
+        ls_vec += k;
+        return ls_vec;
+    }
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator+(const Element& k, Vector<Element,rsize> rs_vec)
+    {
+        rs_vec += k;
+        return rs_vec;
+    }
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator-(Vector<Element,rsize> ls_vec, const Element& k)
+    {
+        ls_vec -= k;
+        return ls_vec;
+    }
+    
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    Vector<Element,lsize> operator-(const Element& k, Vector<Element,rsize> rs_vec)
+    {
+        for (auto& vec_it = rs_vec.begin(); vec_it < rs_vec.end(); ++rs_vec)
+        {
+            *vec_it = k - *vec_it;
+        }
+        return rs_vec;
+    }
+
+    template<Arithmetic Element, size_t lsize, size_t rsize>
+    bool operator==(const Vector<Element,lsize>& ls,const Vector<Element,rsize>& rs)
+    {
+        compare_sz(lsize,rsize);
+        auto ls_it = ls.cbegin();
+        auto rs_it = rs.cbegin();
+        if (ls_it == rs_it) return true;
+        while (ls_it < ls.cend() && *ls_it == *rs_it)
+        {
+            ++ls_it;
+            ++rs_it;
+        }
+        return ls_it == ls.cend();
+    }
+
+// Arithmetic end
 
     // ostream& operator<< works for ostream but not print
     template<Arithmetic Element, size_t size>
@@ -200,7 +432,6 @@ namespace cryptidmath
         vec.print(stream);
         return stream;
     }
-    // MAKE CONSTANT +* VECTOR
 }
 
 // FORMATTER OVERLOAD
@@ -230,6 +461,4 @@ struct std::formatter<cryptidmath::Vector<Element,size>>
         return std::formatter<std::string_view>::format(s,ctx);
     }
 };
-#include "Vector-Constructors.cpp"
-#include "Vector-Operations.cpp"
 #endif
