@@ -32,7 +32,10 @@ int main()
 #ifdef MATRIX_TEST
     cryptidmath::Matrix<int,2,3> m{1,2,3,4,5,6};
     std::cout << m << std::endl;
-    //std::println("{}",m);
+    std::println("{}",m);
+    cryptidmath::Vector<int,3> v{1,2,3};
+    std::println("{}",v);
+    std::println("matrix*vector:\n{}*{}:\n{}",m,v,m*v);
 #endif
 
 #ifdef OPERATION_TEST

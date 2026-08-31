@@ -1,9 +1,24 @@
-#include "Vector.h"
+#ifndef CRYPTID_MATRIX_H
+#define CRYPTID_MATRIX_H
+
+#include <array>
+#include <memory>
+#include <ostream>
+#include <iostream>
+#include <exception>
+#include <ranges>
+
+#include "my_concepts.hpp"
 
 namespace cryptidmath
 {
     constexpr const char    MATRIX_BRACKET_OPEN = '[',
                             MATRIX_BRACKET_CLOSE = ']';
+    constexpr const char    *BAD_SIZE_MSG = "vector sizes do not match!";
+    constexpr const char    *BAD_INDEX_MSG = "index is out of range";
+    constexpr const char    *SEPARATOR = ", ";
+    constexpr const char    *ERROR_SIZE_COL_MISMATCH = "Mismatch between matrix and a column vector!";
+    constexpr const char    *ERROR_SIZE_ROW_MISMATCH = "Mismatch between matrix and a row vector!";
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     class Matrix
@@ -19,7 +34,7 @@ namespace cryptidmath
         const Element& get(size_t row, size_t column) const;
         void set(size_t row, size_t column, const Element& value);
         void print(std::ostream& stream = std::cout, bool stack = false) const;
-
+        
     
 
         Matrix& operator++();
@@ -301,11 +316,14 @@ namespace cryptidmath
         }
         return result;   
     }
+ 
 
+
+// OSTREAM OVERLOAD
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     std::ostream& operator<<(std::ostream& stream, const Matrix<Element,n_rows,m_cols>& Matrix)
     {
-        Matrix.print(stream);
+        Matrix.print(stream,true);
         return stream;
     }
 
@@ -317,7 +335,7 @@ namespace cryptidmath
 template <Arithmetic Element, size_t n_rows, size_t m_cols>
 struct std::formatter<cryptidmath::Matrix<Element, n_rows, m_cols>> : std::formatter<std::string> 
 {
-    template <Arithmetic Context>
+    template <typename Context>
     auto format(const cryptidmath::Matrix<Element, n_rows, m_cols>& matrix, Context& context) const
     {
         std::ostringstream stream;
@@ -325,3 +343,5 @@ struct std::formatter<cryptidmath::Matrix<Element, n_rows, m_cols>> : std::forma
         return std::format_to(context.out(),"{}",stream.str());
     }
 };
+
+#endif

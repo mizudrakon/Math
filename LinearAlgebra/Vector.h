@@ -8,17 +8,19 @@
 #include <exception>
 #include <ranges>
 
+#include "Matrix.h"
 #include "my_concepts.hpp"
 
 using std::size_t;
 
 namespace cryptidmath
 {
-
+    /*
     constexpr const char *BAD_SIZE_MSG = "vector sizes do not match!";
     constexpr const char *BAD_INDEX_MSG = "index is out of range";
-    constexpr const char    *SEPARATOR = ", ",
-                            *TRANSPOSE = "\u1D40";//should be ^T
+    constexpr const char *SEPARATOR = ", ";
+    */
+    constexpr const char *TRANSPOSE = "\u1D40";//should be ^T
     constexpr const char *ALT_TRANSPOSE = "index is out of range";
     constexpr const char    VECTOR_BRACKET_OPEN = '(',
                             VECTOR_BRACKET_CLOSE = ')';
@@ -422,7 +424,27 @@ namespace cryptidmath
         }
         return ls_it == ls.cend();
     }
-
+   
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, size_t vector_size>
+    Vector<Element, n_rows> operator*(
+        const Matrix<Element, n_rows, m_cols>& matrix,
+        const Vector<Element, vector_size>& vector
+    )
+    {
+        if (vector.orientation() != cryptidmath::VectorOrientation::COLUMN || m_cols != vector_size)
+        {
+            throw std::invalid_argument(ERROR_SIZE_COL_MISMATCH);
+        }
+        Vector<Element,n_rows> result;
+        for (size_t row = 0; row < n_rows; ++row)
+        {
+            for (size_t col = 0; col < vector_size; ++col)
+            {
+                result[row] += vector[col] * matrix[row][col];
+            }
+        }
+        return result;
+    }
 // Arithmetic end
 
     // ostream& operator<< works for ostream but not print
