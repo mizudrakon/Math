@@ -1,35 +1,14 @@
 #ifndef CRYPTID_VECTOR_H
 #define CRYPTID_VECTOR_H
 
-#include <array>
-#include <memory>
-#include <ostream>
-#include <iostream>
-#include <exception>
-#include <ranges>
-
+#include "LA_dependancies.h"
 #include "Matrix.h"
-#include "my_concepts.hpp"
 
 using std::size_t;
 
 namespace cryptidmath
 {
-    /*
-    constexpr const char *BAD_SIZE_MSG = "vector sizes do not match!";
-    constexpr const char *BAD_INDEX_MSG = "index is out of range";
-    constexpr const char *SEPARATOR = ", ";
-    */
-    constexpr const char *TRANSPOSE = "\u1D40";//should be ^T
-    constexpr const char *ALT_TRANSPOSE = "index is out of range";
-    constexpr const char    VECTOR_BRACKET_OPEN = '(',
-                            VECTOR_BRACKET_CLOSE = ')';
 
-    enum class VectorOrientation 
-    {
-        COLUMN,
-        ROW
-    };
 #ifdef OWNERSHIP_TEST
     size_t eo_counter = 0;
 #endif

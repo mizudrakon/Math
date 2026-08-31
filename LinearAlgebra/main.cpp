@@ -36,6 +36,10 @@ int main()
     cryptidmath::Vector<int,3> v{1,2,3};
     std::println("{}",v);
     std::println("matrix*vector:\n{}*{}:\n{}",m,v,m*v);
+    auto row2 = m.getRow(1);
+    row2.set_orientation(cryptidmath::VectorOrientation::ROW);
+    std::println("2nd row of matrix: {}", row2);
+    std::println("2nd column of matrix: {}", m.getColumn(1));
 #endif
 
 #ifdef OPERATION_TEST

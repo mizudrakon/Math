@@ -1,24 +1,11 @@
 #ifndef CRYPTID_MATRIX_H
 #define CRYPTID_MATRIX_H
 
-#include <array>
-#include <memory>
-#include <ostream>
-#include <iostream>
-#include <exception>
-#include <ranges>
-
-#include "my_concepts.hpp"
+#include "LA_dependancies.h"
+#include "Vector.h"
 
 namespace cryptidmath
 {
-    constexpr const char    MATRIX_BRACKET_OPEN = '[',
-                            MATRIX_BRACKET_CLOSE = ']';
-    constexpr const char    *BAD_SIZE_MSG = "vector sizes do not match!";
-    constexpr const char    *BAD_INDEX_MSG = "index is out of range";
-    constexpr const char    *SEPARATOR = ", ";
-    constexpr const char    *ERROR_SIZE_COL_MISMATCH = "Mismatch between matrix and a column vector!";
-    constexpr const char    *ERROR_SIZE_ROW_MISMATCH = "Mismatch between matrix and a row vector!";
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     class Matrix
@@ -34,8 +21,9 @@ namespace cryptidmath
         const Element& get(size_t row, size_t column) const;
         void set(size_t row, size_t column, const Element& value);
         void print(std::ostream& stream = std::cout, bool stack = false) const;
-        
-    
+
+        Vector<Element,m_cols> getRow(size_t row) const;
+        Vector<Element,n_rows> getColumn(size_t col) const;
 
         Matrix& operator++();
         Matrix operator++(int);
@@ -179,6 +167,29 @@ namespace cryptidmath
         if (stack)
             stream << std::endl;
         
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Vector<Element,m_cols> Matrix<Element,n_rows,m_cols>::getRow(size_t row) const
+    {
+        Vector<Element,m_cols> result(0,VectorOrientation::ROW);
+        for (size_t i = 0; i < m_cols; ++i)
+        {
+            result[i] = get(row,i);
+        }
+        //result.set_orientation(VectorOrientation::ROW);
+        return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Vector<Element,n_rows> Matrix<Element,n_rows,m_cols>::getColumn(size_t col) const
+    {
+        Vector<Element,n_rows> result;
+        for (size_t i = 0; i < n_rows; ++i)
+        {
+            result[i] = get(i,col);
+        }
+        return result;
     }
 
 // MAKING COPY OF THE DATA
