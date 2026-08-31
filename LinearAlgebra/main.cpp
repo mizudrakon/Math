@@ -1,10 +1,11 @@
-#define OPERATION_TEST
+#define MATRIX_TEST
 
 #include <array>
 #include <ostream>
 #include "my_concepts.hpp"
 #include <iostream>
 #include "Vector.h"
+#include "Matrix.h"
 #include <print>
 
 
@@ -28,6 +29,12 @@ void print_eo_count()
 
 int main()
 {
+#ifdef MATRIX_TEST
+    cryptidmath::Matrix<int,2,3> m{1,2,3,4,5,6};
+    std::cout << m << std::endl;
+    //std::println("{}",m);
+#endif
+
 #ifdef OPERATION_TEST
     cryptidmath::Vector<int,3> a(3);
     std::println("printing a: {}",a);
