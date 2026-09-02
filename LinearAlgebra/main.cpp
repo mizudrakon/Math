@@ -40,6 +40,8 @@ int main()
     row2.set_orientation(cryptidmath::VectorOrientation::ROW);
     std::println("2nd row of matrix: {}", row2);
     std::println("2nd column of matrix: {}", m.getColumn(1));
+    auto t_m = m.transpose();
+    std::println("{}",t_m);
 #endif
 
 #ifdef OPERATION_TEST

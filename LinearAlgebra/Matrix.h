@@ -15,20 +15,30 @@ namespace cryptidmath
 
         class Row;
     public:
+
+// CONSTRUCTORS
         Matrix(const Element& value = 0);
         Matrix(const std::initializer_list<Element>& init_list);
+        
+// MATRIX getters & setters
         Element& get(size_t row, size_t column);
         const Element& get(size_t row, size_t column) const;
         void set(size_t row, size_t column, const Element& value);
         void print(std::ostream& stream = std::cout, bool stack = false) const;
+        bool is_square() const { return n_rows == m_cols; }
 
         Vector<Element,m_cols> getRow(size_t row) const;
         Vector<Element,n_rows> getColumn(size_t col) const;
-
+// MEMBER OPERATIONS
         Matrix& operator++();
         Matrix operator++(int);
         Matrix& operator--();
         Matrix operator--(int);
+
+// COMMON_MEMBER OPERATIONS
+        Matrix& I();
+        Matrix& null();
+        Matrix<Element,m_cols,n_rows> transpose() const;
 
         Row operator[](size_t row);
         const Row operator[](size_t row) const;
@@ -166,7 +176,6 @@ namespace cryptidmath
         stream << MATRIX_BRACKET_CLOSE;
         if (stack)
             stream << std::endl;
-        
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
@@ -256,7 +265,56 @@ namespace cryptidmath
         return M;
     }
 
-// NON-MEMBER OPERATORS:
+// COMMON_MEMBER OPERATIONS
+
+    // right now it returns the same matrix if the operation cannot be procured
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& Matrix<Element,n_rows,m_cols>::I()
+    {
+        if (is_square())
+        {
+            for (size_t row_index = 0; row_index < n_rows; ++row_index)
+            {
+                for (size_t col_index = 0; col_index < m_cols; ++col_index)
+                {
+                    set(row_index,col_index,( (row_index == col_index) ? 1 : 0 ));
+                }
+            }
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& Matrix<Element,n_rows,m_cols>::null()
+    {
+        if (is_square())
+        {
+            for (size_t row_index = 0; row_index < n_rows; ++row_index)
+            {
+                for (size_t col_index = 0; col_index < m_cols; ++col_index)
+                {
+                    set(row_index,col_index,0);
+                }
+            }
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,m_cols,n_rows> Matrix<Element,n_rows,m_cols>::transpose() const
+    {
+        Matrix<Element,m_cols,n_rows> t_m;
+        for (size_t row_index = 0; row_index < n_rows; ++row_index)
+        {
+            for (size_t col_index = 0; col_index < m_cols; ++col_index)
+            {
+                t_m.set(col_index,row_index,get(row_index,col_index));
+            }
+        }
+        return t_m;
+    }
+
+// NONMEMBER OPERATORS:
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element, n_rows, m_cols> operator+(
         const Matrix<Element, n_rows, m_cols>& matrix,
@@ -327,8 +385,19 @@ namespace cryptidmath
         }
         return result;   
     }
- 
 
+// COMMON_NON_MEMBER OPERATIONS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> I(Matrix<Element, n_rows, m_cols> m)
+    {
+        return m.I();
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> null(Matrix<Element, n_rows, m_cols> m)
+    {
+        return m.null();
+    }
 
 // OSTREAM OVERLOAD
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
@@ -337,7 +406,6 @@ namespace cryptidmath
         Matrix.print(stream,true);
         return stream;
     }
-
 }
 
 #include <sstream>
