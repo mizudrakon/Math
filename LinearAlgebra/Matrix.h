@@ -39,12 +39,17 @@ namespace cryptidmath
         Matrix& I();
         Matrix& null();
         Matrix<Element,m_cols,n_rows> transpose() const;
+        Element determinant() const;
+        Element det() const { return determinant(); }
 
+// ROW CLASS
         Row operator[](size_t row);
         const Row operator[](size_t row) const;
 
     private:
         void ensure_ownership();
+        Element det_qrt(size_t depth, size_t left_row, size_t right_row) const;
+        Element det_recursive(std::array<bool,m_cols>& mask, size_t depth) const;
 
     };
 
@@ -314,6 +319,59 @@ namespace cryptidmath
         return t_m;
     }
 
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Matrix<Element,n_rows,m_cols>::det_qrt(size_t depth, size_t left_col, size_t right_col) const 
+    {
+        return get(depth,left_col)*get(depth+1,right_col) - get(depth,right_col)*get(depth+1,left_col);
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Matrix<Element,n_rows,m_cols>::det_recursive(std::array<bool,m_cols>& mask, size_t depth) const
+    {
+        if (depth == n_rows - 2)
+        {
+            size_t left_col = 0;
+            while (!mask[left_col])
+                left_col++;
+            size_t right_col = left_col + 1;
+            while (!mask[right_col])
+                right_col++;
+            return det_qrt(depth,left_col,right_col);
+        }
+        Element sign = 1;
+        Element result = 0;
+        for (size_t i{}; i < m_cols; ++i)
+        {
+            if (!mask[i])
+                continue;
+            mask[i] = false;
+            result += sign * get(depth,i) * det_recursive(mask,depth+1);
+            mask[i] = true;
+            sign *= -1;
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Matrix<Element,n_rows,m_cols>::determinant() const
+    {
+        if (n_rows != m_cols)
+        {
+            throw std::invalid_argument(NOT_SQUARE_MSG);
+        }
+        if (n_rows == 1)
+        {
+            return get(0,0);
+        }
+        if (n_rows == 2)
+        {
+            return det_qrt(0,0,1);
+        }
+        std::array<bool,m_cols> mask;
+        mask.fill(true);
+        return det_recursive(mask,0);
+    }
+    
 // NONMEMBER OPERATORS:
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element, n_rows, m_cols> operator+(

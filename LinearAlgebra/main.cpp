@@ -1,4 +1,5 @@
-#define MATRIX_TEST
+//#define MATRIX_TEST
+#define DETERMINANT_TEST
 
 #include <array>
 #include <ostream>
@@ -26,6 +27,17 @@ void print_eo_count()
 }
 #endif
 
+using cryptidmath::Matrix, cryptidmath::Vector;
+
+template<Arithmetic Element, size_t r, size_t c>
+bool determinant_test(const Matrix<Element,r,c>& m, Element expected)
+{
+    std::print("{}",m);
+    Element result = m.det();
+    std::println("expected = {}, result = {}", expected, result);
+    std::println("passed: {}", expected == result);
+    return expected == result;
+}
 
 int main()
 {
@@ -42,6 +54,20 @@ int main()
     std::println("2nd column of matrix: {}", m.getColumn(1));
     auto t_m = m.transpose();
     std::println("{}",t_m);
+#endif
+
+#ifdef DETERMINANT_TEST
+    Matrix<int,1,1> m1{5};
+    determinant_test(m1,5);
+    Matrix<int,2,2> m2{1,0,0,1};
+    determinant_test(m2,1);
+    Matrix<int,3,3> m3{
+        1, 2, 3,
+        3, 2, 1,
+        1, 0, 3
+    };
+    determinant_test(m3,-16);
+
 #endif
 
 #ifdef OPERATION_TEST

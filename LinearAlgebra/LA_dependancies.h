@@ -18,6 +18,7 @@ namespace cryptidmath
     constexpr const char    MATRIX_BRACKET_OPEN = '[',
                             MATRIX_BRACKET_CLOSE = ']';
     constexpr const char    *BAD_SIZE_MSG = "vector sizes do not match!";
+    constexpr const char    *NOT_SQUARE_MSG = "Operation requires a square matrix!";
     constexpr const char    *BAD_INDEX_MSG = "index is out of range";
     constexpr const char    *SEPARATOR = ", ";
     constexpr const char    *ERROR_SIZE_COL_MISMATCH = "Mismatch between matrix and a column vector!";
