@@ -12,48 +12,54 @@ namespace cryptidmath
     {
     private:
         std::shared_ptr<std::array<Element,n_rows * m_cols>> data_;
-
+// ROW declaration
         class Row;
     public:
 
-// CONSTRUCTORS
+// MATRIX_CONSTRUCTORS
         Matrix(const Element& value = 0);
         Matrix(const std::initializer_list<Element>& init_list);
         
-// MATRIX getters & setters
+// MATRIX_getters_&_setters
         Element& get(size_t row, size_t column);
         const Element& get(size_t row, size_t column) const;
         void set(size_t row, size_t column, const Element& value);
-        void print(std::ostream& stream = std::cout, bool stack = false) const;
-        bool is_square() const { return n_rows == m_cols; }
 
         Vector<Element,m_cols> getRow(size_t row) const;
         Vector<Element,n_rows> getColumn(size_t col) const;
-// MEMBER OPERATIONS
+// MATRIX_MEMBER_OPERATORS
         Matrix& operator++();
         Matrix operator++(int);
         Matrix& operator--();
         Matrix operator--(int);
 
-// COMMON_MEMBER OPERATIONS
+// MATRIX_COMMON_MEMBER_OPERATIONS
+        void print(std::ostream& stream = std::cout, bool stack = false) const;
+        bool is_square() const { return n_rows == m_cols; }
         Matrix& I();
         Matrix& null();
         Matrix<Element,m_cols,n_rows> transpose() const;
         Element determinant() const;
         Element det() const { return determinant(); }
 
-// ROW CLASS
+// MATRIX_ROW_[]
         Row operator[](size_t row);
         const Row operator[](size_t row) const;
 
     private:
+// MATRIX_PRIVATE
         void ensure_ownership();
         Element det_qrt(size_t depth, size_t left_row, size_t right_row) const;
         Element det_recursive(std::array<bool,m_cols>& mask, size_t depth) const;
 
+// MATRIX_NON_MEMBER_OPERATORS
+// MATRIX_COMMON_NON_MEMBER_OPERATIONS
+// MATRIX_OSTREAM_OVERLOAD
+// MATRIX_FORMAT
     };
 
 
+// MATRIX_CONSTRUCTORS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>::
     Matrix(const Element& value)
@@ -78,27 +84,77 @@ namespace cryptidmath
         }
     }
 
-// CLASS REQUEST
+// ROW definition
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     class Matrix<Element,n_rows,m_cols>::Row
     {
     private:
         const Matrix<Element,n_rows,m_cols>& M_;
         size_t row_;
+// ROW_CONSTRUCTOR
         Row(const Matrix<Element,n_rows,m_cols>& M, size_t row);   
         friend class Matrix;
     public:
+// ROW_MATRIX[]
         Element& operator[](size_t column);
         const Element& operator[](size_t column) const;
+
+// ROW_MEMBER_OPERATORS
+        
+        Row& operator*=(const Element& k);
+        Row& operator/=(const Element& k);
+        Row& operator+=(const Row& other_row);
+        Row& operator-=(const Row& other_row);
     };
 
-// REQUEST CONSTRUCTOR
+// ROW_MEMBER_OPERATORS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator*=(const Element& k)
+    {
+        for (size_t i = row_*m_cols; i < (row_+1)*m_cols; ++i)
+        {
+            (*M_.data_)[i] *= k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator/=(const Element& k)
+    {
+        for (size_t i = row_*m_cols; i < (row_+1)*m_cols; ++i)
+        {
+            (*M_.data_)[i] /= k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator+=(const Row& other_row)
+    {
+        for (size_t i = row_*m_cols, j = other_row.row_*m_cols; i < (row_+1)*m_cols; ++i, ++j)
+        {
+            (*M_.data_)[i] += (*other_row.M_.data_)[j];
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator-=(const Row& other_row)
+    {
+        for (size_t i = row_*m_cols, j = other_row.row_*m_cols; i < (row_+1)*m_cols; ++i, ++j)
+        {
+            (*M_.data_)[i] -= (*other_row.M_.data_)[j];
+        }
+        return *this;
+    }
+
+// ROW_CONSTRUCTOR
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>::
     Row::
     Row(const Matrix<Element,n_rows,m_cols>& M, size_t row):M_(M),row_(row){}   
 
-// MATRIX []
+// MATRIX_ROW[]
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     typename Matrix<Element,n_rows,m_cols>::Row 
     Matrix<Element,n_rows,m_cols>::
@@ -115,7 +171,7 @@ namespace cryptidmath
         return Row(*this,row);
     }
 
-// REQUEST []
+// ROW_MATRIX[]
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Element& Matrix<Element,n_rows,m_cols>::
     Row::operator[](size_t column)
@@ -130,7 +186,7 @@ namespace cryptidmath
         return M_.get(row_,column);
     }
 
-// MATRIX getters and setters
+// MATRIX_getters_and_setters
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     inline Element& Matrix<Element,n_rows,m_cols>::
     get(size_t row, size_t column)
@@ -154,6 +210,7 @@ namespace cryptidmath
         (*data_)[row*m_cols + column] = value;
     }
 
+// MATRIX_COMMON_MEMBER_OPERATIONS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Matrix<Element,n_rows,m_cols>::
     print(std::ostream& stream, bool stack) const
@@ -191,7 +248,6 @@ namespace cryptidmath
         {
             result[i] = get(row,i);
         }
-        //result.set_orientation(VectorOrientation::ROW);
         return result;
     }
 
@@ -206,7 +262,7 @@ namespace cryptidmath
         return result;
     }
 
-// MAKING COPY OF THE DATA
+// MATRIX_PRIVATE
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Matrix<Element,n_rows,m_cols>::ensure_ownership()
     {
@@ -215,7 +271,7 @@ namespace cryptidmath
         }
     }
 
-// MEMBER OPERATORS
+// MATRIX_MEMBER_OPERATORS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>& 
     Matrix<Element,n_rows,m_cols>::
@@ -270,7 +326,7 @@ namespace cryptidmath
         return M;
     }
 
-// COMMON_MEMBER OPERATIONS
+// MATRIX_COMMON_MEMBER_OPERATIONS
 
     // right now it returns the same matrix if the operation cannot be procured
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
@@ -372,7 +428,7 @@ namespace cryptidmath
         return det_recursive(mask,0);
     }
     
-// NONMEMBER OPERATORS:
+// MATRIX_NON_MEMBER_OPERATORS:
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element, n_rows, m_cols> operator+(
         const Matrix<Element, n_rows, m_cols>& matrix,
@@ -444,7 +500,7 @@ namespace cryptidmath
         return result;   
     }
 
-// COMMON_NON_MEMBER OPERATIONS
+// MATRIX_COMMON_NON_MEMBER_OPERATIONS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element, n_rows, m_cols> I(Matrix<Element, n_rows, m_cols> m)
     {
@@ -457,7 +513,7 @@ namespace cryptidmath
         return m.null();
     }
 
-// OSTREAM OVERLOAD
+// MATRIX_OSTREAM_OVERLOAD
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     std::ostream& operator<<(std::ostream& stream, const Matrix<Element,n_rows,m_cols>& Matrix)
     {
@@ -468,7 +524,7 @@ namespace cryptidmath
 
 #include <sstream>
 
-// FORMAT 
+// MATRIX_FORMAT 
 template <Arithmetic Element, size_t n_rows, size_t m_cols>
 struct std::formatter<cryptidmath::Matrix<Element, n_rows, m_cols>> : std::formatter<std::string> 
 {

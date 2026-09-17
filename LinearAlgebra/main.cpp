@@ -1,5 +1,6 @@
 //#define MATRIX_TEST
-#define DETERMINANT_TEST
+//#define DETERMINANT_TEST
+#define ROW_OPERATIONS_TESTS
 
 #include <array>
 #include <ostream>
@@ -41,6 +42,22 @@ bool determinant_test(const Matrix<Element,r,c>& m, Element expected)
 
 int main()
 {
+#ifdef ROW_OPERATIONS_TESTS
+    Matrix<int,3,3> m{
+        1, 2, 3,
+        3, 2, 1,
+        1, 0, 3
+    };
+    std::print("{}",m);
+    m[1] *= 2;
+    std::print("r2 * 2:\n{}",m);
+    m[1] /= 2;
+    std::print("r2 / 2:\n{}",m);
+    m[0] += m[1];
+    std::print("r1 + r2:\n{}",m);
+    m[1] -= m[2];
+    std::print("r2 + r3:\n{}",m);
+#endif
 #ifdef MATRIX_TEST
     cryptidmath::Matrix<int,2,3> m{1,2,3,4,5,6};
     std::cout << m << std::endl;
