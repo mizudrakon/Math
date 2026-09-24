@@ -12,7 +12,7 @@ namespace cryptidmath
     {
     private:
         std::shared_ptr<std::array<Element,n_rows * m_cols>> data_;
-// ROW declaration
+// ROW_definition
         class Row;
     public:
 
@@ -41,6 +41,8 @@ namespace cryptidmath
         Matrix<Element,m_cols,n_rows> transpose() const;
         Element determinant() const;
         Element det() const { return determinant(); }
+        void swap_row(size_t a, size_t b);
+        void swap_row(const Row& a, const Row& b);
 
 // MATRIX_ROW_[]
         Row operator[](size_t row);
@@ -84,7 +86,7 @@ namespace cryptidmath
         }
     }
 
-// ROW definition
+// ROW_definition
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     class Matrix<Element,n_rows,m_cols>::Row
     {
@@ -105,6 +107,8 @@ namespace cryptidmath
         Row& operator/=(const Element& k);
         Row& operator+=(const Row& other_row);
         Row& operator-=(const Row& other_row);
+
+        void swap(const Row& other_row);
     };
 
 // ROW_MEMBER_OPERATORS
@@ -146,6 +150,17 @@ namespace cryptidmath
             (*M_.data_)[i] -= (*other_row.M_.data_)[j];
         }
         return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::Row::swap(const Row& other_row)
+    {
+        for (size_t i{}; i < m_cols; ++i)
+        {
+            Element tmp = (*M_.data_)[row_*m_cols+i];
+            (*M_.data_)[row_*m_cols+i] = (*M_.data_)[other_row.row_*m_cols+i];
+            (*M_.data_)[other_row.row_*m_cols+i] = tmp;
+        }
     }
 
 // ROW_CONSTRUCTOR
@@ -260,6 +275,28 @@ namespace cryptidmath
             result[i] = get(i,col);
         }
         return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::swap_row(size_t a, size_t b)
+    {
+        for (size_t i{}; i < n_rows; ++i)
+        {
+            Element temp = get(a,i);
+            set(a,i,get(b,i));
+            set(b,i,temp);
+        }
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::swap_row(const Row& a, const Row& b)
+    {
+        for (size_t i{}; i < n_rows; ++i)
+        {
+            Element temp = get(a.row_,i);
+            set(a.row_,i,get(b.row_,i));
+            set(b.row_,i,temp);
+        }
     }
 
 // MATRIX_PRIVATE
