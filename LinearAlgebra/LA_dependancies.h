@@ -30,7 +30,6 @@ namespace cryptidmath
         ROW
     };
 
-
     template <Arithmetic Element, size_t size>
     class Vector;
     
