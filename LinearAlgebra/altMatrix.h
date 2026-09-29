@@ -1,0 +1,576 @@
+#ifndef CRYPTID_MATRIX_H
+#define CRYPTID_MATRIX_H
+
+#include "all_matrix.h"
+
+namespace cryptidmath
+{
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    class Matrix
+    {
+    private:
+        std::shared_ptr<std::array<Element,n_rows * m_cols>> data_;
+// ROW_definition
+        class Row;
+    public:
+
+// MATRIX_CONSTRUCTORS
+        Matrix(const Element& value = 0);
+        Matrix(const std::initializer_list<Element>& init_list);
+        
+// MATRIX_getters_&_setters
+        Element& get(size_t row, size_t column);
+        const Element& get(size_t row, size_t column) const;
+        void set(size_t row, size_t column, const Element& value);
+
+        Vector<Element,m_cols> getRow(size_t row) const;
+        Vector<Element,n_rows> getColumn(size_t col) const;
+// MATRIX_MEMBER_OPERATORS
+        Matrix& operator++();
+        Matrix operator++(int);
+        Matrix& operator--();
+        Matrix operator--(int);
+
+// MATRIX_COMMON_MEMBER_OPERATIONS
+        void print(std::ostream& stream = std::cout, bool stack = false) const;
+        bool is_square() const { return n_rows == m_cols; }
+        Matrix& I();
+        Matrix& null();
+        Matrix<Element,m_cols,n_rows> transpose() const;
+        Element determinant() const;
+        Element det() const { return determinant(); }
+        void swap_row(size_t a, size_t b);
+        void swap_row(const Row& a, const Row& b);
+
+// MATRIX_ROW_[]
+        Row operator[](size_t row);
+        const Row operator[](size_t row) const;
+
+    private:
+// MATRIX_PRIVATE
+        void ensure_ownership();
+        Element det_qrt(size_t depth, size_t left_row, size_t right_row) const;
+        Element det_recursive(std::array<bool,m_cols>& mask, size_t depth) const;
+
+// MATRIX_NON_MEMBER_OPERATORS
+// MATRIX_COMMON_NON_MEMBER_OPERATIONS
+// MATRIX_OSTREAM_OVERLOAD
+// MATRIX_FORMAT
+    };
+
+
+// MATRIX_CONSTRUCTORS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::
+    Matrix(const Element& value)
+        :data_(std::make_shared<std::array<Element,n_rows*m_cols>>())
+    {
+        data_->fill(value);
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::
+    Matrix(const std::initializer_list<Element>& init_list)
+        :data_(std::make_shared<std::array<Element,n_rows*m_cols>>())
+    {
+        if (init_list.size() != n_rows*m_cols)
+        {
+            throw std::length_error(BAD_SIZE_MSG);
+        }
+        int i = 0;
+        for (auto& el : init_list)
+        {
+            (*data_)[i++] = el;
+        }
+    }
+
+// ROW_definition
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    class Matrix<Element,n_rows,m_cols>::Row
+    {
+    private:
+        const Matrix<Element,n_rows,m_cols>& M_;
+        size_t row_;
+// ROW_CONSTRUCTOR
+        Row(const Matrix<Element,n_rows,m_cols>& M, size_t row);   
+        friend class Matrix;
+    public:
+// ROW_MATRIX[]
+        Element& operator[](size_t column);
+        const Element& operator[](size_t column) const;
+
+// ROW_MEMBER_OPERATORS
+        
+        Row& operator*=(const Element& k);
+        Row& operator/=(const Element& k);
+        Row& operator+=(const Row& other_row);
+        Row& operator-=(const Row& other_row);
+
+        void swap(const Row& other_row);
+    };
+
+// ROW_MEMBER_OPERATORS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator*=(const Element& k)
+    {
+        for (size_t i = row_*m_cols; i < (row_+1)*m_cols; ++i)
+        {
+            (*M_.data_)[i] *= k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator/=(const Element& k)
+    {
+        for (size_t i = row_*m_cols; i < (row_+1)*m_cols; ++i)
+        {
+            (*M_.data_)[i] /= k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator+=(const Row& other_row)
+    {
+        for (size_t i = row_*m_cols, j = other_row.row_*m_cols; i < (row_+1)*m_cols; ++i, ++j)
+        {
+            (*M_.data_)[i] += (*other_row.M_.data_)[j];
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator-=(const Row& other_row)
+    {
+        for (size_t i = row_*m_cols, j = other_row.row_*m_cols; i < (row_+1)*m_cols; ++i, ++j)
+        {
+            (*M_.data_)[i] -= (*other_row.M_.data_)[j];
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::Row::swap(const Row& other_row)
+    {
+        for (size_t i{}; i < m_cols; ++i)
+        {
+            Element tmp = (*M_.data_)[row_*m_cols+i];
+            (*M_.data_)[row_*m_cols+i] = (*M_.data_)[other_row.row_*m_cols+i];
+            (*M_.data_)[other_row.row_*m_cols+i] = tmp;
+        }
+    }
+
+// ROW_CONSTRUCTOR
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::
+    Row::
+    Row(const Matrix<Element,n_rows,m_cols>& M, size_t row):M_(M),row_(row){}   
+
+// MATRIX_ROW[]
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    typename Matrix<Element,n_rows,m_cols>::Row 
+    Matrix<Element,n_rows,m_cols>::
+    operator[](size_t row)
+    {
+        return Row(*this,row);
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    const typename Matrix<Element,n_rows,m_cols>::Row 
+    Matrix<Element,n_rows,m_cols>::
+    operator[](size_t row) const
+    {
+        return Row(*this,row);
+    }
+
+// ROW_MATRIX[]
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element& Matrix<Element,n_rows,m_cols>::
+    Row::operator[](size_t column)
+    {
+        return const_cast<Matrix&>(M_).get(row_,column);
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    const Element& Matrix<Element,n_rows,m_cols>::
+    Row::operator[](size_t column) const
+    {
+        return M_.get(row_,column);
+    }
+
+// MATRIX_getters_and_setters
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    inline Element& Matrix<Element,n_rows,m_cols>::
+    get(size_t row, size_t column)
+    {
+        ensure_ownership();
+        return (*data_)[row*m_cols + column];
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    inline const Element& Matrix<Element,n_rows,m_cols>::
+    get(size_t row, size_t column) const 
+    {
+        return (*data_)[row*m_cols + column];
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    inline void Matrix<Element,n_rows,m_cols>::
+    set(size_t row, size_t column, const Element& value)
+    {
+        ensure_ownership();
+        (*data_)[row*m_cols + column] = value;
+    }
+
+// MATRIX_COMMON_MEMBER_OPERATIONS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::
+    print(std::ostream& stream, bool stack) const
+    {
+        stream << MATRIX_BRACKET_OPEN;
+        if (stack)
+        {
+            stream << std::endl << SEPARATOR;
+        }
+            for (size_t row = 0; row < n_rows; ++row)
+        {
+            if (row > 0)
+            {
+                stream << SEPARATOR;
+            }
+            stream << MATRIX_BRACKET_OPEN << get(row,0);
+            for (size_t col = 1; col < m_cols; ++col)
+            {
+                stream << SEPARATOR << get(row,col);
+            }
+            stream << MATRIX_BRACKET_CLOSE;
+            if (stack)
+                stream << std::endl;
+        }
+        stream << MATRIX_BRACKET_CLOSE;
+        if (stack)
+            stream << std::endl;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Vector<Element,m_cols> Matrix<Element,n_rows,m_cols>::getRow(size_t row) const
+    {
+        Vector<Element,m_cols> result(0,VectorOrientation::ROW);
+        for (size_t i = 0; i < m_cols; ++i)
+        {
+            result[i] = get(row,i);
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Vector<Element,n_rows> Matrix<Element,n_rows,m_cols>::getColumn(size_t col) const
+    {
+        Vector<Element,n_rows> result;
+        for (size_t i = 0; i < n_rows; ++i)
+        {
+            result[i] = get(i,col);
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::swap_row(size_t a, size_t b)
+    {
+        for (size_t i{}; i < n_rows; ++i)
+        {
+            Element temp = get(a,i);
+            set(a,i,get(b,i));
+            set(b,i,temp);
+        }
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::swap_row(const Row& a, const Row& b)
+    {
+        for (size_t i{}; i < n_rows; ++i)
+        {
+            Element temp = get(a.row_,i);
+            set(a.row_,i,get(b.row_,i));
+            set(b.row_,i,temp);
+        }
+    }
+
+// MATRIX_PRIVATE
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Matrix<Element,n_rows,m_cols>::ensure_ownership()
+    {
+        if (data_.use_count() > 1){
+            data_ = std::make_shared<std::array<Element,n_rows*m_cols>>(*data_);
+        }
+    }
+
+// MATRIX_MEMBER_OPERATORS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator++()
+    {
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            ++e;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols> 
+    Matrix<Element,n_rows,m_cols>::
+    operator++(int)
+    {
+        auto M = *this;
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            e++;
+        }
+        return M;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator--()
+    {
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            --e;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols> 
+    Matrix<Element,n_rows,m_cols>::
+    operator--(int)
+    {
+        auto M = *this;
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            e--;
+        }
+        return M;
+    }
+
+// MATRIX_COMMON_MEMBER_OPERATIONS
+
+    // right now it returns the same matrix if the operation cannot be procured
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& Matrix<Element,n_rows,m_cols>::I()
+    {
+        if (is_square())
+        {
+            for (size_t row_index = 0; row_index < n_rows; ++row_index)
+            {
+                for (size_t col_index = 0; col_index < m_cols; ++col_index)
+                {
+                    set(row_index,col_index,( (row_index == col_index) ? 1 : 0 ));
+                }
+            }
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& Matrix<Element,n_rows,m_cols>::null()
+    {
+        if (is_square())
+        {
+            for (size_t row_index = 0; row_index < n_rows; ++row_index)
+            {
+                for (size_t col_index = 0; col_index < m_cols; ++col_index)
+                {
+                    set(row_index,col_index,0);
+                }
+            }
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,m_cols,n_rows> Matrix<Element,n_rows,m_cols>::transpose() const
+    {
+        Matrix<Element,m_cols,n_rows> t_m;
+        for (size_t row_index = 0; row_index < n_rows; ++row_index)
+        {
+            for (size_t col_index = 0; col_index < m_cols; ++col_index)
+            {
+                t_m.set(col_index,row_index,get(row_index,col_index));
+            }
+        }
+        return t_m;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Matrix<Element,n_rows,m_cols>::det_qrt(size_t depth, size_t left_col, size_t right_col) const 
+    {
+        return get(depth,left_col)*get(depth+1,right_col) - get(depth,right_col)*get(depth+1,left_col);
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Matrix<Element,n_rows,m_cols>::det_recursive(std::array<bool,m_cols>& mask, size_t depth) const
+    {
+        if (depth == n_rows - 2)
+        {
+            size_t left_col = 0;
+            while (!mask[left_col])
+                left_col++;
+            size_t right_col = left_col + 1;
+            while (!mask[right_col])
+                right_col++;
+            return det_qrt(depth,left_col,right_col);
+        }
+        Element sign = 1;
+        Element result = 0;
+        for (size_t i{}; i < m_cols; ++i)
+        {
+            if (!mask[i])
+                continue;
+            mask[i] = false;
+            result += sign * get(depth,i) * det_recursive(mask,depth+1);
+            mask[i] = true;
+            sign *= -1;
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Matrix<Element,n_rows,m_cols>::determinant() const
+    {
+        if (n_rows != m_cols)
+        {
+            throw std::invalid_argument(NOT_SQUARE_MSG);
+        }
+        if (n_rows == 1)
+        {
+            return get(0,0);
+        }
+        if (n_rows == 2)
+        {
+            return det_qrt(0,0,1);
+        }
+        std::array<bool,m_cols> mask;
+        mask.fill(true);
+        return det_recursive(mask,0);
+    }
+    
+// MATRIX_NON_MEMBER_OPERATORS:
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> operator+(
+        const Matrix<Element, n_rows, m_cols>& matrix,
+        const Element& increment
+    )
+    {
+        Matrix result(matrix);
+        for (size_t row = 0; row < n_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                result[row][col] += increment;
+            }
+        }
+        return result;   
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> operator*(
+        const Matrix<Element, n_rows, m_cols>& matrix,
+        const Element& factor
+    )
+    {
+        Matrix result(matrix);
+        for (size_t row = 0; row < n_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                result[row][col] *= factor;
+            }
+        }
+        return result;   
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> operator+(
+        const Matrix<Element, n_rows, m_cols>& matrix_1,
+        const Matrix<Element, n_rows, m_cols>& matrix_2
+    )
+    {
+        Matrix result(matrix_1);
+        for (size_t row = 0; row < n_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                result[row][col] += matrix_2[row][col];
+            }
+        }
+        return result;   
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, size_t Depth>
+    Matrix<Element, n_rows, m_cols> operator*(
+        const Matrix<Element, n_rows, Depth>& matrix_1,
+        const Matrix<Element, Depth, m_cols>& matrix_2
+    )
+    {
+        Matrix<Element, n_rows, m_cols> result;
+        for (size_t row = 0; row < n_rows; ++row)
+        {
+            for (size_t col = 0; col < m_cols; ++col)
+            {
+                for (size_t d = 0; d < Depth; ++d)
+                {
+                    result[row][col] += matrix_1[row][d]*matrix_2[d][col];
+                }
+            }
+        }
+        return result;   
+    }
+
+// MATRIX_COMMON_NON_MEMBER_OPERATIONS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> I(Matrix<Element, n_rows, m_cols> m)
+    {
+        return m.I();
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> null(Matrix<Element, n_rows, m_cols> m)
+    {
+        return m.null();
+    }
+
+// MATRIX_OSTREAM_OVERLOAD
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    std::ostream& operator<<(std::ostream& stream, const Matrix<Element,n_rows,m_cols>& Matrix)
+    {
+        Matrix.print(stream,true);
+        return stream;
+    }
+}
+
+#include <sstream>
+
+// MATRIX_FORMAT 
+template <Arithmetic Element, size_t n_rows, size_t m_cols>
+struct std::formatter<cryptidmath::Matrix<Element, n_rows, m_cols>> : std::formatter<std::string> 
+{
+    template <typename Context>
+    auto format(const cryptidmath::Matrix<Element, n_rows, m_cols>& matrix, Context& context) const
+    {
+        std::ostringstream stream;
+        stream << matrix;
+        return std::format_to(context.out(),"{}",stream.str());
+    }
+};
+
+#endif
