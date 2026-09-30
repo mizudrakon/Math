@@ -13,6 +13,7 @@ namespace cryptidmath
         std::shared_ptr<std::array<Element,n_rows * m_cols>> data_;
 // ROW_definition
         class Row;
+
     public:
 
 // MATRIX_CONSTRUCTORS
@@ -24,8 +25,8 @@ namespace cryptidmath
         const Element& get(size_t row, size_t column) const;
         void set(size_t row, size_t column, const Element& value);
 
-        Vector<Element,m_cols> getRow(size_t row) const;
-        Vector<Element,n_rows> getColumn(size_t col) const;
+        Matrix<Element,1,m_cols> getRow(size_t row) const;
+        Matrix<Element,n_rows,1> getColumn(size_t col) const;
 // MATRIX_MEMBER_OPERATORS
         Matrix& operator++();
         Matrix operator++(int);
@@ -255,23 +256,23 @@ namespace cryptidmath
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    Vector<Element,m_cols> Matrix<Element,n_rows,m_cols>::getRow(size_t row) const
+    Matrix<Element,1,m_cols> Matrix<Element,n_rows,m_cols>::getRow(size_t row) const
     {
-        Vector<Element,m_cols> result(0,VectorOrientation::ROW);
+        Matrix<Element,1,m_cols> result(0);
         for (size_t i = 0; i < m_cols; ++i)
         {
-            result[i] = get(row,i);
+            result[1][i] = get(row,i);
         }
         return result;
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    Vector<Element,n_rows> Matrix<Element,n_rows,m_cols>::getColumn(size_t col) const
+    Matrix<Element,n_rows,1> Matrix<Element,n_rows,m_cols>::getColumn(size_t col) const
     {
-        Vector<Element,n_rows> result;
+        Matrix<Element,n_rows,1> result(0);
         for (size_t i = 0; i < n_rows; ++i)
         {
-            result[i] = get(i,col);
+            result[i][1] = get(i,col);
         }
         return result;
     }
