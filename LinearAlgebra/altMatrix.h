@@ -32,6 +32,14 @@ namespace cryptidmath
         Matrix operator++(int);
         Matrix& operator--();
         Matrix operator--(int);
+    // MATRIX_CONSTANT_MEMBER_OPERATIONS
+        Matrix& operator*=(const Element& k);
+        Matrix& operator/=(const Element& k);
+        Matrix& operator+=(const Element& k);
+        Matrix& operator-=(const Element& k);
+    // MATRIX_MATRIX_MEMBER_OPERATIONS
+        Matrix& operator+=(const Matrix<Element,n_rows,m_cols>& rm);
+        Matrix& operator-=(const Matrix<Element,n_rows,m_cols>& rm);
 
 // MATRIX_COMMON_MEMBER_OPERATIONS
         void print(std::ostream& stream = std::cout, bool stack = false) const;
@@ -363,6 +371,79 @@ namespace cryptidmath
         return M;
     }
 
+    // MATRIX_CONSTANT_MEMBER_OPERATIONS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator*=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            e *= k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator/=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            e /= k;
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator+=(const Element& k)
+    {
+        ensure_ownership();
+        for (auto&& e : *data_)
+        {
+            e += k;
+        }
+        return *this;
+    }
+    
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator-=(const Element& k)
+    {
+        this->operator+=(-k);
+    }
+    
+    // MATRIX_MATRIX_MEMBER_OPERATIONS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator+=(const Matrix<Element,n_rows,m_cols>& rm)
+    {
+        for (size_t i{}; i < n_rows*m_cols; ++i)
+        {
+            *data_[i] += *rm.data_[i];
+        }
+        return *this;
+    }
+    
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>& 
+    Matrix<Element,n_rows,m_cols>::
+    operator-=(const Matrix<Element,n_rows,m_cols>& rm)
+    {
+        for (size_t i{}; i < n_rows*m_cols; ++i)
+        {
+            *data_[i] -= *rm.data_[i];
+        }
+        return *this;
+    }
+
 // MATRIX_COMMON_MEMBER_OPERATIONS
 
     // right now it returns the same matrix if the operation cannot be procured
@@ -515,6 +596,20 @@ namespace cryptidmath
             }
         }
         return result;   
+    }
+
+    template <Arithmetic Element, size_t size>
+    Element operator*(
+        const Matrix<Element, 1, size>& matrix_1,
+        const Matrix<Element, size, 1>& matrix_2
+    )
+    {
+        Element result{};
+        for (size_t i{}; i < size; ++i)
+        {
+            result += matrix_1[0][i] * matrix_2[i][0];
+        }
+        return result;
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols, size_t Depth>
