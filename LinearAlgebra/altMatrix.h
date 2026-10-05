@@ -27,6 +27,7 @@ namespace cryptidmath
 
         Matrix<Element,1,m_cols> getRow(size_t row) const;
         Matrix<Element,n_rows,1> getColumn(size_t col) const;
+
 // MATRIX_MEMBER_OPERATORS
         Matrix& operator++();
         Matrix operator++(int);
@@ -40,10 +41,15 @@ namespace cryptidmath
     // MATRIX_MATRIX_MEMBER_OPERATIONS
         Matrix& operator+=(const Matrix<Element,n_rows,m_cols>& rm);
         Matrix& operator-=(const Matrix<Element,n_rows,m_cols>& rm);
+    
+// MATRIX_SHAPE_TESTS
+        bool is_square() const { return n_rows == m_cols; }
+        bool is_row() const { return n_rows == 1; }
+        bool is_column() const { return m_cols == 1; }
+        MatrixType type() const;
 
 // MATRIX_COMMON_MEMBER_OPERATIONS
         void print(std::ostream& stream = std::cout, bool stack = false) const;
-        bool is_square() const { return n_rows == m_cols; }
         Matrix& I();
         Matrix& null();
         Matrix<Element,m_cols,n_rows> transpose() const;
@@ -231,6 +237,15 @@ namespace cryptidmath
     {
         ensure_ownership();
         (*data_)[row*m_cols + column] = value;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    MatrixType Matrix<Element,n_rows,m_cols>::type() const 
+    {
+        if (is_square) return MatrixType::SQUARE;
+        if (is_column) return MatrixType::COLUMN;
+        if (is_row) return MatrixType::ROW;
+        return MatrixType::OTHER;
     }
 
 // MATRIX_COMMON_MEMBER_OPERATIONS
