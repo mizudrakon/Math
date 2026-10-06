@@ -17,10 +17,14 @@ int main()
     // COL * ROW -> MATRIX
     std::println("{}*{}: {}",colv2,rowv2,colv2*rowv2);
     //rowv2 *= colv2;
-    
+    std::println("Working on a matrix:"); 
     auto m = colv1*rowv1;
     std::println("{}",m);
 //    std::println("{}",m[1]);
+    m.swap_row(0,2);
+    m[1] -= 3*m[2];
+    std::println("{}",m);
+
 
 // we need print row and operations with rows
 

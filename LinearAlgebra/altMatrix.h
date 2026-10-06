@@ -72,6 +72,7 @@ namespace cryptidmath
 // MATRIX_COMMON_NON_MEMBER_OPERATIONS
 // MATRIX_OSTREAM_OVERLOAD
 // MATRIX_FORMAT
+// OPERATOR*_k_ROW
     };
 
 
@@ -120,7 +121,11 @@ namespace cryptidmath
         Row& operator*=(const Element& k);
         Row& operator/=(const Element& k);
         Row& operator+=(const Row& other_row);
+        Row& operator+=(const Matrix<Element,1,m_cols>& row_vector);
         Row& operator-=(const Row& other_row);
+        Row& operator-=(const Matrix<Element,1,m_cols>& row_vector);
+        
+        friend Matrix<Element,1,m_cols> operator*(const Element& k, const Row& other_row);
 
         void swap(const Row& other_row);
     };
@@ -134,6 +139,18 @@ namespace cryptidmath
             (*M_.data_)[i] *= k;
         }
         return *this;
+    }
+
+    // OPERATOR*_k_ROW
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,1,m_cols> operator*(const Element& k, const typename Matrix<Element,n_rows,m_cols>::Row& other_row)
+    {
+        Matrix<Element,1,m_cols> result{};
+        for (size_t i{}, j = other_row.row_*m_cols; i < m_cols; ++i, ++j)
+        {
+            result[0][i] == k*(other_row.M_.data_)[j]; 
+        }
+        return result;
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
@@ -157,11 +174,31 @@ namespace cryptidmath
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator+=(const Matrix<Element,1,m_cols>& row_vector)
+    {
+        for (size_t i = row_*m_cols, j{}; i < (row_+1)*m_cols; ++i, ++j)
+        {
+            (*M_.data_)[i] += (*row_vector.data_)[j];
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator-=(const Row& other_row)
     {
         for (size_t i = row_*m_cols, j = other_row.row_*m_cols; i < (row_+1)*m_cols; ++i, ++j)
         {
             (*M_.data_)[i] -= (*other_row.M_.data_)[j];
+        }
+        return *this;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator-=(const Matrix<Element,1,m_cols>& row_vector)
+    {
+        for (size_t i = row_*m_cols, j{}; i < (row_+1)*m_cols; ++i, ++j)
+        {
+            (*M_.data_)[i] -= (*row_vector.data_)[j];
         }
         return *this;
     }
