@@ -11,10 +11,10 @@ namespace cryptidmath
     {
     private:
         std::shared_ptr<std::array<Element,n_rows * m_cols>> data_;
-// ROW_definition
-        class Row;
 
     public:
+// ROW_definition
+        class Row;
 
 // MATRIX_CONSTRUCTORS
         Matrix(const Element& value = 0);
@@ -72,7 +72,6 @@ namespace cryptidmath
 // MATRIX_COMMON_NON_MEMBER_OPERATIONS
 // MATRIX_OSTREAM_OVERLOAD
 // MATRIX_FORMAT
-// OPERATOR*_k_ROW
     };
 
 
@@ -125,8 +124,49 @@ namespace cryptidmath
         Row& operator-=(const Row& other_row);
         Row& operator-=(const Matrix<Element,1,m_cols>& row_vector);
         
-        friend Matrix<Element,1,m_cols> operator*(const Element& k, const Row& other_row);
-
+// MULT_OPERATOR_k_ROW
+#ifdef MEMBER_OPkROW
+        friend Matrix<Element,1,m_cols> operator*(const Element& k, const Row& other_row)
+        {
+            Matrix<Element,1,m_cols> result{};
+            for (size_t i{}; i < m_cols; ++i)
+            {
+                result[0][i] = k*other_row.M_[other_row.row_][i];
+            }
+            return result;
+        }
+        friend Matrix<Element,1,m_cols> operator/(const Row& other_row, const Element& k)
+        {
+            Matrix<Element,1,m_cols> result{};
+            for (size_t i{}; i < m_cols; ++i)
+            {
+                result[0][i] = other_row.M_[other_row.row_][i] / k;
+            }
+            return result;
+        }
+        friend Matrix<Element,1,m_cols> operator+(const Row& row1, const Row& row2)
+        {
+            Matrix<Element,1,m_cols> result{};
+            for (size_t i{}; i < m_cols; ++i)
+            {
+                std::cout << i << '<' << m_cols << std::endl;
+                std::cout << row1.M_[row1.row_][i] << '+' << row2.M_[row2.row_][i] << std::endl;
+                result[0][i] = row1.M_[row1.row_][i] + row2.M_[row2.row_][i];
+            }
+            return result;
+        }
+        friend Matrix<Element,1,m_cols> operator-(const Row& row1, const Row& row2)
+        {
+            Matrix<Element,1,m_cols> result{};
+            for (size_t i{}; i < m_cols; ++i)
+            {
+                std::cout << i << '<' << m_cols << std::endl;
+                std::cout << row1.M_[row1.row_][i] << '-' << row2.M_[row2.row_][i] << std::endl;
+                result[0][i] = row1.M_[row1.row_][i] - row2.M_[row2.row_][i];
+            }
+            return result;
+        }
+#endif
         void swap(const Row& other_row);
     };
 
@@ -141,17 +181,20 @@ namespace cryptidmath
         return *this;
     }
 
-    // OPERATOR*_k_ROW
+    // MULT_OPERATOR_k_ROW
+#ifdef NONMEMBER_OPkROW
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,1,m_cols> operator*(const Element& k, const typename Matrix<Element,n_rows,m_cols>::Row& other_row)
     {
         Matrix<Element,1,m_cols> result{};
         for (size_t i{}, j = other_row.row_*m_cols; i < m_cols; ++i, ++j)
         {
-            result[0][i] == k*(other_row.M_.data_)[j]; 
+            result[0][i] = k*(other_row.M_.data_)[j]; 
+            //result[0][i] = k*other_row.M_[other_row.row_][i];
         }
         return result;
     }
+#endif
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator/=(const Element& k)
@@ -176,9 +219,9 @@ namespace cryptidmath
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator+=(const Matrix<Element,1,m_cols>& row_vector)
     {
-        for (size_t i = row_*m_cols, j{}; i < (row_+1)*m_cols; ++i, ++j)
+        for (size_t i = row_*m_cols; i < (row_+1)*m_cols; ++i)
         {
-            (*M_.data_)[i] += (*row_vector.data_)[j];
+            (*M_.data_)[i] += row_vector[0][i];
         }
         return *this;
     }
@@ -198,7 +241,7 @@ namespace cryptidmath
     {
         for (size_t i = row_*m_cols, j{}; i < (row_+1)*m_cols; ++i, ++j)
         {
-            (*M_.data_)[i] -= (*row_vector.data_)[j];
+            (*M_.data_)[i] -= row_vector[0][j];
         }
         return *this;
     }
