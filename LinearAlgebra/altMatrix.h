@@ -219,9 +219,9 @@ namespace cryptidmath
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element,n_rows,m_cols>::Row& Matrix<Element,n_rows,m_cols>::Row::operator+=(const Matrix<Element,1,m_cols>& row_vector)
     {
-        for (size_t i = row_*m_cols; i < (row_+1)*m_cols; ++i)
+        for (size_t i = row_*m_cols, j{}; i < (row_+1)*m_cols; ++i, ++j)
         {
-            (*M_.data_)[i] += row_vector[0][i];
+            (*M_.data_)[i] += row_vector[0][j];
         }
         return *this;
     }

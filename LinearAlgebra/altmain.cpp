@@ -30,7 +30,6 @@ int main()
     std::println("m[0]+5*m[2]\n{}",m);
     auto mr = m[0] - m[1]; 
     std::println("separate test done:{}",mr);
-    // PROBLEM WITH m[2] += m[0] - m[1], BUT NOT auto mr = m[0] - m[1]!!!
     m[2] += m[0] - m[1];
     std::println("m[2]+m[0]+m[1]\n{}",m);
     
