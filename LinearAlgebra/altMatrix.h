@@ -322,9 +322,9 @@ namespace cryptidmath
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     MatrixType Matrix<Element,n_rows,m_cols>::type() const 
     {
-        if (is_square) return MatrixType::SQUARE;
-        if (is_column) return MatrixType::COLUMN;
-        if (is_row) return MatrixType::ROW;
+        if (is_square()) return MatrixType::SQUARE;
+        if (is_column()) return MatrixType::COLUMN;
+        if (is_row()) return MatrixType::ROW;
         return MatrixType::OTHER;
     }
 
@@ -333,10 +333,11 @@ namespace cryptidmath
     void Matrix<Element,n_rows,m_cols>::
     print(std::ostream& stream, bool stack) const
     {
-        stream << MATRIX_BRACKET_OPEN;
+        if (n_rows > 1 || m_cols > 1)
+            stream << MATRIX_BRACKET_OPEN;
         if (stack)
         {
-            stream << std::endl << SEPARATOR;
+            stream << std::endl;
         }
             for (size_t row = 0; row < n_rows; ++row)
         {
@@ -354,7 +355,7 @@ namespace cryptidmath
                 stream << std::endl;
         }
         stream << MATRIX_BRACKET_CLOSE;
-        if (stack)
+        if (stack && (type() == MatrixType::SQUARE || type() == MatrixType::OTHER))
             stream << std::endl;
     }
 
