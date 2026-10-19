@@ -1,6 +1,5 @@
-#include "altMatrix.h"
-//#include "matrix_hierarchy.h"
-
+//#include "altMatrix.h"
+#include "MatrixVectorHierarchy.h"
 #include <print>
 
 using namespace cryptidmath;

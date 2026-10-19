@@ -35,7 +35,7 @@ namespace cryptidmath
     
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    class Matrix;
+    class Matrix final : public NDArray<Element, size_t n_rows, size_t m_cols>;
 }
 
 

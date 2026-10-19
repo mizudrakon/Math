@@ -1,7 +1,6 @@
 #ifndef CRYPTID_NDARRAY_H
 #define CRYPTID_NDARRAY_H
 
-#endif
 
 #include "matrix_hierarchy.h"
 
@@ -9,7 +8,7 @@ namespace cryptidmath
 {
 
 // NDARRAY_DEFINITION
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
     class NDArray 
     {
     protected:
@@ -25,26 +24,25 @@ namespace cryptidmath
         void set(size_t row, size_t column, const Element& value);
 
 // NDARRAY_MEMBER_OPERATORS
-        NDArray& operator++();
-        NDArray operator++(int);
-        NDArray& operator--();
-        NDArray operator--(int);
+        Derived& operator++();
+        Derived operator++(int);
+        Derived& operator--();
+        Derived operator--(int);
     // NDARRAY_CONSTANT_MEMBER_OPERATIONS
-        NDArray& operator*=(const Element& k);
-        NDArray& operator/=(const Element& k);
-        NDArray& operator+=(const Element& k);
-        NDArray& operator-=(const Element& k);
+        Derived& operator*=(const Element& k);
+        Derived& operator/=(const Element& k);
+        Derived& operator+=(const Element& k);
+        Derived& operator-=(const Element& k);
     // NDARRAY_NDARRAY_MEMBER_OPERATIONS
-        NDArray& operator+=(const NDArray<Element,n_rows,m_cols>& rm);
-        NDArray& operator-=(const NDArray<Element,n_rows,m_cols>& rm);
+        Derived& operator+=(const Derived& rm);
+        Derived& operator-=(const Derived& rm);
 
 // NDARRAY_SHAPE_TESTS
         virtual bool is_square() const = 0;
         virtual bool is_row() const = 0;
         virtual bool is_column() const = 0;
         NDArrayType type() const = 0;
-        NDArray& null();
-        virtual NDArray<Element,m_cols,n_rows> transpose() const = 0;
+        Derived& null();
 
 // NDARRAY_COMMON_MEMBER_OPERATIONS
         virtual void print(std::ostream& stream = std::cout, bool stack = false) const = 0;
@@ -58,16 +56,16 @@ namespace cryptidmath
 
 
 // NDARRAY_CONSTRUCTORS
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    NDArray<Element,n_rows,m_cols,Derived>::
     NDArray(const Element& value)
         :data_(std::make_shared<std::array<Element,n_rows*m_cols>>())
     {
         data_->fill(value);
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    NDArray<Element,n_rows,m_cols,Derived>::
     NDArray(const std::initializer_list<Element>& init_list)
         :data_(std::make_shared<std::array<Element,n_rows*m_cols>>())
     {
@@ -83,23 +81,23 @@ namespace cryptidmath
     }
 
 // NDARRAY_getters_and_setters
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    inline Element& NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    inline Element& NDArray<Element,n_rows,m_cols,Derived>::
     get(size_t row, size_t column)
     {
         ensure_ownership();
         return (*data_)[row*m_cols + column];
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    inline const Element& NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    inline const Element& NDArray<Element,n_rows,m_cols,Derived>::
     get(size_t row, size_t column) const 
     {
         return (*data_)[row*m_cols + column];
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    inline void NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    inline void NDArray<Element,n_rows,m_cols,Derived>::
     set(size_t row, size_t column, const Element& value)
     {
         ensure_ownership();
@@ -107,9 +105,9 @@ namespace cryptidmath
     }
 
 // NDARRAY_MEMBER_OPERATORS
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator++()
     {
         ensure_ownership();
@@ -120,9 +118,9 @@ namespace cryptidmath
         return *this;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols> 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator++(int)
     {
         auto M = *this;
@@ -134,9 +132,9 @@ namespace cryptidmath
         return M;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator--()
     {
         ensure_ownership();
@@ -147,9 +145,9 @@ namespace cryptidmath
         return *this;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols> 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator--(int)
     {
         auto M = *this;
@@ -162,9 +160,9 @@ namespace cryptidmath
     }
 
     // NDARRAY_CONSTANT_MEMBER_OPERATIONS
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator*=(const Element& k)
     {
         ensure_ownership();
@@ -175,9 +173,9 @@ namespace cryptidmath
         return *this;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator/=(const Element& k)
     {
         ensure_ownership();
@@ -188,9 +186,9 @@ namespace cryptidmath
         return *this;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator+=(const Element& k)
     {
         ensure_ownership();
@@ -201,19 +199,19 @@ namespace cryptidmath
         return *this;
     }
     
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
     operator-=(const Element& k)
     {
         this->operator+=(-k);
     }
     
     // NDARRAY_NDARRAY_MEMBER_OPERATIONS
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
-    operator+=(const NDArray<Element,n_rows,m_cols>& rm)
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
+    operator+=(const Derived& rm)
     {
         for (size_t i{}; i < n_rows*m_cols; ++i)
         {
@@ -222,10 +220,10 @@ namespace cryptidmath
         return *this;
     }
     
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& 
-    NDArray<Element,n_rows,m_cols>::
-    operator-=(const NDArray<Element,n_rows,m_cols>& rm)
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& 
+    NDArray<Element,n_rows,m_cols,Derived>::
+    operator-=(const Derived& rm)
     {
         for (size_t i{}; i < n_rows*m_cols; ++i)
         {
@@ -234,8 +232,8 @@ namespace cryptidmath
         return *this;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    NDArray<Element,n_rows,m_cols>& NDArray<Element,n_rows,m_cols>::null()
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived& NDArray<Element,n_rows,m_cols,Derived>::null()
     {
         if (is_square())
         {
@@ -252,8 +250,8 @@ namespace cryptidmath
 
 
 // NDARRAY_PRIVATE
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    void NDArray<Element,n_rows,m_cols>::ensure_ownership()
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    void NDArray<Element,n_rows,m_cols,Derived>::ensure_ownership()
     {
         if (data_.use_count() > 1){
             data_ = std::make_shared<std::array<Element,n_rows*m_cols>>(*data_);
@@ -264,11 +262,11 @@ namespace cryptidmath
 // MATRIX_SECTION
 // MATRIX_DEFINITION
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    class Matrix : public NDArray
+    class Matrix final : public NDArray<Element,n_rows,m_cols,Matrix<Element,n_rows,m_cols>>
     {
-        using NDArray::NDArray;
+        using Mother = NDArray<Element,n_rows,m_cols,Matrix<Element,n_rows,m_cols>>;
     public:
-    
+        using Mother::Mother;
 // ROW_definition
         class Row;
 
@@ -317,7 +315,7 @@ namespace cryptidmath
         Matrix<Element,1,m_cols> result(0);
         for (size_t i = 0; i < m_cols; ++i)
         {
-            result[1][i] = get(row,i);
+            result[1][i] = this->get(row,i);
         }
         return result;
     }
@@ -328,7 +326,7 @@ namespace cryptidmath
         Matrix<Element,n_rows,1> result(0);
         for (size_t i = 0; i < n_rows; ++i)
         {
-            result[i][1] = get(i,col);
+            result[i][1] = this->get(i,col);
         }
         return result;
     }
@@ -360,7 +358,7 @@ namespace cryptidmath
         {
             for (size_t col_index = 0; col_index < m_cols; ++col_index)
             {
-                t_m.set(col_index,row_index,get(row_index,col_index));
+                t_m.set(col_index,row_index,this->get(row_index,col_index));
             }
         }
         return t_m;
@@ -369,7 +367,7 @@ namespace cryptidmath
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Element Matrix<Element,n_rows,m_cols>::det_qrt(size_t depth, size_t left_col, size_t right_col) const 
     {
-        return get(depth,left_col)*get(depth+1,right_col) - get(depth,right_col)*get(depth+1,left_col);
+        return this->get(depth,left_col)*this->get(depth+1,right_col) - this->get(depth,right_col)*this->get(depth+1,left_col);
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
@@ -392,7 +390,7 @@ namespace cryptidmath
             if (!mask[i])
                 continue;
             mask[i] = false;
-            result += sign * get(depth,i) * det_recursive(mask,depth+1);
+            result += sign * this->get(depth,i) * det_recursive(mask,depth+1);
             mask[i] = true;
             sign *= -1;
         }
@@ -408,7 +406,7 @@ namespace cryptidmath
         }
         if (n_rows == 1)
         {
-            return get(0,0);
+            return this->get(0,0);
         }
         if (n_rows == 2)
         {
@@ -441,8 +439,8 @@ namespace cryptidmath
     {
         for (size_t i{}; i < n_rows; ++i)
         {
-            Element temp = get(a,i);
-            set(a,i,get(b,i));
+            Element temp = this->get(a,i);
+            set(a,i,this->get(b,i));
             set(b,i,temp);
         }
     }
@@ -452,8 +450,8 @@ namespace cryptidmath
     {
         for (size_t i{}; i < n_rows; ++i)
         {
-            Element temp = get(a.row_,i);
-            set(a.row_,i,get(b.row_,i));
+            Element temp = this->get(a.row_,i);
+            set(a.row_,i,this->get(b.row_,i));
             set(b.row_,i,temp);
         }
     }
@@ -475,17 +473,17 @@ namespace cryptidmath
             {
                 stream << SEPARATOR;
             }
-            stream << MATRIX_BRACKET_OPEN << get(row,0);
+            stream << MATRIX_BRACKET_OPEN << this->get(row,0);
             for (size_t col = 1; col < m_cols; ++col)
             {
-                stream << SEPARATOR << get(row,col);
+                stream << SEPARATOR << this->get(row,col);
             }
             stream << MATRIX_BRACKET_CLOSE;
             if (stack)
                 stream << std::endl;
         }
         stream << MATRIX_BRACKET_CLOSE;
-        if (stack && (type() == MatrixType::SQUARE || type() == MatrixType::OTHER))
+        if (stack && (type() == NDArrayType::SQUARE || type() == NDArrayType::OTHER))
             stream << std::endl;
     }
 
@@ -663,14 +661,14 @@ namespace cryptidmath
     Element& Matrix<Element,n_rows,m_cols>::
     Row::operator[](size_t column)
     {
-        return const_cast<Matrix&>(M_).get(row_,column);
+        return const_cast<Matrix&>(M_).this->get(row_,column);
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     const Element& Matrix<Element,n_rows,m_cols>::
     Row::operator[](size_t column) const
     {
-        return M_.get(row_,column);
+        return M_.this->get(row_,column);
     }
 
 // jump to NDARRAY_DEFINITION
@@ -679,11 +677,11 @@ namespace cryptidmath
 
 // VECTOR_SECTION
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    class Matrix : public NDArray
+    class Vector final : public NDArray<Element,n_rows,m_cols,Vector<Element,n_rows,m_cols>>
     {
-        using NDArray::NDArray;
-    
+        using Mother = NDArray<Element,n_rows,m_cols,Vector<Element,n_rows,m_cols>>;
     public:
+        using Mother::Mother;
 // VECTOR_SHAPE_TESTS
         bool is_square() const override { return false; }
         bool is_row() const override { return n_rows == 1 && m_cols > 1; }
@@ -705,3 +703,4 @@ namespace cryptidmath
 // jump to NDARRAY_DEFINITION
 // jump to ROW_definition
 // jump to MATRIX_DEFINITION
+#endif
