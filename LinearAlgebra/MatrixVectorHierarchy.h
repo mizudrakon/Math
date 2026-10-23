@@ -16,7 +16,7 @@ namespace cryptidmath
     public:
         NDArray(const Element& value = 0);
         NDArray(const std::initializer_list<Element>& init_list);
-        virtual ~NDArray();
+        virtual ~NDArray() = default;
         
 // NDARRAY_getters_&_setters
         Element& get(size_t row, size_t column);
@@ -41,7 +41,7 @@ namespace cryptidmath
         virtual bool is_square() const = 0;
         virtual bool is_row() const = 0;
         virtual bool is_column() const = 0;
-        NDArrayType type() const = 0;
+        virtual NDArrayType type() const = 0;
         Derived& null();
 
 // NDARRAY_COMMON_MEMBER_OPERATIONS
@@ -286,7 +286,7 @@ namespace cryptidmath
 
 // MATRIX_COMMON_MEMBER_OPERATIONS
         Matrix& I();
-        Matrix<Element,m_cols,n_rows> transpose() const override;
+        Matrix<Element,m_cols,n_rows> transpose() const;
         Element determinant() const;
         Element det() const { return determinant(); }
         void swap_row(size_t a, size_t b);
@@ -343,7 +343,7 @@ namespace cryptidmath
             {
                 for (size_t col_index = 0; col_index < m_cols; ++col_index)
                 {
-                    set(row_index,col_index,( (row_index == col_index) ? 1 : 0 ));
+                    this->set(row_index,col_index,( (row_index == col_index) ? 1 : 0 ));
                 }
             }
         }
@@ -661,14 +661,14 @@ namespace cryptidmath
     Element& Matrix<Element,n_rows,m_cols>::
     Row::operator[](size_t column)
     {
-        return const_cast<Matrix&>(M_).this->get(row_,column);
+        return const_cast<Matrix&>(M_).get(row_,column);
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     const Element& Matrix<Element,n_rows,m_cols>::
     Row::operator[](size_t column) const
     {
-        return M_.this->get(row_,column);
+        return M_.get(row_,column);
     }
 
 // jump to NDARRAY_DEFINITION
@@ -682,6 +682,7 @@ namespace cryptidmath
         using Mother = NDArray<Element,n_rows,m_cols,Vector<Element,n_rows,m_cols>>;
     public:
         using Mother::Mother;
+        ~Vector(){}
 // VECTOR_SHAPE_TESTS
         bool is_square() const override { return false; }
         bool is_row() const override { return n_rows == 1 && m_cols > 1; }
@@ -690,7 +691,7 @@ namespace cryptidmath
             if ( is_row ) return NDArrayType::ROW;
             return NDArrayType::COLUMN;
         }
-        NDArray<Element,m_cols,n_rows> transpose() const override;
+        Vector<Element,m_cols,n_rows> transpose() const;
 
 // VECTOR_COMMON_MEMBER_OPERATIONS
         void print(std::ostream& stream = std::cout, bool stack = false) const override;
