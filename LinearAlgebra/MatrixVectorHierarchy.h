@@ -671,6 +671,14 @@ namespace cryptidmath
         return M_.get(row_,column);
     }
 
+// MATRIX_OSTREAM_OVERLOAD
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    std::ostream& operator<<(std::ostream& stream, const Matrix<Element,n_rows,m_cols>& Matrix)
+    {
+        Matrix.print(stream,true);
+        return stream;
+    }
+
 // jump to NDARRAY_DEFINITION
 // jump to ROW_definition
 // jump to MATRIX_DEFINITION
@@ -698,9 +706,74 @@ namespace cryptidmath
         
     };
 
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    void Vector<Element,n_rows,m_cols>::
+    print(std::ostream& stream, bool stack) const
+    {
+        if (n_rows > 1 || m_cols > 1)
+            stream << VECTOR_BRACKET_OPEN;
+        if (stack)
+        {
+            stream << std::endl;
+        }
+            for (size_t row = 0; row < n_rows; ++row)
+        {
+            if (row > 0)
+            {
+                stream << SEPARATOR;
+            }
+            stream << VECTOR_BRACKET_OPEN << this->get(row,0);
+            for (size_t col = 1; col < m_cols; ++col)
+            {
+                stream << SEPARATOR << this->get(row,col);
+            }
+            stream << VECTOR_BRACKET_CLOSE;
+            if (stack)
+                stream << std::endl;
+        }
+        stream << VECTOR_BRACKET_CLOSE;
+        if (stack && (type() == NDArrayType::SQUARE || type() == NDArrayType::OTHER))
+            stream << std::endl;
+    }
+
+// VECTOR_OSTREAM_OVERLOAD
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    std::ostream& operator<<(std::ostream& stream, const Vector<Element,n_rows,m_cols>& Vect)
+    {
+        Vect.print(stream,true);
+        return stream;
+    }
 }
 
 
+#include <sstream>
+
+// MATRIX_FORMAT 
+template <Arithmetic Element, size_t n_rows, size_t m_cols>
+struct std::formatter<cryptidmath::Matrix<Element, n_rows, m_cols>> : std::formatter<std::string> 
+{
+    template <typename Context>
+    auto format(const cryptidmath::Matrix<Element, n_rows, m_cols>& matrix, Context& context) const
+    {
+        std::ostringstream stream;
+        stream << matrix;
+        return std::format_to(context.out(),"{}",stream.str());
+    }
+};
+
+// VECTOR_FORMAT 
+template <Arithmetic Element, size_t n_rows, size_t m_cols>
+struct std::formatter<cryptidmath::Vector<Element, n_rows, m_cols>> : std::formatter<std::string> 
+{
+    template <typename Context>
+    auto format(const cryptidmath::Vector<Element, n_rows, m_cols>& vec, Context& context) const
+    {
+        std::ostringstream stream;
+        stream << vec;
+        return std::format_to(context.out(),"{}",stream.str());
+    }
+};
 // jump to NDARRAY_DEFINITION
 // jump to ROW_definition
 // jump to MATRIX_DEFINITION

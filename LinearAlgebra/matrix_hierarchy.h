@@ -38,6 +38,12 @@ namespace cryptidmath
     template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
     class NDArray;
 
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    class Matrix;
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    class Vector;
+
 }
 
 
