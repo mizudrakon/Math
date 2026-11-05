@@ -47,11 +47,11 @@ int main()
     Matrix<int,3,1> colM = {1,2,3};
     Matrix<int,3,3> sqrM = {1,2,3, 4,5,6, 7,8,9};
 
-    rowM.print(std::cout,true);
-    std::println();
-    colM.print(std::cout,true);
-    std::println();
-    sqrM.print(std::cout,true);
-    std::println();
+    //rowM.print(std::cout,true);
+    std::println("{}",rowM);
+    //colM.print(std::cout,true);
+    std::println("{}",colM);
+    sqrM.print(std::cout,true,true);
+    std::println("\n{}",sqrM);
 #endif
 }

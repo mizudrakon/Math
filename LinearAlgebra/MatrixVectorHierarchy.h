@@ -45,7 +45,7 @@ namespace cryptidmath
         Derived& null();
 
 // NDARRAY_COMMON_MEMBER_OPERATIONS
-        virtual void print(std::ostream& stream = std::cout, bool stack = false) const = 0;
+        virtual void print(std::ostream& stream = std::cout, bool stack = false, bool enumerate = false) const = 0;
         
     protected:
         void ensure_ownership();
@@ -291,7 +291,7 @@ namespace cryptidmath
         Element det() const { return determinant(); }
         void swap_row(size_t a, size_t b);
         void swap_row(const Row& a, const Row& b);
-        void print(std::ostream& stream = std::cout, bool stack = false) const override;
+        void print(std::ostream& stream = std::cout, bool stack = false, bool enumerate = false) const override;
 
 // MATRIX_ROW_[]
         Row operator[](size_t row);
@@ -456,35 +456,56 @@ namespace cryptidmath
         }
     }
 
+    
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Matrix<Element,n_rows,m_cols>::
-    print(std::ostream& stream, bool stack) const
+    print(std::ostream& stream, bool stack, bool enumerate) const
     {
-        if (n_rows > 1 || m_cols > 1)
-            stream << MATRIX_BRACKET_OPEN;
         if (stack)
         {
-            stream << std::endl;
+            stream << MATRIX_BRACKET_OPEN << std::endl;
         }
-            for (size_t row = 0; row < n_rows; ++row)
+        for (size_t row = 0; row < n_rows; ++row)
         {
-            if (row > 0)
+            if (stack)
             {
-                stream << SEPARATOR;
+                if (enumerate)
+                {
+                    size_t enum_indent = 0;
+                    size_t n_r = n_rows; 
+                    size_t r = row;
+                    while (n_r / 10 > 0)
+                    {
+                        enum_indent++;
+                        n_r /= 10;
+                    }
+                    while (r / 10 > 0)
+                    {
+                        enum_indent--;
+                        r /= 10;
+                    }
+                    for (size_t i = 0; i < enum_indent; ++i)
+                        stream << ' ';
+                    stream << '.' << row;
+                }
+                else
+                {
+                    stream << SEPARATOR;
+                }   
+                stream << INDENT;
             }
             stream << MATRIX_BRACKET_OPEN << this->get(row,0);
             for (size_t col = 1; col < m_cols; ++col)
             {
-                stream << SEPARATOR << this->get(row,col);
+                stream << SEPARATOR << INDENT << this->get(row,col);
             }
             stream << MATRIX_BRACKET_CLOSE;
             if (stack)
                 stream << std::endl;
         }
-        stream << MATRIX_BRACKET_CLOSE;
-        if (stack && (type() == NDArrayType::SQUARE || type() == NDArrayType::OTHER))
-            stream << std::endl;
+        if (stack)
+            stream << MATRIX_BRACKET_CLOSE;
     }
 
 // jump to NDARRAY_DEFINITION
