@@ -301,7 +301,11 @@ namespace cryptidmath
         Element det_qrt(size_t depth, size_t left_row, size_t right_row) const;
         Element det_recursive(std::array<bool,m_cols>& mask, size_t depth) const;
 
-// MATRIX_NON_MEMBER_OPERATORS
+/* MATRIX_NON_MEMBER_OPERATORS
+        Matrix<n,m> opeartor(Matrix<n,m>,Element)
+        Matrix<n,m> operator(Matrix<n,m>,Matrix<n,m>)
+        Matrix<n,m> operator(Matrix<n,d>,Matrix<d,m>)
+*/
 // MATRIX_COMMON_NON_MEMBER_OPERATIONS
 // MATRIX_OSTREAM_OVERLOAD
 // MATRIX_FORMAT
@@ -487,7 +491,7 @@ namespace cryptidmath
                     }
                     for (size_t i = 0; i < enum_indent; ++i)
                         stream << ' ';
-                    stream << '.' << row;
+                    stream << row << '.';
                 }
                 else
                 {

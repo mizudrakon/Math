@@ -46,6 +46,7 @@ int main()
     Matrix<int,1,3> rowM = {1,2,3};
     Matrix<int,3,1> colM = {1,2,3};
     Matrix<int,3,3> sqrM = {1,2,3, 4,5,6, 7,8,9};
+    Matrix<int,13,3> hightM = {1,2,3, 2,3,4, 3,4,5, 4,5,6, 5,6,7, 6,7,8, 7,8,9, 8,9,10, 9,10,11, 10,11,12, 11,12,13, 12,13,14, 13,14,15};
 
     //rowM.print(std::cout,true);
     std::println("{}",rowM);
@@ -53,5 +54,7 @@ int main()
     std::println("{}",colM);
     sqrM.print(std::cout,true,true);
     std::println("\n{}",sqrM);
+    hightM.print(std::cout,true,true);
+    std::println();
 #endif
 }
