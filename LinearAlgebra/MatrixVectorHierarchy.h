@@ -248,6 +248,48 @@ namespace cryptidmath
         return *this;
     }
 
+// NDARRAY_NONMEMBER_OPERATORS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived operator+(Derived ls, const Derived& rs)
+    {
+        ls += rs;
+        return ls;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived operator-(Derived ls, const Derived& rs)
+    {
+        ls -= rs;
+        return ls;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived operator*(Derived ls, const Element& rs)
+    {
+        ls *= rs;
+        return ls;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived operator*(const Element& ls, Derived rs)
+    {
+        rs *= ls;
+        return rs;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived operator/(Derived ls, const Element& rs)
+    {
+        ls /= rs;
+        return ls;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
+    Derived operator/(const Element& ls, Derived rs)
+    {
+        rs /= ls;
+        return rs;
+    }
 
 // NDARRAY_PRIVATE
     template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
@@ -438,6 +480,7 @@ namespace cryptidmath
         }
         return result;   
     }
+
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Matrix<Element,n_rows,m_cols>::swap_row(size_t a, size_t b)
     {
