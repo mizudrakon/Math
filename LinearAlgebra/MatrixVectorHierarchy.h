@@ -52,6 +52,7 @@ namespace cryptidmath
     };
 
 // MATRIX_SECTION
+// ROW_SECTION
 // VECTOR_SECTION
 
 
@@ -284,13 +285,6 @@ namespace cryptidmath
         return ls;
     }
 
-    template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
-    Derived operator/(const Element& ls, Derived rs)
-    {
-        rs /= ls;
-        return rs;
-    }
-
 // NDARRAY_PRIVATE
     template <Arithmetic Element, size_t n_rows, size_t m_cols, typename Derived>
     void NDArray<Element,n_rows,m_cols,Derived>::ensure_ownership()
@@ -344,13 +338,12 @@ namespace cryptidmath
         Element det_recursive(std::array<bool,m_cols>& mask, size_t depth) const;
 
 /* MATRIX_NON_MEMBER_OPERATORS
-        Matrix<n,m> opeartor(Matrix<n,m>,Element)
-        Matrix<n,m> operator(Matrix<n,m>,Matrix<n,m>)
         Matrix<n,m> operator(Matrix<n,d>,Matrix<d,m>)
 */
 // MATRIX_COMMON_NON_MEMBER_OPERATIONS
 // MATRIX_OSTREAM_OVERLOAD
 // MATRIX_FORMAT
+// ROW_SECTION
     };
 
 
@@ -464,18 +457,35 @@ namespace cryptidmath
     }
     
 // MATRIX_NON_MEMBER_OPERATORS:
+/*
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    Matrix<Element, n_rows, m_cols> operator+(
-        const Matrix<Element, n_rows, m_cols>& matrix,
-        const Element& increment
+    Element operator*(
+        const Matrix<Element, 1, m_cols>& ls,
+        const Matrix<Element, n_rows, 1>& rs
     )
     {
-        Matrix result(matrix);
+        Element result{};
+        for (size_t i = 0; i < n_rows; ++i)
+        {
+            result += ls[1][i]*rs[i][1];
+        }
+    }
+*/
+    template <Arithmetic Element, size_t n_rows, size_t m_cols, size_t Depth>
+    Matrix<Element, n_rows, m_cols> operator*(
+        const Matrix<Element, n_rows, Depth>& ls,
+        const Matrix<Element, Depth, m_cols>& rs
+    )
+    {
+        Matrix<Element, n_rows, m_cols> result;
         for (size_t row = 0; row < n_rows; ++row)
         {
             for (size_t col = 0; col < m_cols; ++col)
             {
-                result[row][col] += increment;
+                for (size_t d = 0; d < Depth; ++d)
+                {
+                    result[row][col] += ls[row][d]*rs[d][col];
+                }
             }
         }
         return result;   
@@ -487,22 +497,16 @@ namespace cryptidmath
         for (size_t i{}; i < n_rows; ++i)
         {
             Element temp = this->get(a,i);
-            set(a,i,this->get(b,i));
-            set(b,i,temp);
+            this->set(a,i,this->get(b,i));
+            this->set(b,i,temp);
         }
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Matrix<Element,n_rows,m_cols>::swap_row(const Row& a, const Row& b)
     {
-        for (size_t i{}; i < n_rows; ++i)
-        {
-            Element temp = this->get(a.row_,i);
-            set(a.row_,i,this->get(b.row_,i));
-            set(b.row_,i,temp);
-        }
+        this->swap_row(a,b);
     }
-
     
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
@@ -559,6 +563,7 @@ namespace cryptidmath
 // jump to ROW_definition
 // jump to MATRIX_DEFINITION
 
+// ROW_SECTION
 // ROW_definition
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     class Matrix<Element,n_rows,m_cols>::Row
@@ -608,8 +613,6 @@ namespace cryptidmath
             Matrix<Element,1,m_cols> result{};
             for (size_t i{}; i < m_cols; ++i)
             {
-                std::cout << i << '<' << m_cols << std::endl;
-                std::cout << row1.M_[row1.row_][i] << '+' << row2.M_[row2.row_][i] << std::endl;
                 result[0][i] = row1.M_[row1.row_][i] + row2.M_[row2.row_][i];
             }
             return result;
@@ -619,8 +622,6 @@ namespace cryptidmath
             Matrix<Element,1,m_cols> result{};
             for (size_t i{}; i < m_cols; ++i)
             {
-                std::cout << i << '<' << m_cols << std::endl;
-                std::cout << row1.M_[row1.row_][i] << '-' << row2.M_[row2.row_][i] << std::endl;
                 result[0][i] = row1.M_[row1.row_][i] - row2.M_[row2.row_][i];
             }
             return result;
