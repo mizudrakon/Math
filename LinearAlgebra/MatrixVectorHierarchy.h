@@ -457,20 +457,7 @@ namespace cryptidmath
     }
     
 // MATRIX_NON_MEMBER_OPERATORS:
-/*
-    template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    Element operator*(
-        const Matrix<Element, 1, m_cols>& ls,
-        const Matrix<Element, n_rows, 1>& rs
-    )
-    {
-        Element result{};
-        for (size_t i = 0; i < n_rows; ++i)
-        {
-            result += ls[1][i]*rs[i][1];
-        }
-    }
-*/
+
     template <Arithmetic Element, size_t n_rows, size_t m_cols, size_t Depth>
     Matrix<Element, n_rows, m_cols> operator*(
         const Matrix<Element, n_rows, Depth>& ls,
@@ -770,12 +757,99 @@ namespace cryptidmath
         }
         Vector<Element,m_cols,n_rows> transpose() const;
 
+
 // VECTOR_COMMON_MEMBER_OPERATIONS
         void print(std::ostream& stream = std::cout, bool stack = false) const override;
+
+// VECTOR_MEMBER_OPERATORS
+        Element& operator[](size_t idx);
+        const Element& operator[](size_t idx) const;
+// VECTOR_NON_MEMBER_OPERATORS
         
     };
 
+// VECTOR_MEMBER_OPERATORS
 
+// only ACCESS_OPS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element& Vector<Element,n_rows,m_cols>::operator[](size_t idx)
+    {
+        if (is_row())
+            return this->get(1,idx);
+        else
+            return this->get(idx,1);
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    const Element& Vector<Element,n_rows,m_cols>::operator[](size_t idx) const
+    {
+        if (is_row())
+            return this->get(1,idx);
+        else
+            return this->get(idx,1);
+    }
+
+// VECTOR_NON_MEMBER_OPERATORS
+    template <Arithmetic Element, size_t n_rows, size_t depth>
+    Vector<Element,n_rows,1> operator*(const Matrix<Element,n_rows,depth>& transforM, const Vector<Element,depth,1>& vec)
+    {
+        Vector<Element,n_rows,1> result;
+        for (size_t row{}; row < n_rows; ++row)
+        {
+            for (size_t col{}; col < depth; ++col)
+            {
+                result[row][0] += vec[col][0]*transforM[row][col];
+            } 
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t m_cols, size_t depth>
+    Vector<Element,1,m_cols> operator*(const Vector<Element,1,depth>& vec, const Matrix<Element,depth,m_cols>& transforM)
+    {
+        Vector<Element,1,m_cols> result;
+        for (size_t row{}; row < depth; ++row)
+        {
+            for (size_t col{}; col < m_cols; ++col)
+            {
+                result[0][col] += vec[0][col]*transforM[row][col];
+            } 
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t depth>
+    Element operator*(const Vector<Element,1,depth>& left_row_vec, const Vector<Element,depth,1>& right_col_vec)
+    {
+        Element result{};
+        for (size_t i{}; i < depth; ++i)
+        {
+            result += left_row_vec[0][i]*right_col_vec[i][0];
+        }
+        return result;
+    }
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Matrix<Element, n_rows, m_cols> operator*(
+        const Vector<Element, n_rows, 1>& ls,
+        const Vector<Element, 1, m_cols>& rs
+    )
+    {
+        Matrix<Element, n_rows, m_cols> result;
+        for (size_t row = 0; row < n_rows; ++row)
+        {
+            for (size_t row = 0; row < n_rows; ++row)
+            {
+                for (size_t col = 0; col < m_cols; ++col)
+                {
+                    result[row][col] += ls[row][0]*rs[0][col];
+                }
+            }
+        }
+        return result;   
+    }
+
+// VECTOR_COMMON_MEMBER_OPERATIONS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Vector<Element,n_rows,m_cols>::
     print(std::ostream& stream, bool stack) const

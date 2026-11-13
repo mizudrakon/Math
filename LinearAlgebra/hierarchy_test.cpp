@@ -24,13 +24,15 @@ int main()
     // COL * ROW -> MATRIX
     std::println("COL * ROW -> MATRIX");
     std::println("{}*{}: {}",colv2,rowv2,colv2*rowv2);
-    //rowv2 *= colv2;
+    // Matrix from single row and col matrices:
     std::println("Working on a matrix:"); 
     auto m = colv1*rowv1;
     std::println("{}",m);
     std::println("Swapping row 0 and 2");
     m.swap_row(0,2);
     std::println("{}",m);
+    // Row operations
+    std::println("Row operations using [] notation:");
     std::println("m[0]-3*m[2]");
     m[0] -= 3*m[2];
     std::println("{}",m);
@@ -41,6 +43,10 @@ int main()
     std::println("{}",mr);
     m[2] += m[0] - m[1];
     std::println("m[2]+m[0]-m[1]\n{}",m);
+    std::println("m determinant: {}",m.det());
+    auto mt = m.transpose();
+    std::println("m transposed: {}",mt);
+    std::println("m.I(): {}",m.I());
 #endif 
 #ifdef PRINTING_TESTS
     std::println("Basic print with no arguments:");
