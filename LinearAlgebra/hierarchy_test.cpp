@@ -64,6 +64,16 @@ int main()
     auto rowvt = rowv.transpose();
     std::println("inverted row vector:\n{}",rowvt);
     std::println("scalar product row*transposed row:{}",rowv*rowvt);
+    auto tf_rowvt = rcm * rowvt;
+    std::println("{} * {}:\n{}",rcm,rowvt,tf_rowvt);
+    Matrix<int, 4, 3> mx{1,2,0, 2,1,3, 0,3,1, 1,2,3};
+    std::println("mx:\n{} colv:\n{} rowv: {}\n mx*colv:\n{}, rowv*mx:\n{}",mx, colv, rowv, mx*colv, rowv*mx);
+    Matrix<int, 1, 4> rowm{3,4,2,1};
+    Vector<int, 1, 4> rowvm(rowm);
+    std::println("vector from matrix: {}",rowvm);
+    auto sec_row = mx.getRow(1);
+    auto first_col = mx.getColumn(0);
+    std::println("2nd row of mx as vector: {}\n1st column of mx as vector:\n {}",sec_row,first_col);
 #endif
 
 #ifdef PRINTING_TESTS

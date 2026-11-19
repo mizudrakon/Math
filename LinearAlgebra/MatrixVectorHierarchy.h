@@ -308,8 +308,8 @@ namespace cryptidmath
 
 
 // MATRIX_EXTRA_GETTERS_SETTERS
-        Matrix<Element,1,m_cols> getRow(size_t row) const;
-        Matrix<Element,n_rows,1> getColumn(size_t col) const;
+        Vector<Element,1,m_cols> getRow(size_t row) const;
+        Vector<Element,n_rows,1> getColumn(size_t col) const;
 
 // MATRIX_SHAPE_TESTS
         bool is_square() const override { return n_rows == m_cols; }
@@ -349,23 +349,23 @@ namespace cryptidmath
 
 // MATRIX_EXTRA_GETTERS_SETTERS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    Matrix<Element,1,m_cols> Matrix<Element,n_rows,m_cols>::getRow(size_t row) const
+    Vector<Element,1,m_cols> Matrix<Element,n_rows,m_cols>::getRow(size_t row) const
     {
-        Matrix<Element,1,m_cols> result(0);
+        Vector<Element,1,m_cols> result(0);
         for (size_t i = 0; i < m_cols; ++i)
         {
-            result[1][i] = this->get(row,i);
+            result[i] = this->get(row,i);
         }
         return result;
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
-    Matrix<Element,n_rows,1> Matrix<Element,n_rows,m_cols>::getColumn(size_t col) const
+    Vector<Element,n_rows,1> Matrix<Element,n_rows,m_cols>::getColumn(size_t col) const
     {
-        Matrix<Element,n_rows,1> result(0);
+        Vector<Element,n_rows,1> result(0);
         for (size_t i = 0; i < n_rows; ++i)
         {
-            result[i][1] = this->get(i,col);
+            result[i] = this->get(i,col);
         }
         return result;
     }
@@ -746,6 +746,7 @@ namespace cryptidmath
         using Mother = NDArray<Element,n_rows,m_cols,Vector<Element,n_rows,m_cols>>;
     public:
         using Mother::Mother;
+        Vector(const Matrix<Element,n_rows,m_cols>& mx);
         ~Vector(){}
 // VECTOR_SHAPE_TESTS
         bool is_square() const override { return false; }
@@ -768,6 +769,20 @@ namespace cryptidmath
 // VECTOR_NON_MEMBER_OPERATORS
         
     };
+
+// SPECIAL_CONSTRUCTORS
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Vector<Element,n_rows,m_cols>::Vector(const Matrix<Element,n_rows,m_cols>& mx)
+    {
+        this->data_ = std::make_shared<std::array<Element,n_rows*m_cols>>(); 
+        for (size_t row{}; row < n_rows; ++row)
+        {
+            for (size_t col{}; col < m_cols; ++col)            
+            {
+                (*(this->data_))[row*n_rows+col] = mx[row][col];
+            }
+        }
+    }
 
 // VECTOR_MEMBER_OPERATORS
 
@@ -820,11 +835,11 @@ namespace cryptidmath
     Vector<Element,1,m_cols> operator*(const Vector<Element,1,depth>& vec, const Matrix<Element,depth,m_cols>& transforM)
     {
         Vector<Element,1,m_cols> result;
-        for (size_t row{}; row < depth; ++row)
+        for (size_t d{}; d < depth; ++d)
         {
             for (size_t col{}; col < m_cols; ++col)
             {
-                result[0][col] += vec[0][col]*transforM[row][col];
+                result[col] += vec[d]*transforM[d][col];
             } 
         }
         return result;
@@ -857,6 +872,7 @@ namespace cryptidmath
         }
         return result;   
     }
+
 
 // VECTOR_COMMON_MEMBER_OPERATIONS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
