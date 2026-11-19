@@ -69,10 +69,11 @@ int main()
     std::println("mx:\n{} colv:\n{} rowv: {}\n mx*colv:\n{}, rowv*mx:\n{}",mx, colv, rowv, mx*colv, rowv*mx);
     Matrix<int, 1, 4> rowm{3,4,2,1};
     Vector<int, 1, 4> rowvm(rowm);
-    std::println("vector from matrix: {}",rowvm);
+    std::println("vector from matrix rowvm: {}",rowvm);
     auto sec_row = mx.getRow(1);
     auto first_col = mx.getColumn(0);
     std::println("2nd row of mx as vector: {}\n1st column of mx as vector:\n {}",sec_row,first_col);
+    std::println("magnitude of rowvm: {}", rowvm.norm());
 #endif
 
 #ifdef PRINTING_TESTS

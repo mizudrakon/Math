@@ -2,13 +2,12 @@
 #define CRYPTID_MATRIXVECTOR_H
 
 
-//#include <concepts>
 #include <array>
 #include <memory>
 #include <ostream>
 #include <iostream>
-//#include <exception>
 #include <ranges>
+#include <cmath>
 
 #define MEMBER_OPkROW
 //#define NONMEMBER_OPkROW
@@ -812,6 +811,8 @@ namespace cryptidmath
 
 
 // VECTOR_COMMON_MEMBER_OPERATIONS
+        Element norm() const;
+        double direction() const;
         void print(std::ostream& stream = std::cout, bool stack = false, bool enumerate = false) const override;
 
 // VECTOR_MEMBER_OPERATORS
@@ -924,8 +925,25 @@ namespace cryptidmath
         return result;   
     }
 
-
 // VECTOR_COMMON_MEMBER_OPERATIONS
+
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Element Vector<Element,n_rows,m_cols>::norm() const
+    {
+        Element sum{};
+        for (size_t i{}; i < this->size(); ++i)
+        {
+            sum += pow(this->operator[](i),2);
+        }        
+        return sqrt(sum);
+    }
+    
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    double Vector<Element,n_rows,m_cols>::direction() const
+    {
+        return 1;
+    }
+    
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Vector<Element,n_rows,m_cols>::
     print(std::ostream& stream, bool stack, bool enumerate) const
