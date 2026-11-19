@@ -749,17 +749,18 @@ namespace cryptidmath
         ~Vector(){}
 // VECTOR_SHAPE_TESTS
         bool is_square() const override { return false; }
-        bool is_row() const override { return n_rows == 1 && m_cols > 1; }
-        bool is_column() const override { return n_rows > 1 && m_cols == 1; }
+        bool is_row() const override { return (n_rows == 1) && (m_cols > 1); }
+        bool is_column() const override { return (m_cols == 1) && n_rows > 1; }
+        size_t size() const {return is_row() ? m_cols : n_rows; }
         NDArrayType type() const override {
-            if ( is_row ) return NDArrayType::ROW;
+            if ( is_row() ) return NDArrayType::ROW;
             return NDArrayType::COLUMN;
         }
         Vector<Element,m_cols,n_rows> transpose() const;
 
 
 // VECTOR_COMMON_MEMBER_OPERATIONS
-        void print(std::ostream& stream = std::cout, bool stack = false) const override;
+        void print(std::ostream& stream = std::cout, bool stack = false, bool enumerate = false) const override;
 
 // VECTOR_MEMBER_OPERATORS
         Element& operator[](size_t idx);
@@ -770,23 +771,34 @@ namespace cryptidmath
 
 // VECTOR_MEMBER_OPERATORS
 
+    template <Arithmetic Element, size_t n_rows, size_t m_cols>
+    Vector<Element,m_cols,n_rows> Vector<Element,n_rows,m_cols>::transpose() const
+    {
+        Vector<Element,m_cols,n_rows> result;
+        for (size_t i{}; i < this->size(); ++i)
+        {
+            result[i] = this->operator[](i);
+        }
+        return result;
+    }
+
 // only ACCESS_OPS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Element& Vector<Element,n_rows,m_cols>::operator[](size_t idx)
     {
-        if (is_row())
-            return this->get(1,idx);
+        if (this->is_row())
+            return this->get(0,idx);
         else
-            return this->get(idx,1);
+            return this->get(idx,0);
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     const Element& Vector<Element,n_rows,m_cols>::operator[](size_t idx) const
     {
-        if (is_row())
-            return this->get(1,idx);
+        if (this->is_row())
+            return this->get(0,idx);
         else
-            return this->get(idx,1);
+            return this->get(idx,0);
     }
 
 // VECTOR_NON_MEMBER_OPERATORS
@@ -798,7 +810,7 @@ namespace cryptidmath
         {
             for (size_t col{}; col < depth; ++col)
             {
-                result[row][0] += vec[col][0]*transforM[row][col];
+                result[row] += vec[col]*transforM[row][col];
             } 
         }
         return result;
@@ -824,26 +836,23 @@ namespace cryptidmath
         Element result{};
         for (size_t i{}; i < depth; ++i)
         {
-            result += left_row_vec[0][i]*right_col_vec[i][0];
+            result += left_row_vec[i]*right_col_vec[i];
         }
         return result;
     }
 
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Matrix<Element, n_rows, m_cols> operator*(
-        const Vector<Element, n_rows, 1>& ls,
-        const Vector<Element, 1, m_cols>& rs
+        const Vector<Element, n_rows, 1>& left_col,
+        const Vector<Element, 1, m_cols>& right_row
     )
     {
         Matrix<Element, n_rows, m_cols> result;
-        for (size_t row = 0; row < n_rows; ++row)
+        for (size_t row{}; row < left_col.size(); ++row)
         {
-            for (size_t row = 0; row < n_rows; ++row)
+            for (size_t col{}; col < right_row.size(); ++col)
             {
-                for (size_t col = 0; col < m_cols; ++col)
-                {
-                    result[row][col] += ls[row][0]*rs[0][col];
-                }
+                result[row][col] = left_col[row]*right_row[col];
             }
         }
         return result;   
@@ -852,39 +861,59 @@ namespace cryptidmath
 // VECTOR_COMMON_MEMBER_OPERATIONS
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     void Vector<Element,n_rows,m_cols>::
-    print(std::ostream& stream, bool stack) const
+    print(std::ostream& stream, bool stack, bool enumerate) const
     {
-        if (n_rows > 1 || m_cols > 1)
-            stream << VECTOR_BRACKET_OPEN;
-        if (stack)
+        if (stack && is_column())
         {
-            stream << std::endl;
+            stream << VECTOR_BRACKET_OPEN << std::endl;
         }
-            for (size_t row = 0; row < n_rows; ++row)
+        for (size_t row = 0; row < n_rows; ++row)
         {
-            if (row > 0)
+            if (stack && is_column())
             {
-                stream << SEPARATOR;
+                if (enumerate)
+                {
+                    size_t enum_indent = 0;
+                    size_t n_r = n_rows; 
+                    size_t r = row;
+                    while (n_r / 10 > 0)
+                    {
+                        enum_indent++;
+                        n_r /= 10;
+                    }
+                    while (r / 10 > 0)
+                    {
+                        enum_indent--;
+                        r /= 10;
+                    }
+                    for (size_t i = 0; i < enum_indent; ++i)
+                        stream << ' ';
+                    stream << row << '.';
+                }
+                else
+                {
+                    stream << SEPARATOR;
+                }   
+                stream << INDENT;
             }
             stream << VECTOR_BRACKET_OPEN << this->get(row,0);
             for (size_t col = 1; col < m_cols; ++col)
             {
-                stream << SEPARATOR << this->get(row,col);
+                stream << SEPARATOR << INDENT << this->get(row,col);
             }
             stream << VECTOR_BRACKET_CLOSE;
             if (stack)
                 stream << std::endl;
         }
-        stream << VECTOR_BRACKET_CLOSE;
-        if (stack && (type() == NDArrayType::SQUARE || type() == NDArrayType::OTHER))
-            stream << std::endl;
+        if (stack && is_column())
+            stream << VECTOR_BRACKET_CLOSE;
     }
 
 // VECTOR_OSTREAM_OVERLOAD
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     std::ostream& operator<<(std::ostream& stream, const Vector<Element,n_rows,m_cols>& Vect)
     {
-        Vect.print(stream,true);
+        Vect.print(stream,true,true);
         return stream;
     }
 }

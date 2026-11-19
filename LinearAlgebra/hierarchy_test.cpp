@@ -5,7 +5,8 @@
 
 using namespace cryptidmath;
 
-#define MATRIX_OP_TESTS
+#define VECTOR_OPS
+//#define MATRIX_OP_TESTS
 //#define PRINTING_TESTS
 
 int main()
@@ -15,6 +16,7 @@ int main()
     Matrix<int, 1, 3> rowv2{1,1,1};
     Matrix<int, 3, 1> colv1{1,2,3};
     Matrix<int, 3, 1> colv2{1,1,1};
+    Matrix<int, 4, 1> colv3{1,2,3,4};
 
     // ROW * COL -> dot product
     std::println("ROW * COL -> dot product:");
@@ -23,7 +25,7 @@ int main()
 
     // COL * ROW -> MATRIX
     std::println("COL * ROW -> MATRIX");
-    std::println("{}*{}: {}",colv2,rowv2,colv2*rowv2);
+    std::println("{}*{}: {}",colv3,rowv2,colv3*rowv2);
     // Matrix from single row and col matrices:
     std::println("Working on a matrix:"); 
     auto m = colv1*rowv1;
@@ -48,6 +50,22 @@ int main()
     std::println("m transposed: {}",mt);
     std::println("m.I(): {}",m.I());
 #endif 
+#ifdef VECTOR_OPS
+    Vector<int, 1, 4> rowv{1,2,3,4};
+    Vector<int, 3, 1> colv{5,6,7};
+    std::println("row vector of size {}:\n{}",rowv.size(),rowv);
+    std::println("col vector of size {}:\n{}",colv.size(),colv);
+    std::println("rowv is a row vector: {}, it's also a column vector: {}", rowv.is_row(), rowv.is_column());
+    std::println("colv is a column vector: {}, it's also a row vector: {}", colv.is_column(), colv.is_row());
+    std::println("print rowv using[]: {}, {}, {}, {}",rowv[0],rowv[1],rowv[2],rowv[3]);
+    
+    auto rcm = colv*rowv;
+    std::println("matrix from vectors col*row:\n{}",rcm);
+    auto rowvt = rowv.transpose();
+    std::println("inverted row vector:\n{}",rowvt);
+    std::println("scalar product row*transposed row:{}",rowv*rowvt);
+#endif
+
 #ifdef PRINTING_TESTS
     std::println("Basic print with no arguments:");
     Matrix<int,2,2> m1={1,2,3,4};
