@@ -826,7 +826,6 @@ namespace cryptidmath
     template <Arithmetic Element, size_t n_rows, size_t m_cols>
     Vector<Element,n_rows,m_cols>::Vector(const Matrix<Element,n_rows,m_cols>& mx)
     {
-        this->data_ = std::make_shared<std::array<Element,n_rows*m_cols>>(); 
         for (size_t row{}; row < n_rows; ++row)
         {
             for (size_t col{}; col < m_cols; ++col)            
